@@ -1,13 +1,126 @@
+
 <meta charset="utf-8">
                             **WIP: Elements of Perl**
                             Stijn Heymans
-                            Revised: 20 August 2019
+                            Published: N/A
+                            Revised: N/A
 
 # Introduction
 
-# Scalar Variables
+# Scalars
+
+## Strings
+
+### Basic Usage
+
+Scalars or scalar values are typically the smallest unit of data type in perl, for example numbers and strings.
+
+Generally, we'll store scalars in variables as follows:
+
+~~~perl
+my $var = 'I am a string';
+~~~
+
+The `my` in this part _declares_ the variable (similar to a `let` in
+Javascript), and `$var` consists of the symbol `$` and the name `var`. The
+latter is one of the things to get used to when switching from
+python/javascript to perl, the symbol `$` hints at how the variable is used or accessed. In
+this case, it declares and initializes a string, which is a scalar, and thus
+the symbol `$` emphasizes that.
+
+You'll later see symbols `@` for array usage and `%` for hash usage (a `hash`
+is python's `dict` or generally a key-value structure such as a `Map` in Java).
+
+Back to strings, you'll from to time want to concatenate 2 strings:
+
+~~~perl
+my $concat = $var . ' and me too.';
+~~~
+
+!!! note
+   _statements_ in perl end with `;` as they do in Java or C++.
+
+
+If you'd like to change `$var` by concatenating something to it, instead of `$var = $var . ' and me too.'` you can do:
+
+~~~perl
+$var .= ' and me too.';
+~~~
+
+You have spotted the single quotes for strings, and are wondering _what about
+double quotes?_. You can use double quotes as well. Good practice is them only
+when you want to _interpolate_ variables in them. For example:
+
+~~~perl
+my $name = 'stijn';
+~~~
+
+Interpolation will now make sure that `$name` in that `$hello` string is always
+_expanded_ to its value. In this case, it will be `my name is stijn`.
+Interpolation will usually lead to cleaner code than concatenation:
+
+~~~perl
+my $name = 'stijn';
+my $hello = "my name is $name";
+my $hello_conc = "my name is " . $name; 
+~~~
+
+Why is it good practice to only use them when you actually want to interpolate variables? Imagine I have 
+
+~~~perl
+my $money = "my password is !$guest";
+~~~
+
+In this case `perl` will try to expand `$guest` which does not exist and will result in warning and an unexpected result in `$money`.
+
+You actually meant:
+
+~~~perl
+my $money = 'my password is !$guest';
+~~~
+
+### Useful built-in Functions
+
+TODO
+
+## Numbers
+
+### Basic Usage
+
+Let's dive into numbers.
+
+~~~perl
+my $numero = 42;
+~~~
+
+Easy enough. We can add numbers:
+
+~~~perl
+my $sum = $numero + 42;
+~~~
+
+which is of course the same as if we would have done:
+
+~~~perl
+my $doubling = 2 * $numero;
+~~~
+
+Similar like in other languages, there is a short hand for `$numero = $numero + 42`:
+
+~~~perl
+$numero += 42;
+~~~
+
+and similarly for other operations.
+
+### Useful built-in Functions
+
+TODO
 
 # Array Variables
+
+
+- TODO: mix array and scalar operations (e.g., with lenght)
 
 # Hash Variables
 
