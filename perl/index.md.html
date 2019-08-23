@@ -65,13 +65,15 @@ my $hello = "my name is $name";
 my $hello_conc = "my name is " . $name; 
 ~~~
 
-Why is it good practice to only use them when you actually want to interpolate variables? Imagine I have 
+Why is it good practice to only use them when you actually want to interpolate
+variables? Imagine I have 
 
 ~~~perl
 my $money = "my password is !$guest";
 ~~~
 
-In this case `perl` will try to expand `$guest` which does not exist and will result in warning and an unexpected result in `$money`.
+In this case `perl` will try to expand `$guest` which does not exist and will
+result in warning and an unexpected result in `$money`.
 
 You actually meant:
 
@@ -79,9 +81,63 @@ You actually meant:
 my $money = 'my password is !$guest';
 ~~~
 
+You can get to individual characters of a string, as is expected from other languages:
+
+~~~perl
+my $string = 'what';
+my $first = $string[0];
+~~~
+
+The kicker is to get the last character of the string:
+
+~~~perl
+my $last = $string[-1];
+~~~
+
 ### Useful built-in Functions
 
-TODO
+#### [`substr`](https://perldoc.perl.org/functions/substr.html)
+
+Extract a substring out of a string. For example, to get a `cat` out of `concatenate`, do:
+
+~~~perl
+my $cat = substr('concatenate', 3, 3);
+~~~
+
+The first `3` is the offset from where to start the substring, the second `3`
+is the length of the substring you want (_cat_ has 3 letters). You'll see this
+pattern occur frequently, an _offset_ followed by a _length_ in the arguments
+of a function.
+
+If you leave off the length, you'll just take the substring until the end of
+the string, for example to get `catenate`:
+
+~~~perl
+my $nonsense_substring = substr('concatenate', 3);
+~~~
+
+#### [`split`](https://perldoc.perl.org/functions/split.html)
+
+Generally, allows to split a string into parts based on a regular expression
+`/REGEXP/`. However, I will just mention the form you'll often spot in the
+wild:
+
+~~~perl
+split //, 'yeah';
+~~~
+
+This will split the string `yeah` into its individual characters because the
+pattern `//` matches _everything_ and returns a list of individual charactesr
+(arrays follow later).
+
+!!! 
+   You'll have spotted `split //, 'yeah'` written without parenthesis. Based on
+   how I wrote `substr` you expected to see `split(//,'yeah')` and you'd been
+   right as well! `perl` is playing loose with parenthesis generally, so for
+   built-in functions you'll often see parenthesis dropped. For functions you
+   write yourself, I suggest to keep parenthesis when invoking them. Life is
+   complicated enough as it is.
+
 
 ## Numbers
 
@@ -115,10 +171,26 @@ and similarly for other operations.
 
 ### Useful built-in Functions
 
-TODO
+I guess this is where I'd give a `sqrt` example, but how often have you used a
+`sqrt` function in your professional code?
+
+Oh, you can `print` them and a good conversion (the `%d` in the below template string) is...`%d`:
+
+~~~perl
+print "The meaning of life is %d", 42;
+~~~
 
 # Array Variables
 
+### Basic Usage
+
+I get headaches when people start about an _array_ is this but a _list_ is this. This is how you create an array of elements `I`, `do`, `not`, `care`:
+
+~~~perl
+my $array = ('I', 'do', 'not', 'care');
+~~~
+
+### Useful built-in Functions
 
 - TODO: mix array and scalar operations (e.g., with lenght)
 
@@ -137,6 +209,18 @@ TODO
 ## With `map`
 
 # Subroutines
+
+# Regular Expressions
+
+We cannot talk about `perl` without regular expressions.
+
+# Constants
+
+I know you miss your `private static final` variables, my dear `java`
+aficianado. For the rest of the world, constants, how do I declare something as
+constant, you can't change it, don't touch it, don't even look at it!?
+
+
 
 # Examples
 
