@@ -96,6 +96,19 @@ my $last = $string[-1];
 
 ### Useful built-in Functions
 
+#### [`print`](https://perldoc.perl.org/functions/print.html)
+
+Printing to `STDOUT` will be mostly useful for debugging the odd statement here and there:
+
+~~~perl
+print "This is a printed string\n";
+~~~
+
+!!!
+   There's an explicit `\n` in that statement; you might be used to a `println`
+   from other languages that puts that `\n` there for you. But `perl` is not
+   putting it there for you.
+
 #### [`substr`](https://perldoc.perl.org/functions/substr.html)
 
 Extract a substring out of a string. For example, to get a `cat` out of `concatenate`, do:
@@ -180,19 +193,113 @@ Oh, you can `print` them and a good conversion (the `%d` in the below template s
 print "The meaning of life is %d", 42;
 ~~~
 
+## `undef`
+
+We talked about scalars like strings and numbers. But what about `null`? `null`
+is a _thing_! Does `perl` has a `null`? Yes, it's `undef`. And where you'll see
+in other languages a lot of null-checks, in `perl`, you'll see a lot of:
+
+~~~perl
+if (defined $x) {
+  # stuff
+}
+~~~
+
+which checks whether `$x` is defined (so is `undef` or not).
+
+What's with the 
+
+~~~perl
+# stuff
+~~~
+
+You guessed it. `#` marks comments: anything
+following it is ignored by the `perl` compiler.
+
 # Array Variables
 
 ### Basic Usage
 
-I get headaches when people start about an _array_ is this but a _list_ is this. This is how you create an array of elements `I`, `do`, `not`, `care`:
+I get headaches when people start about an _array_ is this but a _list_ is
+this. This is how you create an array of elements `I`, `do`, `not`, `care`:
 
 ~~~perl
-my $array = ('I', 'do', 'not', 'care');
+my @array = ('I', 'do', 'not', 'care');
 ~~~
+
+The crucial thing to note is the `@` here for the variable. In contrast to
+other languages like Python or Javascript, `perl` gives you a queue on what
+kind of variable something is. We already saw _scalar_ variables in which you
+can store the lowest unit of _things_. The `@` signififies this is an _array_
+variable and stores a _list of things_. And the wording of _things_ is
+intentionaly. Array variables are list of _things_. So if a list contains a
+variable, that variable will be a _scalar variable_.
+
+I have find this probably the most confusing _thing_ (so I'd store my confusion
+in a scalar).
+
+Let's complicate this slightly more. Try getting the first element of the array `@array`:
+
+~~~perl
+my $first_element = $array[0];
+~~~
+
+The `[0]` part should look famililar, but note that it is `$array` when you use
+`@array` to _access_ the scalar value at the first position (index `0`).
+
+The last element is usually easily retrieved using the `-1` index:
+
+~~~perl
+my $last_element = $array[-1];
+~~~
+
+We can change an element similarly as retrieving. Change the first element of `@array`:
+
+~~~perl
+$array[0] = 'You';
+~~~
+
+I can copy an existing array `@array` to a new array `@copy`:
+
+~~~perl
+my @copy = @array;
+~~~
+
+Note that here I again use `@` for both: I'm creating an array `@copy` and
+copying the array `@array` (I am not referring to the individual elements in
+`@array`: the array is used in a _list_ context).
+
+Note that this is indeed a copy: changing elements in `@copy` will _not_ change
+elements in `@array`.
 
 ### Useful built-in Functions
 
-- TODO: mix array and scalar operations (e.g., with lenght)
+#### Adding and Removing from an Array
+
+##### At Back
+
+##### At Front 
+
+##### In Middle
+
+#### Length of an Array with a detour to contexts
+
+The length of an array is a funny thing. The notion of _context_ (briefly mentioned before) is important in `perl`. For example, assigning an array to a scalar variable, will cause the _length_ of that array to be assigned to the scalar. Indeed, you cannot store an array into a scalar, so what do you store? Well, a reasonable thing to store is the length of that array. So for this:
+
+~~~perl
+my @array = ('hey', 'you');
+my $scalar_something = @array;
+####
+
+we have that `$scalar_something` now contains `2`: the length of `@array`. 
+
+
+TODO: storing `undef` in an array.
+
+
+
+
+
 
 # Hash Variables
 
