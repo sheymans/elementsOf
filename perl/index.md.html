@@ -289,16 +289,23 @@ The length of an array is a funny thing. The notion of _context_ (briefly mentio
 ~~~perl
 my @array = ('hey', 'you');
 my $scalar_something = @array;
-####
+~~~
 
 we have that `$scalar_something` now contains `2`: the length of `@array`. 
 
+This also works the other way: what if you want to store a scalar into a list?
+For example:
 
-TODO: storing `undef` in an array.
+~~~perl
+my $scalar = 'a';
+my @array = $scalar;
+~~~
 
-
-
-
+You're now trying to store a scalar variable `$scalar` into an array variable,
+or in other words, into a _list context_. `perl` will try to make a list out of
+the scalar, and the natural way to do so is by treating your scalar as a list
+with 1 element in it (the scalar). So `@array` will effectively be the list
+`('a')`.
 
 
 # Hash Variables
@@ -328,7 +335,6 @@ aficianado. For the rest of the world, constants, how do I declare something as
 constant, you can't change it, don't touch it, don't even look at it!?
 
 
-
 # Examples
 
 # More
@@ -336,11 +342,6 @@ constant, you can't change it, don't touch it, don't even look at it!?
 We skipped objects and so much more.
 
 # Conclusion
-
-
-
-
-
 
 
 <link rel="stylesheet" href="https://casual-effects.com/markdeep/latest/latex.css?">
