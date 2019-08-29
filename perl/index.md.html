@@ -218,7 +218,7 @@ following it is ignored by the `perl` compiler.
 
 # Array Variables
 
-### Basic Usage
+## Basic Usage
 
 I get headaches when people start about an _array_ is this but a _list_ is
 this. This is how you create an array of elements `I`, `do`, `not`, `care`:
@@ -272,19 +272,72 @@ copying the array `@array` (I am not referring to the individual elements in
 Note that this is indeed a copy: changing elements in `@copy` will _not_ change
 elements in `@array`.
 
-### Useful built-in Functions
+## Useful built-in Functions
 
-#### Adding and Removing from an Array
+### Adding and Removing from Back of an Array
 
-##### At Back
 
-##### At Front 
+You can remove elements from the back/end of an array, using [`pop`](https://perldoc.perl.org/functions/pop.html):
 
-##### In Middle
+~~~perl
+my @array = (4, 5);
+my $last = pop @array;
+~~~
 
-#### Length of an Array with a detour to contexts
+Note that we did not write `pop(@array)` as `pop` is a built-in. What will
+`$last` store? It'll store the last element of `@array`: `5`. What will
+`@array` store? An array with the last element removed: `(4)`.
 
-The length of an array is a funny thing. The notion of _context_ (briefly mentioned before) is important in `perl`. For example, assigning an array to a scalar variable, will cause the _length_ of that array to be assigned to the scalar. Indeed, you cannot store an array into a scalar, so what do you store? Well, a reasonable thing to store is the length of that array. So for this:
+You can add it back by adding it end of array using [`push`](https://perldoc.perl.org/functions/pop.html):
+
+~~~perl
+push @array, 5;
+~~~
+
+Then, `@array` will be `(4, 5)` again. You can also use `push` to append a list:
+
+~~~perl
+push @array, (4, 5);
+~~~
+
+### Adding and Removing from Front of an Array
+
+Sometimes you'd want to add something to the front of an array, and we use the
+very memorizable [`unshift`](https://perldoc.perl.org/functions/unshift.html)
+for that:
+
+~~~perl
+unshift @array, 4;
+~~~
+
+This adds `4` to the front of `@array`. Note that you can also pre-pend lists like that:
+
+~~~perl
+unshift @array, (4, 5)
+~~~
+
+This turns for example, `(6, 7)` into `(4, 5, 6, 7)`. Note that the order is
+preserved (so it does not loop through `(4, 5)` and adds the elements one by
+one)
+
+Similar to how `pop` removes from the back of the list, we have a function to remove something from the start of the list:
+
+~~~perl
+my $first = shift @array;
+~~~
+
+`@array` will be modified after this: the first element is removed and in this
+case we stored it in `$first`. You can imagine
+[`shift`](https://perldoc.perl.org/functions/shift.html) as shifting the array
+to the left and thus dropping of the first element.
+
+### Length of an Array with a detour to contexts
+
+The length of an array is a funny thing. The notion of _context_ (briefly
+mentioned before) is important in `perl`. For example, assigning an array to a
+scalar variable, will cause the _length_ of that array to be assigned to the
+scalar. Indeed, you cannot store an array into a scalar, so what do you store?
+Well, a reasonable thing to store is the length of that array. So for this:
 
 ~~~perl
 my @array = ('hey', 'you');
@@ -323,6 +376,10 @@ with 1 element in it (the scalar). So `@array` will effectively be the list
 ## With `map`
 
 # Subroutines
+
+TODO: talk about call by value for functions (can I change arguments: yes, if I use references)
+
+TODO: talk about why you will see `my $first = shift` without arguments for shift (cause it uses `@_` by default).
 
 # Regular Expressions
 
