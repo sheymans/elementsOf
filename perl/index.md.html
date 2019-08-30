@@ -7,62 +7,66 @@
 
 # Introduction
 
+TODO: Audience, someonew with familiarity with 1, preferably more, programming
+languages. This is not a "how to program" course.
+
 # Scalars
 
 ## Strings
 
 ### Basic Usage
 
-Scalars or scalar values are typically the smallest unit of data type in perl, for example numbers and strings.
+Scalars or scalar values are the smallest unit of data in perl. Numbers and
+strings are scalars.
 
-Generally, we'll store scalars in variables as follows:
+We'll store scalars in variables as follows:
 
 ~~~perl
 my $var = 'I am a string';
 ~~~
 
-The `my` in this part _declares_ the variable (similar to a `let` in
-Javascript), and `$var` consists of the symbol `$` and the name `var`. The
-latter is one of the things to get used to when switching from
-python/javascript to perl, the symbol `$` hints at how the variable is used or accessed. In
-this case, it declares and initializes a string, which is a scalar, and thus
-the symbol `$` emphasizes that.
+!!! note
+   _statements_ in perl end with `;` as they do in Java or C++.
 
-You'll later see symbols `@` for array usage and `%` for hash usage (a `hash`
+The `my` keyword _declares_ the variable (similar to a `let` in Javascript),
+and `$var` consists of the symbol `$` and the name `var`. The use of symbols
+like `$` is something to get used to when switching from python/javascript to
+perl. The symbol `$` hints at how the variable is used or accessed. In this
+case, it declares and initializes a string, which is a scalar, and thus the
+symbol `$` emphasizes that.
+
+You'll later see a symbol `@` for array usage and `%` for hash usage (a `hash`
 is python's `dict` or generally a key-value structure such as a `Map` in Java).
 
-Back to strings, you'll from to time want to concatenate 2 strings:
+Back to strings. A common operation is concatenating 2 strings:
 
 ~~~perl
 my $concat = $var . ' and me too.';
 ~~~
 
-!!! note
-   _statements_ in perl end with `;` as they do in Java or C++.
-
-
-If you'd like to change `$var` by concatenating something to it, instead of `$var = $var . ' and me too.'` you can do:
+If you'd like to change `$var` by concatenating something to it, instead of
+`$var = $var . ' and me too.'` you can do:
 
 ~~~perl
 $var .= ' and me too.';
 ~~~
 
-You have spotted the single quotes for strings, and are wondering _what about
-double quotes?_. You can use double quotes as well. Good practice is them only
-when you want to _interpolate_ variables in them. For example:
-
-~~~perl
-my $name = 'stijn';
-~~~
-
-Interpolation will now make sure that `$name` in that `$hello` string is always
-_expanded_ to its value. In this case, it will be `my name is stijn`.
-Interpolation will usually lead to cleaner code than concatenation:
+Note the single quotes for strings we used. What about double quotes?. You can
+use double quotes as well. Good practice is to use them only when you want to
+_interpolate_ variables in them. For example:
 
 ~~~perl
 my $name = 'stijn';
 my $hello = "my name is $name";
-my $hello_conc = "my name is " . $name; 
+~~~
+
+Interpolation makes sure that `$name` in that `$hello` string is always
+_expanded_ to its value. In this case, it will be `my name is stijn`.
+Interpolation will usually lead to cleaner code than concatenation. Compare the above to:
+
+~~~perl
+my $name = 'stijn';
+my $hello_conc = 'my name is ' . $name; 
 ~~~
 
 Why is it good practice to only use them when you actually want to interpolate
@@ -81,14 +85,15 @@ You actually meant:
 my $money = 'my password is !$guest';
 ~~~
 
-You can get to individual characters of a string, as is expected from other languages:
+You can get individual characters of a string as you'd expect from other languages:
 
 ~~~perl
 my $string = 'what';
 my $first = $string[0];
 ~~~
 
-The kicker is to get the last character of the string:
+The kicker is to get the last character of the string using `-1`, something you
+might know from `Python`:
 
 ~~~perl
 my $last = $string[-1];
@@ -131,7 +136,7 @@ my $nonsense_substring = substr('concatenate', 3);
 
 #### [`split`](https://perldoc.perl.org/functions/split.html)
 
-Generally, allows to split a string into parts based on a regular expression
+`split` splits a string into parts based on a regular expression
 `/REGEXP/`. However, I will just mention the form you'll often spot in the
 wild:
 
@@ -144,7 +149,7 @@ pattern `//` matches _everything_ and returns a list of individual charactesr
 (arrays follow later).
 
 !!! 
-   You'll have spotted `split //, 'yeah'` written without parenthesis. Based on
+   Note the `split //, 'yeah'` without parenthesis. Based on
    how I wrote `substr` you expected to see `split(//,'yeah')` and you'd been
    right as well! `perl` is playing loose with parenthesis generally, so for
    built-in functions you'll often see parenthesis dropped. For functions you
@@ -180,14 +185,14 @@ Similar like in other languages, there is a short hand for `$numero = $numero + 
 $numero += 42;
 ~~~
 
-and similarly for other operations.
+and _pour les_ for other operations _la même chose_.
 
 ### Useful built-in Functions
 
 I guess this is where I'd give a `sqrt` example, but how often have you used a
 `sqrt` function in your professional code?
 
-Oh, you can `print` them and a good conversion (the `%d` in the below template string) is...`%d`:
+Oh, you can `print` numbers and a good conversion (the `%d` in the below template string) is...`%d`:
 
 ~~~perl
 print "The meaning of life is %d", 42;
@@ -195,8 +200,8 @@ print "The meaning of life is %d", 42;
 
 ## `undef`
 
-We talked about scalars like strings and numbers. But what about `null`? `null`
-is a _thing_! Does `perl` has a `null`? Yes, it's `undef`. And where you'll see
+I talked about scalars like strings and numbers. But what about `null`? `null`
+is a _thing_! Does `perl` have a `null`? Yes: `undef`. And where you'll see
 in other languages a lot of null-checks, in `perl`, you'll see a lot of:
 
 ~~~perl
@@ -205,7 +210,7 @@ if (defined $x) {
 }
 ~~~
 
-which checks whether `$x` is defined (so is `undef` or not).
+which checks whether `$x` is defined (so is `$x` `undef` or not).
 
 What's with the 
 
@@ -227,12 +232,12 @@ this. This is how you create an array of elements `I`, `do`, `not`, `care`:
 my @array = ('I', 'do', 'not', 'care');
 ~~~
 
-The crucial thing to note is the `@` here for the variable. In contrast to
-other languages like Python or Javascript, `perl` gives you a queue on what
+Note the `@` symbol prefixing the variable name. In contrast to
+other languages like Python or Javascript, `perl` gives you a hint on what
 kind of variable something is. We already saw _scalar_ variables in which you
-can store the lowest unit of _things_. The `@` signififies this is an _array_
+can store the smallest unit of _things_. The `@` signififies this is an _array_
 variable and stores a _list of things_. And the wording of _things_ is
-intentionaly. Array variables are list of _things_. So if a list contains a
+intentional. Array variables store lists of _things_. So if a list contains the
 variable, that variable will be a _scalar variable_.
 
 I have find this probably the most confusing _thing_ (so I'd store my confusion
@@ -284,11 +289,12 @@ my @array = (4, 5);
 my $last = pop @array;
 ~~~
 
-Note that we did not write `pop(@array)` as `pop` is a built-in. What will
-`$last` store? It'll store the last element of `@array`: `5`. What will
-`@array` store? An array with the last element removed: `(4)`.
+Note that we did not write `pop(@array)` as `pop` is a built-in. We leave
+parenthesis of of built-ins per convention. What will `$last` store? It'll
+store the last element of `@array`: `5`. What will `@array` store after the
+`pop`ping? An array with the last element removed: `(4)`.
 
-You can add it back by adding it end of array using [`push`](https://perldoc.perl.org/functions/pop.html):
+You can add it back by adding it to the end of array using [`push`](https://perldoc.perl.org/functions/pop.html):
 
 ~~~perl
 push @array, 5;
@@ -316,7 +322,7 @@ This adds `4` to the front of `@array`. Note that you can also pre-pend lists li
 unshift @array, (4, 5)
 ~~~
 
-This turns for example, `(6, 7)` into `(4, 5, 6, 7)`. Note that the order is
+This would turn an `@array` that is `(6, 7)` into `(4, 5, 6, 7)`. Note that the order is
 preserved (so it does not loop through `(4, 5)` and adds the elements one by
 one)
 
@@ -329,7 +335,7 @@ my $first = shift @array;
 `@array` will be modified after this: the first element is removed and in this
 case we stored it in `$first`. You can imagine
 [`shift`](https://perldoc.perl.org/functions/shift.html) as shifting the array
-to the left and thus dropping of the first element.
+to the _left_ and thus dropping of the first element.
 
 ### Length of an Array with a detour to contexts
 
