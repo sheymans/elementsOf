@@ -7,7 +7,7 @@
 
 # Introduction
 
-TODO: Audience, someonew with familiarity with 1, preferably more, programming
+TODO: Audience, someone with familiarity with 1, preferably more, programming
 languages. This is not a "how to program" course.
 
 # Scalars
@@ -30,7 +30,7 @@ my $var = 'I am a string';
 
 The `my` keyword _declares_ the variable (similar to a `let` in Javascript),
 and `$var` consists of the symbol `$` and the name `var`. The use of symbols
-like `$` is something to get used to when switching from python/javascript to
+like `$` is something to get used to when switching from python/Javascript to
 perl. The symbol `$` hints at how the variable is used or accessed. In this
 case, it declares and initializes a string, which is a scalar, and thus the
 symbol `$` emphasizes that.
@@ -145,7 +145,7 @@ split //, 'yeah';
 ~~~
 
 This will split the string `yeah` into its individual characters because the
-pattern `//` matches _everything_ and returns a list of individual charactesr
+pattern `//` matches _everything_ and returns a list of individual characters
 (arrays follow later).
 
 !!! 
@@ -235,7 +235,7 @@ my @array = ('I', 'do', 'not', 'care');
 Note the `@` symbol prefixing the variable name. In contrast to
 other languages like Python or Javascript, `perl` gives you a hint on what
 kind of variable something is. We already saw _scalar_ variables in which you
-can store the smallest unit of _things_. The `@` signififies this is an _array_
+can store the smallest unit of _things_. The `@` signifies this is an _array_
 variable and stores a _list of things_. And the wording of _things_ is
 intentional. Array variables store lists of _things_. So if a list contains the
 variable, that variable will be a _scalar variable_.
@@ -249,7 +249,7 @@ Let's complicate this slightly more. Try getting the first element of the array 
 my $first_element = $array[0];
 ~~~
 
-The `[0]` part should look famililar, but note that it is `$array` when you use
+The `[0]` part should look familiar, but note that it is `$array` when you use
 `@array` to _access_ the scalar value at the first position (index `0`).
 
 The last element is usually easily retrieved using the `-1` index:
@@ -309,7 +309,7 @@ push @array, (4, 5);
 ### Adding and Removing from Front of an Array
 
 Sometimes you'd want to add something to the front of an array, and we use the
-very memorizable [`unshift`](https://perldoc.perl.org/functions/unshift.html)
+very memorable [`unshift`](https://perldoc.perl.org/functions/unshift.html)
 for that:
 
 ~~~perl
@@ -367,7 +367,82 @@ with 1 element in it (the scalar). So `@array` will effectively be the list
 `('a')`.
 
 
+### [`reverse`](https://perldoc.perl.org/functions/reverse.html)
+
+We can reverse arrays as follows:
+
+~~~perl
+my @array = (1, 2);
+my @rev = reverse @array;
+~~~
+
+`@rev` will be `(2, 1)` and `@array` will have stayed the same (so `reverse` is
+non-destructive on its argument).
+
+
 # Hash Variables
+
+## Basic Usage
+
+Some variation of a key/value data structure (or `Map`, or `dict`) is common.
+In `perl` they are called a _hash_. A hash _literal_ can be initialized as
+follows:
+
+~~~perl
+my %some_hash = ('name', 'john', 'age', 39);
+~~~
+
+There are a couple of interesting things going on here:
+
+1. we used a new symbol `%` for indicating that `some_hash` is a variable used to store a hash. 
+2. there seems to be no distinction made in syntax between keys and values. We'd expect `'name'` and `'age'` to be keys, and `'john'` and `39` to be values. Instead, this has the same syntax as a literal list. In fact, it _is_ just a list. Let's get back to our _contexts_. We already saw a _list context_ and a _scalar context_. The `%` on the left-hand side of the assignment, indicates a _hash context_ and whereas the right-hand side is indeed a list, we are trying to assign the list to a hash such that effectively we indeed store a hash (i.e, something we can access based on keys `'name'` and `'age'` as we will see in a bit.
+3. The keys `'name'` and `'age'` are strings while the values is a string or a number (`39`). Indeed, the keys of a hash are always strings. The values are less strict and can be any _scalar_. As such we cannot nest hashes by embedding another hash as a value within a hash. At least not without a final concept called _references_ which we'll introduce later. For now, remember that values of a hash are always scalars.
+
+As the list syntax for hashes is obviously confusing, `perl` has a trick (of
+course it has). We can replace certain commands by so-called `fat commas`: `=>`.
+A fat comma `=>` is absolutely the same as a comma for the perl parser, but for
+us mere humans, it makes things a bit more palatable:
+
+~~~perl
+my %some_hash = ('name' => 'john', 'age' => 39);
+~~~
+
+When using the fat arrow notation, you can also leave of the quotes on the keys:
+
+~~~perl
+my %some_hash = (name => 'john', age => 39);
+~~~
+
+We can access values of a hash, using curly braces (`{` `}`):
+
+~~~perl
+my $name = $some_hash{name};
+my $age = $some_hash{age};
+~~~
+
+Note that I did not write `'name'` nor `'age'`: indeed once `%some_hash` is
+establishes as a hash, you can access values by using the keys without quotes
+whether you initialized with quotes keys or not. However, you _could_ have written:
+
+~~~perl
+my $name = $some_hash{'name'};
+my $age = $some_hash{'age'};
+~~~
+
+Same difference. We also used the scalar `$` symbol instead of the hash symbol
+`%` when _accessing_ the hash. In effect, we're accessing a scalar so we use
+`$`. Or differently, `$some_hash{name}` _is_ a scalar (always, but the rule
+that values in hashes have to be scalars) rather than a _hash_, so it makes
+sense to refer to it with `$`.
+
+Changing the value for a key is than as you'd expect:
+
+~~~perl
+$some_hash{name} = 'bill';
+$some_hash{age} = 40;
+~~~
+
+## Useful built-in Functions
 
 # References
 
@@ -394,7 +469,7 @@ We cannot talk about `perl` without regular expressions.
 # Constants
 
 I know you miss your `private static final` variables, my dear `java`
-aficianado. For the rest of the world, constants, how do I declare something as
+aficionado. For the rest of the world, constants, how do I declare something as
 constant, you can't change it, don't touch it, don't even look at it!?
 
 
