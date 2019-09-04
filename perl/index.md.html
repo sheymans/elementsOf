@@ -444,7 +444,128 @@ $some_hash{age} = 40;
 
 ## Useful built-in Functions
 
+### `values`/`keys`
+
+As is usual with map-like structures in programming languages, you can get the
+keys `age` and `name` from the hash:
+
+~~~perl
+my @keys = keys %some_hash
+~~~
+
+Indeed, `@keys` will be the array `('age', 'name')`. Similarly, you can get the
+values `39` and `john` from the hash:
+
+~~~perl
+my @values = values %some_hash
+~~~
+
+Indeed `@values` will be the array `(39, 'john')`. Note that even though we
+defined `%some_hash` using the literal `('name', 'john', 'age', '39')` which
+hints at some _ordering_, neither `values` nor `keys` need to satisfy that
+original order. 
+
 # References
+
+_References_ or the concept that makes nested structures possible. Recall that
+arrays can store lists of scalars and hashes are key-value maps where the key
+needs to be a string and the value needs to be a scalar.
+
+At first sight this restricts us to rather flat data structures, for example, I
+could not directly store a list of hashes. Or a hash that is an index of names
+(the key) to person's addresses (the value, consisting of street, zip code)).
+
+But of course, we can, but we need a new concept for it: the _reference_. To
+some degree the reference is a bit like C/C++ style pointers. It is officially
+a _scalar_ that _points_ to other _things_ (and those other other things could
+be other lists, hashes, or other scalars, and thus also other references).
+
+For example, say we have a reference `$a_ref` (note that references are
+scalars, so here we go with the `$` again) that points to an array `(1, 2, 3)`:
+
+***********************************
+*                                 *
+*   .--------.       .----------. *    
+*   | $a_ref +----->| (1, 2, 3)  |*
+*   '--------'       '----------' *
+***********************************
+
+This now means that we can indeed have a hash with values that are effectively pointing to arrays:
+
+~~~perl
+my $array_value_hash = ('john': $a_ref);
+~~~
+
+I kept a crucial piece to myself though. How did I create that `$a_ref`
+reference to the array `(1, 2, 3)`? Recall that we would create an array
+variable as follows:
+
+~~~perl
+my @array = (1, 2, 3);
+~~~
+
+I can now take a reference to `@array` using `\`:
+
+~~~perl
+my $a_ref = \@array;
+~~~
+
+There's a shorthand for taking a reference to an array _literal_ though:
+
+~~~perl
+my $a_ref = [1, 2, 3];
+~~~
+
+So use square brackets `[ ]` instead of `( )`. Effectively, this:
+
+~~~perl
+my @array = (1, 2, 3);
+my $a_ref = \@array;
+~~~
+
+is the same as:
+
+~~~perl
+my $a_ref = [1, 2, 3];
+~~~
+
+How could I now get values out of that array, given the reference `$a_ref`
+rather than using the `@array`. Well, recall that you could get the first
+element (or change the first element) of `@array`, doing `$array[0]`. We can
+get to the underlying array based on the `$a_ref` reference, by
+_de-referencing_ it (pointers anyone?) using curly brackets `{$a_ref}`. Getting
+the first element based on `$a_ref` can then be done by:
+
+~~~perl
+my $first = ${$a_ref}[0];
+~~~
+
+Similar rule dereferencing rule holds in situations where you'd normally deal with the array itself like when copying:
+
+~~~perl
+my @copy = @array;
+~~~
+
+To make a copy based on the `$a_ref`, you could do:
+
+~~~perl
+my @copy = @{$a_ref};
+~~~
+
+You can see that we just switched out the `array` part in `@array` by the
+dereferenced `{$a_ref}` reference: `@{$a_ref}`.
+
+TODO: change value of original array when having the copy be a copy of the array reference.
+
+TODO: shorthands for ${$} ($$ and `->`).
+
+TODO: references to hashes.
+
+
+
+
+
+
 
 # Conditions
 
@@ -460,7 +581,9 @@ $some_hash{age} = 40;
 
 TODO: talk about call by value for functions (can I change arguments: yes, if I use references)
 
-TODO: talk about why you will see `my $first = shift` without arguments for shift (cause it uses `@_` by default).
+TODO: talk about why you will see `my $first = shift` without arguments for shift (cause it uses `@_` by default).o
+
+TODO: coderefs or subroutine references
 
 # Regular Expressions
 
