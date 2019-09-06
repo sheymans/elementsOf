@@ -384,19 +384,19 @@ non-destructive on its argument).
 
 ## Basic Usage
 
-Some variation of a key/value data structure (or `Map`, or `dict`) is common.
-In `perl` they are called a _hash_. A hash _literal_ can be initialized as
-follows:
+Most programming languages have some variation of a key/value data structure
+(or `Map`, or `dict`).  In `perl` such a key/value store is called a _hash_. A hash _literal_
+can be initialized as follows:
 
 ~~~perl
 my %some_hash = ('name', 'john', 'age', 39);
 ~~~
 
-There are a couple of interesting things going on here:
+Note: 
 
 1. we used a new symbol `%` for indicating that `some_hash` is a variable used to store a hash. 
 2. there seems to be no distinction made in syntax between keys and values. We'd expect `'name'` and `'age'` to be keys, and `'john'` and `39` to be values. Instead, this has the same syntax as a literal list. In fact, it _is_ just a list. Let's get back to our _contexts_. We already saw a _list context_ and a _scalar context_. The `%` on the left-hand side of the assignment, indicates a _hash context_ and whereas the right-hand side is indeed a list, we are trying to assign the list to a hash such that effectively we indeed store a hash (i.e, something we can access based on keys `'name'` and `'age'` as we will see in a bit.
-3. The keys `'name'` and `'age'` are strings while the values is a string or a number (`39`). Indeed, the keys of a hash are always strings. The values are less strict and can be any _scalar_. As such we cannot nest hashes by embedding another hash as a value within a hash. At least not without a final concept called _references_ which we'll introduce later. For now, remember that values of a hash are always scalars.
+3. The keys `'name'` and `'age'` are strings while the values are strings or numbers (`39`). Indeed, the keys of a hash are always strings. The values are less strict and can be any _scalar_. As such we cannot nest hashes by embedding another hash as a value within a hash. At least not without a final concept called _references_ which we'll introduce later. For now, remember that values of a hash are always scalars.
 
 As the list syntax for hashes is obviously confusing, `perl` has a trick (of
 course it has). We can replace certain commands by so-called `fat commas`: `=>`.
@@ -421,8 +421,8 @@ my $age = $some_hash{age};
 ~~~
 
 Note that I did not write `'name'` nor `'age'`: indeed once `%some_hash` is
-establishes as a hash, you can access values by using the keys without quotes
-whether you initialized with quotes keys or not. However, you _could_ have written:
+established as a hash, you can access values by using the keys without quotes
+whether you initialized with quoted keys or not. However, you _could_ have written:
 
 ~~~perl
 my $name = $some_hash{'name'};
@@ -431,7 +431,7 @@ my $age = $some_hash{'age'};
 
 Same difference. We also used the scalar `$` symbol instead of the hash symbol
 `%` when _accessing_ the hash. In effect, we're accessing a scalar so we use
-`$`. Or differently, `$some_hash{name}` _is_ a scalar (always, but the rule
+`$`. Or differently, `$some_hash{name}` _is_ a scalar (always, by the rule
 that values in hashes have to be scalars) rather than a _hash_, so it makes
 sense to refer to it with `$`.
 
@@ -450,14 +450,14 @@ As is usual with map-like structures in programming languages, you can get the
 keys `age` and `name` from the hash:
 
 ~~~perl
-my @keys = keys %some_hash
+my @keys = keys %some_hash;
 ~~~
 
 Indeed, `@keys` will be the array `('age', 'name')`. Similarly, you can get the
 values `39` and `john` from the hash:
 
 ~~~perl
-my @values = values %some_hash
+my @values = values %some_hash;
 ~~~
 
 Indeed `@values` will be the array `(39, 'john')`. Note that even though we
@@ -476,7 +476,7 @@ could not directly store a list of hashes. Or a hash that is an index of names
 (the key) to person's addresses (the value, consisting of street, zip code)).
 
 But of course, we can, but we need a new concept for it: the _reference_. To
-some degree the reference is a bit like C/C++ style pointers. It is officially
+some degree the reference is a bit like C/C++ style pointers. It is 
 a _scalar_ that _points_ to other _things_ (and those other other things could
 be other lists, hashes, or other scalars, and thus also other references).
 
@@ -490,10 +490,10 @@ scalars, so here we go with the `$` again) that points to an array `(1, 2, 3)`:
 *   '--------'       '----------' *
 ***********************************
 
-This now means that we can indeed have a hash with values that are effectively pointing to arrays:
+This now means that we can indeed have a hash with values that are pointing to arrays:
 
 ~~~perl
-my $array_value_hash = ('john': $a_ref);
+my $array_value_hash = (john => $a_ref);
 ~~~
 
 I kept a crucial piece to myself though. How did I create that `$a_ref`
@@ -540,7 +540,7 @@ the first element based on `$a_ref` can then be done by:
 my $first = ${$a_ref}[0];
 ~~~
 
-Similar rule dereferencing rule holds in situations where you'd normally deal with the array itself like when copying:
+A similar dereferencing rule holds in situations where you'd normally deal with the array itself like when copying:
 
 ~~~perl
 my @copy = @array;
@@ -553,7 +553,7 @@ my @copy = @{$a_ref};
 ~~~
 
 You can see that we just switched out the `array` part in `@array` by the
-dereferenced `{$a_ref}` reference: `@{$a_ref}`.
+dereferenced reference: `@{$a_ref}`.
 
 We can of course copy array references and one would expect that if I change a value in the copied array reference I'd be changing the original:
 
@@ -573,8 +573,13 @@ my $copy_ref = $a_ref;
 *                                 *
 ***********************************
 
-If we then change `${$copy_ref}` we'd expect to change the underlying array.
-Indeed both `${$a_ref}` and `${$copy_ref}` will now be equal to `500`:
+If we then change `$copy_ref` we'd expect to change the underlying array:
+
+~~~perl
+${$copy_ref}[0] = 500;
+~~~
+
+Indeed both `${$a_ref}[0]` and `${$copy_ref}[0]` will now be equal to `500`:
 
 ************************************
 *                                  *
@@ -597,7 +602,7 @@ $a_ref->[0];  # use an arrow notation to indicate that `$a_ref` is actually a re
 ~~~
 
 That's that for array references. What about hash references? Similarly to
-array references you can take a a reference by using `\`:
+array references you can take a reference by using `\`:
 
 ~~~perl
 my %hash = (age => 9);
@@ -638,19 +643,6 @@ $hash_ref->{age}
 ~~~
 
 which we will mostly use going forward.
-
-
-
-
-
-
-
-TODO: references to hashes.
-
-
-
-
-
 
 
 # Conditions
