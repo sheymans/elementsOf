@@ -555,9 +555,95 @@ my @copy = @{$a_ref};
 You can see that we just switched out the `array` part in `@array` by the
 dereferenced `{$a_ref}` reference: `@{$a_ref}`.
 
-TODO: change value of original array when having the copy be a copy of the array reference.
+We can of course copy array references and one would expect that if I change a value in the copied array reference I'd be changing the original:
 
-TODO: shorthands for ${$} ($$ and `->`).
+~~~perl
+my $copy_ref = $a_ref;
+~~~
+
+***********************************
+*                                 *
+*   .--------.       .----------. *    
+*   | $a_ref +----->| (1, 2, 3)  |*
+*   '--------'       '----------' *
+*                         ^       *
+*   .-----------.         |       * 
+*   | $copy_ref +--------'        *
+*   '-----------'                 *
+*                                 *
+***********************************
+
+If we then change `${$copy_ref}` we'd expect to change the underlying array.
+Indeed both `${$a_ref}` and `${$copy_ref}` will now be equal to `500`:
+
+************************************
+*                                  *
+*   .--------.       .-----------. *    
+*   | $a_ref +----->| (500, 2, 3) |*
+*   '--------'       '-----------' *
+*                           ^      *
+*   .-----------.           |      * 
+*   | $copy_ref +----------'       *
+*   '-----------'                  *
+*                                  *
+************************************
+
+To always type `${$a_ref}` is not very succinct. But you we can do better. These are all the same:
+
+~~~perl
+${$a_ref}[0]; # what we saw before
+$$a_ref[0];   # 2 consecutive `$` so leave of braces (we'll not use this notation)
+$a_ref->[0];  # use an arrow notation to indicate that `$a_ref` is actually a reference
+~~~
+
+That's that for array references. What about hash references? Similarly to
+array references you can take a a reference by using `\`:
+
+~~~perl
+my %hash = (age => 9);
+my $hash_ref = \%hash;
+~~~
+
+Note again that `$hash_ref` is a scalar and thus indicated with `$`. We can
+thus use this hash reference as values in other hashes or as members of an
+array.
+
+As with arrays there is a shorthand for creating such hash references:
+
+~~~perl
+my $hash_ref = { age => 9 };
+~~~
+
+Namely, use `{ }` instead of `( )`. You will see that frequently and it will
+comfort you as it is similar notation to JSON or Python `dict`s.
+
+Accessing values from hash references is similar. Recall that if you'd want the value `9` of the above `%hash`, you'd do:
+
+~~~perl
+$hash{age};
+~~~
+
+We have a similar _trick_ when you want to get that value via the `$hash_ref`
+where we replace the name `hash` by dereferencing the `{$hash_ref}` that refers
+to it:
+
+~~~perl
+${$hash_ref}{age};
+~~~
+
+Also this form has an easier to read form using an `->` notation:
+
+~~~perl
+$hash_ref->{age}
+~~~
+
+which we will mostly use going forward.
+
+
+
+
+
+
 
 TODO: references to hashes.
 
