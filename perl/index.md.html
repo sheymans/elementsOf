@@ -647,7 +647,91 @@ which we will mostly use going forward.
 
 # Conditions
 
-`if`, `grep`, and `any`, and `first`.
+We all want control, _if_ we only could have it:
+
+~~~perl
+if ( $age == 18 ) {
+  # stuff
+}
+~~~
+
+The syntax for `if` is as you're used to from C, Java, JavaScript, ....
+
+Note the equality test using `==`. Inequality would be tested with `!=`:
+
+~~~perl
+if ( $age != 18 ) {
+  # stuff
+}
+~~~
+
+or by using the negation operator `!` directly:
+
+~~~perl
+if ( !($age == 18) ) {
+  # stuff
+}
+~~~
+
+Note the extra parenthesis. This is needed in this case, indeed `!$age == 18`
+would lead to `!$age` being interpreted first. Since `$age` is a number but `!`
+forces a boolean context, and given that, any number other than `0` is
+considered truth, we have that `$age` is false. And false is never equal to
+`18` so `!$age == 18` would always be false.
+
+Other useful operators are `&&` for logical _and_, `||` for logical _or_.
+
+We have the usual `else`:
+
+~~~perl
+if ( $age == 18 ) {
+  # stuff
+}
+else {
+  # other stuff
+}
+~~~
+
+You can do cases using `elsif`:
+
+~~~perl
+if ( $age == 18 ) {
+  # stuff
+}
+elsif ( $age > 18) {
+  # other stuff
+}
+else {
+  # more stuff
+}
+~~~
+
+Note that it's _not_ `elseif` nor `else if`. It's `elsif`.
+
+`perl` also has the `unless` keyword for the "`if` not" situation. Do not use
+`unless`. It's confusing to all of us. 
+
+Related to a condition is the concept of filtering an array to keep only the
+items that satisfy a certain condition. `perl` has `grep` for that (yes, named
+after that [`grep`](http://linuxcommand.org/lc3_man_pages/grep1.html). 
+
+So say we want to create an array containing only negative numbers:
+
+~~~perl
+my @all_numbers = (9, -7, -6, 5, 4);
+my @negatives = grep { $_ < 0 } @all_numbers;
+~~~
+
+I was able to avoid `$_` for a long time, but no more. `$_` is a scalar
+variable (given away by the `$`). And the `_` is the _"I contain whatever makes
+sense at this point in the code"_. In this case `$_`, will contain, in
+sequence, every number from `@all_numbers`. `grep` will apply the condition `$_
+< 0` and will keep only those numbers that satisfy that condition (and store it
+in `@negatives`).
+
+Thus, `@negatives` will contain `(-7, -6)`.
+
+TODO: `any`, and`first`.
 
 # Looping
 
