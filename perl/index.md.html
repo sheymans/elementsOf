@@ -731,7 +731,82 @@ in `@negatives`).
 
 Thus, `@negatives` will contain `(-7, -6)`.
 
-TODO: `any`, and`first`.
+Say you'd like to find out whether there's _any_ negative number (i.e., is there at least 1 negative number?) in a list `@all_numbers`. You could do this:
+
+~~~perl
+my @all_numbers = (9, -7, -6, 5, 4);
+my @negatives = grep { $_ < 0 } @all_numbers;
+my $contains_negative = @negatives;
+~~~
+
+You first used `grep` to get all negatives, and then you forced the array into
+a scalar and we know that when you force an array into a scalar it will store
+the length of that array. So `$contains_negative` will contain a `0` or
+strictly positive number. We can then use this in a condition:
+
+~~~perl
+if ($contains_negative) {
+  # stuff
+}
+~~~
+
+Indeed, since any non-zero positive number is considered true, this condition
+will be true if there was _any_ negative number.
+
+Besides being slightly involved, this also not as efficient as it could be:
+`grep` collects _all_ negative numbers and where just interested in whether
+there's `1` negative number. In other words, we'd want to short-circuit this.
+We have exactly that functionality in the core module `List::Util` and
+[`any`](https://perldoc.perl.org/List/Util.html#any):
+
+~~~perl
+use List::Util qw(any);
+
+if ( any { $_ < 0 } @all_numbers ) {
+  # stuff
+}
+~~~
+
+You see that `any { $_ < 0 } @all_numbers` returns true if the condition `$_ <
+0` is true for _any_ of the numbers in `@all_numbers`.
+
+I sprung something else on you (you're welcome):
+
+~~~perl
+use List::Util qw(any);
+~~~
+
+You're used to such inclusions of modules/packages/languages (modules in `perl`
+parlance). So `use` announces _I'm making stuff available to use from the
+module `List::Util`_. But what with `qw(any)`?
+
+Well, I did not tell you yet. `any` is a function/subroutine (`subroutine` in
+`perl`) defined in that `List::Util` module, so we're indicating that we'd like
+to import `any` from `List::Util`. But what about `qw`? Well, you essentially
+want to indicate what functions you'd want to include, so you could write a
+literal list of strings: `("any")`. And if you want also the subroutine
+`first`:
+
+~~~perl
+use List::Util ("any", "first");
+~~~
+
+`perl` programmers find double quotes and commans annoying it seemed, so you can write this as:
+
+~~~perl
+use List::Util qw(any first);
+~~~
+
+where `qw` signifies, _hey, these are quoted words_. Or something like that.
+
+We already mentioned `first`: use `first` when you want rather than just `true`
+when there is an element in a list satisfying the condition, you'd like to see
+that first element that matches the condition:
+
+~~~perl
+my @all_numbers = (9, -7, -6, 5, 4);
+my $first_negative = first { $_ < 0 } @all_numbers;
+~~~
 
 # Looping
 
