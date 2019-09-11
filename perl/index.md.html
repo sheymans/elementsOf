@@ -810,9 +810,85 @@ my $first_negative = first { $_ < 0 } @all_numbers;
 
 # Looping
 
-## With `for`
+Besides the usual C-style `for` [syntax](https://perldoc.perl.org/perlsyn.html#For-Loops), I find myself often resorting to:
 
-## With `map`
+~~~perl
+for my $number (@all_numbers) {
+  print "el: $number";
+}
+~~~
+
+Given the above `@all_numbers` this will print: `el: 9 el: -7 el: -6 el: 5 el: 4 `.
+
+The syntax initializes using `my $number` with consecutive numbers from
+`@all_numbers`. Why is there `( )` around `@all_numbers` in that syntax. That
+seems odd. The internet seems to think that the reason is that it's because
+[Larry wants
+it](https://stackoverflow.com/questions/3650000/what-is-the-purpose-of-the-parentheses-in-perls-foreach-statement).
+
+Let's print only negative numbers:
+
+~~~perl
+for my $number (@all_numbers) {
+  if ( $number < 0 ) {
+    print $number;
+  }
+}
+~~~
+
+Say I ask you to only use the condition `$number > 0` (testing for positive numbers) but I'd still like you to print negative numbers:
+
+~~~perl
+for my $number (@all_numbers) {
+  if ( $number > 0 ) {
+    # do nothing
+  }
+  else {
+    print $number;
+  }
+}
+~~~
+
+I'm on a roll so I annoy you even more and ask you, _well, I'd like to see that without an `else`_. You're thinking, well, if there's a way to skip the rest of the loop I can just put the `print` as last statement, I just need to make sure I never reach that last statement for positive numbers. I'd just need to skip to the next iteration of the loop:
+
+~~~perl
+for my $number (@all_numbers) {
+  if ( $number > 0 ) {
+    next;
+  }
+  print $number;
+}
+~~~
+
+You can use `next`. Usually, when using `next` in such a simple case, you'd
+like it to more prominent, so you'd use the postfix notation:
+
+~~~perl
+for my $number (@all_numbers) {
+  next if ( $number > 0 );
+  print $number;
+}
+~~~
+
+For clarify, you can label your for-loops when having such control statements like `next`:
+
+~~~perl
+NUMBER:
+for my $number (@all_numbers) {
+  next NUMBER if ( $number > 0 );
+  print $number;
+}
+~~~
+
+That's often useful when nesting loops.
+
+So you can skip the current iteration, can I just exit the loop? Yes, use
+[last](https://perldoc.perl.org/functions/last.html).
+
+
+TODO: with `map`
+
+
 
 # Subroutines
 
