@@ -886,15 +886,129 @@ So you can skip the current iteration, can I just exit the loop? Yes, use
 [last](https://perldoc.perl.org/functions/last.html).
 
 
-TODO: with `map`
+Let's do another example of a loop: let's construct a new array out of `@all_numbers` that contains the elements of `@all_numbers` but doubled:
 
 
+~~~perl
+my @doubled_numbers = ();
+for my $number (@all_numbers) {
+  push @doubled_numbers, 2 * $number;
+}
+~~~
+
+Great, we initialized a new array `@doubled_numbers` with the empty array `(
+)`, we looped through `@all_numbers` and using `push` we added all doubled numbers.
+`push` adds numbers from the back as we saw before so order nicely stays
+maintained. Is there a problem with this approach?
+
+It's fine, except that, as is usual in most programming languages, the memory
+allocated for `@doubled_numbers` has the potentially to be need to be
+re-allocated when we're running out of initial memory for `@doubled_numbers`.
+This is inefficient. In cases where we're constructing a new _something_ out of
+an another _something_ consider using a
+[`map`](https://perldoc.perl.org/functions/map.html):
+
+~~~perl
+my @doubled_numbers = map { 2 * $_ } @all_numbers;
+~~~
+
+As with `grep`, the variable `$_` will be _each element from `@all_numbers`_.
+We will take that element and execute the expresssion within `{ }`, and then we
+will put the results of all those executions in 1 list. That list is the result
+of the `map`. Note that we can generate multiple elements for each element, so
+we can increase the size of the list. Say we want to repeat each occurrence of
+each element:
+
+~~~perl
+my @double_sight = map { $_, $_ } @all_numbers;
+~~~
+
+will return a list of 2 elements for each number in `@all_numbers` which we'll
+the concatenate. For example, say `@all_numbers` is `(1, 2, 3)`, then
+`@double_sight` will be `(1, 1, 2, 2, 3, 3)`. Why will it not be `((1, 1), (2,
+2), (3, 3))`: `perl` does not allow such nested lists, so the inner lists will
+be implicitly flattened. We could make the list construction in that latter a
+bit more explicit by writing:
+
+~~~perl
+my @double_sight = map { ($_, $_) } @all_numbers;
+~~~
+
+Since the result of a `map` is always an array, we can always store that result
+into an array variable. But we also saw that we can initialize a hash using an
+array. In other words, something like this:
+
+~~~perl
+my %hash = map { $_ => $_ } @something;
+~~~
+
+_could_ make sense.
 
 # Subroutines
 
-TODO: talk about call by value for functions (can I change arguments: yes, if I use references)
+We talked about data structures and some ways to manipulate them using `perl`'s
+built-ins. But of course, you'd want to define your own subroutines that built
+on other subroutines that built on...
+
+In `perl` we indicate a subroutine by the keyword `sub`. Say I want to define a
+function for the doubling that I used in the above `map`:
+
+~~~perl
+sub double_it {
+  my ($x) = @_;
+
+  return 2 * $x;
+}
+~~~
+
+The `return 2 * $x` is intuitively clear. What is is _new_  at least for this
+document, is the `return`. That's working as it works in other programming
+languages: it exits from the subroutine and returns the value `2 * $x` to the
+caller of the subroutine.
+
+The main thing you will notice is: where are the arguments to this function, it
+_seems_ like `$x` is the argument but why are you extracting this in the
+weirdest way possible:
+
+~~~perl
+  my ($x) = @_;
+~~~
+
+What is happening here? Well, you will call `double_it` as you're used from other programming languages:
+
+~~~perl
+my $y = double_it(5);
+~~~
+
+The argument list to `double_it` now gets implicitly bound to the special array
+variable `@_`. Note that we already say special variable `$_`, well, this is
+another special one, for arrays. It contains the weirdest stuff.
+
+In this case, we'd have that `@_` would be bound to `(5)`. Ok, cool, so `my
+($x) = @_`is at that point the same as `my ($x) = (5)`. The left hand side is
+an array literal with a variable `$x` in it, the right hand side is just an
+array literal. `perl` matches those 2 for you such `$x` is now `5`. Exactly
+what we were hoping for.  Note this mechanism of matching allows you  in
+general to do neat things:
+
+~~~perl
+my ($x, $y) = (5);
+~~~
+
+`$x` is now `5`, but what happened to `$y`? It's `undef` as you had nothing to match it with. What about:
+
+~~~perl
+my ($x) = (5, 6);
+~~~
+
+Again, `$x` is `5`, but what happened with `6`? Nothing. It fell on the floor.
+Looking back at `double_it` it also means, we could have done `double_it(5, 6)`
+and this would have run without complaints. It's just that when doing `my ($x)
+= @_` we'd have dropped `6` on the floor and only have assigned `5`.
 
 TODO: talk about why you will see `my $first = shift` without arguments for shift (cause it uses `@_` by default).o
+
+TODO: talk about call by value for functions (can I change arguments: yes, if I use references)
 
 TODO: coderefs or subroutine references
 
