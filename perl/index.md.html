@@ -1,4 +1,5 @@
 
+
 <meta charset="utf-8">
                             **WIP: Elements of Perl**
                             Stijn Heymans
@@ -1006,11 +1007,91 @@ Looking back at `double_it` it also means, we could have done `double_it(5, 6)`
 and this would have run without complaints. It's just that when doing `my ($x)
 = @_` we'd have dropped `6` on the floor and only have assigned `5`.
 
-TODO: talk about why you will see `my $first = shift` without arguments for shift (cause it uses `@_` by default).o
+I'll mention an alternative way to get to the arguments as you'll see that one as well frequently:
 
-TODO: talk about call by value for functions (can I change arguments: yes, if I use references)
+~~~perl
+my $x = shift;
+my $y = shift;
+~~~
 
-TODO: coderefs or subroutine references
+as an alternative for 
+
+~~~perl
+my ($x, $y) = @_;
+~~~
+
+You might ask why do I see `shift` and not `shift @_`? Well, `perl` is in the
+habit of assuming defaults, in this case the `@_` is assumed and `shift` indeed
+stands for `shift @_`.
+
+This might be a cleaner way in case you want to validate `$x` for example,
+before continuing with the rest of the arguments. 
+
+To test our knowledge, let's look at this:
+
+~~~perl
+my @a = (1, 2);
+
+sub f {
+  my @args = @_;
+  $args[0] = 3;
+}
+
+f(@a);
+print "@a\n";
+~~~
+
+What will this print? The array will print the original `@a`, namely `1 2`. The
+reason is that `@args` is a copy of `@_`, and we only changed the copy.
+
+How can we make it so the original `@a` is indeed changed. Well, we have references for that:
+
+~~~perl
+my @a = (1, 2);
+
+sub f {
+  my ($args_ref) = @_;
+  $args_ref->[0] = 3;
+}
+
+f(\@a);
+print "@a\n";
+~~~
+
+will print `3 2` as the original `@a` is now indeed changed since we passed it by reference.
+
+Talking about references, can I use a reference to a subroutine as an argument?
+
+Take a simple `print` function:
+
+~~~perl
+sub print_double {
+  my ($x) = @_;
+  print $x * 2;
+}
+~~~
+
+Now say you want to write a function that applies another function to a scalar.
+For example a `do_it` function:
+
+~~~perl
+sub do_it {
+  my ($function_ref, $x) = @_;
+  $function_ref->($x);
+}
+
+do_it(\&print_double, 3);
+~~~
+
+We gave a reference to the function `print_double` to the `do_it` function:
+`\&print_double`. And in the `do_it` function, we called the function using the
+`->` notation. We could also have called it as follows:
+
+~~~perl
+&{$function_ref}($x);
+~~~
+
+so using the dereference `{ }`. Generally, the arrow notation is more readable.
 
 # Regular Expressions
 
