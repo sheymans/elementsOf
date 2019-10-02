@@ -1093,9 +1093,70 @@ We gave a reference to the function `print_double` to the `do_it` function:
 
 so using the dereference `{ }`. Generally, the arrow notation is more readable.
 
-# Regular Expressions
+# Matching and Substituting
 
-We cannot talk about `perl` without regular expressions.
+We cannot talk about `perl` without regular expressions but I'll do my utter
+best to keep it short. There's a world of pain for you waiting, so let me
+introduce some elements. Say you have a string "there is a wolf somewhere". And
+you'd like to check whether to contain the word _wolf_ (it does). You could do:
+
+~~~perl
+my $test = "there is a wolf somewhere";
+if ($test =~ /wolf/) {
+  print "there is a wolf somewhere but you already knew that!";
+}
+~~~
+
+Well that looked easy enough. The meat of this code is in the `if` test: `$test
+=~ /wolf/`. With the binding operator `=~` we are saying: I want to check the
+pattern on the right of `=~` in the text on the left of `=~`. What is the
+pattern? The pattern is between `/`: `/wolf/`. Note that you'll sometimes see
+`m/wolf/` so the pattern prefixed with `m`. That's because there's a version
+with `s` as well, which stands for _substitute_. Later more on that.
+
+On important concept is _capture groups_. They allow you to refer to the
+matched pattern later:
+
+~~~perl
+my $test = "there is a Wolf somewhere";
+if ($test =~ /([wW]olf)/) {
+  my $matched_wolf = $1;
+  print "there is a $matched_wolf somewhere but you already knew that!";
+}
+~~~
+
+Some "fun" stuff is happening here: we used a _character class_ `[wW]` which
+stands for a match with either `w` or `W`. And we surrounded `[wW]olf` with
+parenthesis like so: `([wW]olf)`. The parenthesis created a capture group which
+we referenced later using `$1`. Note that you could have several capture groups
+in a pattern, and you can refer to these as `$1`, `$2`, etc. The ordering is
+following the order of the parenthesis. For example, if you have
+`((stuff)more)`, we'd have `stuffmore` being in `$1` and `stuff` being in `$2`.
+
+What else do you need to know? A lot more. But I'll say that the dot `.` stands
+for any character _except_ a newline.
+
+That was for matching, what about substituting? Very very similar. Let's try:
+
+~~~perl
+my $test = "there is a Wolf somewhere";
+$test =~ s/([wW]olf)/bear/;
+print $test;
+~~~
+
+will predictably announce to us that _there is a bear somewhere_. We already
+mentioned the `s` for `substitute`. The first part of that `s//` construct is
+the pattern to replace, the second part is the pattern to replace it with. We
+can refer to the capturing groups of the first pattern in the 2nd pattern:
+
+~~~perl
+my $test = "there is a wolf somewhere";
+$test =~ s/([wW]olf)/bear$1/;
+print $test;
+~~~
+
+which would lead to `there is a bearwolf somewhere`. At which point, we should
+all just leave the building.
 
 # Constants
 
@@ -1103,12 +1164,15 @@ I know you miss your `private static final` variables, my dear `java`
 aficionado. For the rest of the world, constants, how do I declare something as
 constant, you can't change it, don't touch it, don't even look at it!?
 
-
 # Examples
 
 # More
 
-We skipped objects and so much more.
+We skipped objects and so much more, but this is called _elements of perl_ and not the _the art of perl_ so I'll refer you these 3 books once more:
+
+- [Learning Perl: Making Easy Things Easy and Hard Things Possible](https://www.goodreads.com/book/show/30413201-learning-perl) by Randal L. Schwartz, Brian D. Foy, Tom Phoenix,
+- [Intermediate Perl](https://www.goodreads.com/book/show/209276.Intermediate_Perl) by Randal L. Schwartz, Brian D. Foy, Tom Phoenix,
+- [Perl Best Practices: Standards and Styles for Developing Maintainable Code](https://www.goodreads.com/book/show/86379.Perl_Best_Practices) by Damian Conway.
 
 # Conclusion
 
