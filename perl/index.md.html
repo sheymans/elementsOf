@@ -8,8 +8,34 @@
 
 # Introduction
 
-TODO: Audience, someone with familiarity with 1, preferably more, programming
-languages. This is not a "how to program" course.
+This article is intended to get you quickly up to speed with a basic `perl 5.x`
+understanding and _typical_ best practices. I read the following 3 books in
+order:
+
+- [Learning Perl: Making Easy Things Easy and Hard Things Possible](https://www.goodreads.com/book/show/30413201-learning-perl) by Randal L. Schwartz, Brian D. Foy, Tom Phoenix,
+- [Intermediate Perl](https://www.goodreads.com/book/show/209276.Intermediate_Perl) by Randal L. Schwartz, Brian D. Foy, Tom Phoenix,
+- [Perl Best Practices: Standards and Styles for Developing Maintainable Code](https://www.goodreads.com/book/show/86379.Perl_Best_Practices) by Damian Conway.
+
+Those gave me my basic understanding and are worth reading in detail as they
+will teach you so much more than this article.
+
+Apart from those books, I have at the time of writing about 8 months of `perl`
+reading/writing experience under my belt from working at
+[ZipRecruiter](http://ziprecruiter.com). I'm of course still a beginner with
+`perl` but I hope that I bring experience from other languages (Java, Python,
+Clojure, Lisp, ...) to bring a fresh view of `perl` within the ecosystem of
+programming languages so to speak.
+
+This article is woefully incomplete and highly subjective in what I decided to
+highlight (for example, I mention _constants_, as Java is full of them). I do
+hope they somehow present some core of what others could agree with are
+_elements of_ `perl`, although sometimes I think it should more seen as _my
+elements of_ perl.
+
+Enjoy reading and if you have questions or something I can clarify, or errors
+you found, please let me know at stijn.heymans@gmail.com
+
+--Stijn Heymans, October 2019.
 
 # Scalars
 
@@ -1164,17 +1190,55 @@ I know you miss your `private static final` variables, my dear `java`
 aficionado. For the rest of the world, constants, how do I declare something as
 constant, you can't change it, don't touch it, don't even look at it!?
 
-# Examples
+You have to use a package:
+
+~~~perl
+use Readonly;
+~~~
+
+And then:
+
+~~~perl
+Readonly my $MEANING_OF_LIFE => 42;
+~~~
+
+Things to note:
+
+- we use `=>` instead of `=`
+- we write `Readonly` before the variable declaration.
+
+The reader (you!) sees of course that this is probably just a subroutine call
+`Readonly(my $MEANING_OF_LIFE, 42)`. Maybe it is. Maybe it is.
+
+In any case, try this:
+
+~~~perl
+$MEANING_OF_LIFE = 41;
+~~~
+
+The compiler will complain with something along the lines of _Invalid
+initialization by assignment_, cause it's a READ-ONLY variable!
 
 # More
 
-We skipped objects and so much more, but this is called _elements of perl_ and not the _the art of perl_ so I'll refer you these 3 books once more:
+We skipped objects and so much more, but this is called _elements of perl_ and
+not the _the art of perl_ so I'll refer you these 3 books once more:
 
 - [Learning Perl: Making Easy Things Easy and Hard Things Possible](https://www.goodreads.com/book/show/30413201-learning-perl) by Randal L. Schwartz, Brian D. Foy, Tom Phoenix,
 - [Intermediate Perl](https://www.goodreads.com/book/show/209276.Intermediate_Perl) by Randal L. Schwartz, Brian D. Foy, Tom Phoenix,
 - [Perl Best Practices: Standards and Styles for Developing Maintainable Code](https://www.goodreads.com/book/show/86379.Perl_Best_Practices) by Damian Conway.
 
+Before doing something yourself, check [CPAN](https://metacpan.org) to see
+whether it has been done before.
+
 # Conclusion
+
+I hope the above is enough to get you started with `perl`. If you see errors I
+made or if something could use some more clarification, don't hesitate to reach
+out at stijn.heymans@gmail.com and I'd be happy to help or to help
+find the answer. 
+
+Thanks for reading!
 
 
 <link rel="stylesheet" href="https://casual-effects.com/markdeep/latest/latex.css?">
