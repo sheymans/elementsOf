@@ -1,38 +1,36 @@
 
 
 <meta charset="utf-8">
-                            **WIP: Elements of Perl**
+                            **Elements of Perl**
                             Stijn Heymans
-                            Published: N/A
-                            Revised: N/A
+                            12 October 2019
 
 # Introduction
 
-This article is intended to get you quickly up to speed with a basic `perl 5.x`
-understanding and _typical_ best practices. I read the following 3 books in
-order:
+This article highlights language elements from `perl 5.x`, focusing on 1 way to
+do something, rather than explaining all the ways something can be done in
+perl.  To prepare for this article, I studied these 3 books, which when read in
+order will provide you with a solid perl basis:
 
 - [Learning Perl: Making Easy Things Easy and Hard Things Possible](https://www.goodreads.com/book/show/30413201-learning-perl) by Randal L. Schwartz, Brian D. Foy, Tom Phoenix,
 - [Intermediate Perl](https://www.goodreads.com/book/show/209276.Intermediate_Perl) by Randal L. Schwartz, Brian D. Foy, Tom Phoenix,
 - [Perl Best Practices: Standards and Styles for Developing Maintainable Code](https://www.goodreads.com/book/show/86379.Perl_Best_Practices) by Damian Conway.
 
-Those gave me my basic understanding and are worth reading in detail as they
-will teach you so much more than this article.
+Compared to those books, this article is incomplete and opinionated. For
+example, there is a section on constants, purely because `Java` programmers
+will wonder _how do I do constants in perl?_ My hope is that the article
+represents some core of how to use `perl` most effectively, leaving what
+_effective_ means purposefully out of sight.
+In the best case, I managed to capture some _elements of_ perl, in the worst
+case, it's _my_ elements of `perl`.
 
-Apart from those books, I have at the time of writing about 8 months of `perl`
-reading/writing experience under my belt from working at
+I have at the time of writing about 8 months of `perl` reading/writing
+experience under my belt from working at
 [ZipRecruiter](http://ziprecruiter.com). I'm of course still a beginner with
-`perl` but I hope that I bring experience from other languages (Java, Python,
-Clojure, Lisp, ...) to bring a fresh view of `perl` within the ecosystem of
-programming languages so to speak.
+`perl` but I bring some experience from other languages (Java, Python, Clojure,
+Lisp, ...).
 
-This article is woefully incomplete and highly subjective in what I decided to
-highlight (for example, I mention _constants_, as Java is full of them). I do
-hope they somehow present some core of what others could agree with are
-_elements of_ `perl`, although sometimes I think it should more seen as _my
-elements of_ perl.
-
-Enjoy reading and if you have questions or something I can clarify, or errors
+Enjoy reading and if you have questions, something I can clarify, or errors
 you found, please let me know at stijn.heymans@gmail.com
 
 --Stijn Heymans, October 2019.
@@ -41,12 +39,13 @@ you found, please let me know at stijn.heymans@gmail.com
 
 ## Strings
 
-### Basic Usage
+### Basics
 
-Scalars or scalar values are the smallest unit of data in perl. Numbers and
+_Scalars_ or _scalar values_ are the smallest unit of data in perl. Numbers and
 strings are scalars.
 
-We'll store scalars in variables as follows:
+We store scalars in _scalar variables_, for example, let's look at how to store
+and manipulate strings in this section:
 
 ~~~perl
 my $var = 'I am a string';
@@ -57,13 +56,13 @@ my $var = 'I am a string';
 
 The `my` keyword _declares_ the variable (similar to a `let` in Javascript),
 and `$var` consists of the symbol `$` and the name `var`. The use of symbols
-like `$` is something to get used to when switching from python/Javascript to
+like `$` is something to get used to when switching from Python/Javascript to
 perl. The symbol `$` hints at how the variable is used or accessed. In this
 case, it declares and initializes a string, which is a scalar, and thus the
 symbol `$` emphasizes that.
 
 You'll later see a symbol `@` for array usage and `%` for hash usage (a `hash`
-is python's `dict` or generally a key-value structure such as a `Map` in Java).
+is Python's `dict` or generally a key-value structure such as a `Map` in Java).
 
 Back to strings. A common operation is concatenating 2 strings:
 
@@ -78,9 +77,9 @@ If you'd like to change `$var` by concatenating something to it, instead of
 $var .= ' and me too.';
 ~~~
 
-Note the single quotes for strings we used. What about double quotes?. You can
+Note that we used single quotes for strings. What about double quotes?. You can
 use double quotes as well. Good practice is to use them only when you want to
-_interpolate_ variables in them. For example:
+_interpolate_ variables appearing in such strings. For example:
 
 ~~~perl
 my $name = 'stijn';
@@ -88,7 +87,7 @@ my $hello = "my name is $name";
 ~~~
 
 Interpolation makes sure that `$name` in that `$hello` string is always
-_expanded_ to its value. In this case, it will be `my name is stijn`.
+_expanded_ to its value. In this case, the string will be `my name is stijn`.
 Interpolation will usually lead to cleaner code than concatenation. Compare the above to:
 
 ~~~perl
@@ -112,21 +111,25 @@ You actually meant:
 my $money = 'my password is !$guest';
 ~~~
 
-You can get individual characters of a string as you'd expect from other languages:
+You can extract individual characters out of a string similar to you'd do it in
+other languages:
 
 ~~~perl
 my $string = 'what';
 my $first = $string[0];
 ~~~
 
-The kicker is to get the last character of the string using `-1`, something you
+You can get the last character of the string using the index `-1`, something you
 might know from `Python`:
 
 ~~~perl
 my $last = $string[-1];
 ~~~
 
-### Useful built-in Functions
+And yes, you'd get the next-to-last element, by accessing it using `-2`.
+
+
+### Built-in Functions
 
 #### [`print`](https://perldoc.perl.org/functions/print.html)
 
@@ -140,6 +143,7 @@ print "This is a printed string\n";
    There's an explicit `\n` in that statement; you might be used to a `println`
    from other languages that puts that `\n` there for you. But `perl` is not
    putting it there for you.
+
 
 #### [`substr`](https://perldoc.perl.org/functions/substr.html)
 
@@ -186,7 +190,7 @@ pattern `//` matches _everything_ and returns a list of individual characters
 
 ## Numbers
 
-### Basic Usage
+### Basics
 
 Let's dive into numbers.
 
@@ -214,7 +218,7 @@ $numero += 42;
 
 and _pour les_ for other operations _la même chose_.
 
-### Useful built-in Functions
+### Built-in Functions
 
 I guess this is where I'd give a `sqrt` example, but how often have you used a
 `sqrt` function in your professional code?
@@ -250,7 +254,7 @@ following it is ignored by the `perl` compiler.
 
 # Array Variables
 
-## Basic Usage
+## Basics
 
 I get headaches when people start about an _array_ is this but a _list_ is
 this. This is how you create an array of elements `I`, `do`, `not`, `care`:
@@ -304,7 +308,7 @@ copying the array `@array` (I am not referring to the individual elements in
 Note that this is indeed a copy: changing elements in `@copy` will _not_ change
 elements in `@array`.
 
-## Useful built-in Functions
+## Built-in Functions
 
 ### Adding and Removing from Back of an Array
 
@@ -409,7 +413,7 @@ non-destructive on its argument).
 
 # Hash Variables
 
-## Basic Usage
+## Basics
 
 Most programming languages have some variation of a key/value data structure
 (or `Map`, or `dict`).  In `perl` such a key/value store is called a _hash_. A hash _literal_
@@ -469,7 +473,7 @@ $some_hash{name} = 'bill';
 $some_hash{age} = 40;
 ~~~
 
-## Useful built-in Functions
+## Built-in Functions
 
 ### `values`/`keys`
 
@@ -1218,6 +1222,26 @@ $MEANING_OF_LIFE = 41;
 
 The compiler will complain with something along the lines of _Invalid
 initialization by assignment_, cause it's a READ-ONLY variable!
+
+# Printing Anything
+
+You might end up adding more debugging `print` statements in `perl` than you're
+used in other languages. When printing structures, references, hashes, etc, the
+following package will be useful:
+
+~~~perl
+use Data::Dumper;
+
+my $hash_ref = {a => 1, b => 2};
+print Dumper($hash_ref);
+~~~
+
+Often the thing you'd like to print is a deeply nested structure. If you want
+to limit the levels you'd like to print you can do:
+
+~~~perl
+$Data::Dumper::Maxdepth=2;
+~~~
 
 # More
 
