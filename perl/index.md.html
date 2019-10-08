@@ -176,15 +176,17 @@ split //, 'yeah';
 ~~~
 
 This will split the string `yeah` into its individual characters because the
-pattern `//` matches _everything_ and returns a list of individual characters
-(arrays follow later).
+pattern `//` matches _everything_ and returns a list of individual characters.
+We will introduce lists/arrays later, and we'll also talk in a bit more detail
+about regular expressions.
+
 
 !!! 
    Note the `split //, 'yeah'` without parenthesis. Based on
    how I wrote `substr` you expected to see `split(//,'yeah')` and you'd been
-   right as well! `perl` is playing loose with parenthesis generally, so for
-   built-in functions you'll often see parenthesis dropped. For functions you
-   write yourself, I suggest to keep parenthesis when invoking them. Life is
+   right as well! `perl` is playing loose with parentheses, so for
+   built-in functions you'll often see parentheses dropped. For functions you
+   write yourself, I suggest to keep parentheses when invoking them. Life is
    complicated enough as it is.
 
 
@@ -216,14 +218,14 @@ Similar like in other languages, there is a short hand for `$numero = $numero + 
 $numero += 42;
 ~~~
 
-and _pour les_ for other operations _la même chose_.
+and for the other operations _la même chose_.
 
 ### Built-in Functions
 
-I guess this is where I'd give a `sqrt` example, but how often have you used a
-`sqrt` function in your professional code?
+This is where you'd see an enlightening _this is how to take the square
+root_ using the built-in `sqrt`. You would.
 
-Oh, you can `print` numbers and a good conversion (the `%d` in the below template string) is...`%d`:
+You can `print` numbers and a good conversion (the `%d` in the below template string) is...`%d`:
 
 ~~~perl
 print "The meaning of life is %d", 42;
@@ -249,15 +251,14 @@ What's with the
 # stuff
 ~~~
 
-You guessed it. `#` marks comments: anything
-following it is ignored by the `perl` compiler.
+A `#` marks comments. Anything following it is ignored by the `perl` compiler.
 
 # Array Variables
 
 ## Basics
 
-I get headaches when people start about an _array_ is this but a _list_ is
-this. This is how you create an array of elements `I`, `do`, `not`, `care`:
+People distinguish between an _array_ and a _list_. This is how you create an
+array with elements `I`, `do`, `not`, `care`:
 
 ~~~perl
 my @array = ('I', 'do', 'not', 'care');
@@ -266,7 +267,7 @@ my @array = ('I', 'do', 'not', 'care');
 Note the `@` symbol prefixing the variable name. In contrast to
 other languages like Python or Javascript, `perl` gives you a hint on what
 kind of variable something is. We already saw _scalar_ variables in which you
-can store the smallest unit of _things_. The `@` signifies this is an _array_
+can store the smallest unit of _things_ (for example, numbers or strings). The `@` signifies this is an _array_
 variable and stores a _list of things_. And the wording of _things_ is
 intentional. Array variables store lists of _things_. So if a list contains the
 variable, that variable will be a _scalar variable_.
@@ -281,9 +282,12 @@ my $first_element = $array[0];
 ~~~
 
 The `[0]` part should look familiar, but note that it is `$array` when you use
-`@array` to _access_ the scalar value at the first position (index `0`).
+`@array` to _access_ the scalar value at the first position (index `0`). Or
+differently put, while `@array` is an array, `$array[0]` is a scalar which
+could be a reminder for why we use `$` in that case rather than `@`.
 
-The last element is usually easily retrieved using the `-1` index:
+The last element is usually easily retrieved using the `-1` index (similar to
+for accessing characters in a string we saw before):
 
 ~~~perl
 my $last_element = $array[-1];
@@ -321,7 +325,7 @@ my $last = pop @array;
 ~~~
 
 Note that we did not write `pop(@array)` as `pop` is a built-in. We leave
-parenthesis of of built-ins per convention. What will `$last` store? It'll
+parentheses off of built-ins per convention. What will `$last` store? It will
 store the last element of `@array`: `5`. What will `@array` store after the
 `pop`ping? An array with the last element removed: `(4)`.
 
@@ -366,7 +370,7 @@ my $first = shift @array;
 `@array` will be modified after this: the first element is removed and in this
 case we stored it in `$first`. You can imagine
 [`shift`](https://perldoc.perl.org/functions/shift.html) as shifting the array
-to the _left_ and thus dropping of the first element.
+to the _left_ and thus dropping the first element.
 
 ### Length of an Array with a detour to contexts
 
@@ -408,8 +412,8 @@ my @rev = reverse @array;
 ~~~
 
 `@rev` will be `(2, 1)` and `@array` will have stayed the same (so `reverse` is
-non-destructive on its argument).
-
+non-destructive on its argument). Contrast that with `pop`/`push` and
+`shift/unshift` all of which are destructive on the lists they operate on.
 
 # Hash Variables
 
