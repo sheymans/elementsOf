@@ -419,9 +419,9 @@ non-destructive on its argument). Contrast that with `pop`/`push` and
 
 ## Basics
 
-Most programming languages have some variation of a key/value data structure
-(or `Map`, or `dict`).  In `perl` such a key/value store is called a _hash_. A hash _literal_
-can be initialized as follows:
+Most programming languages have some variation of a key/value data structure (a
+`Map in Java`, a `dict` in Python).  In `perl` such a key/value store is called
+a _hash_. A hash _literal_ can be initialized as follows:
 
 ~~~perl
 my %some_hash = ('name', 'john', 'age', 39);
@@ -429,12 +429,12 @@ my %some_hash = ('name', 'john', 'age', 39);
 
 Note: 
 
-1. we used a new symbol `%` for indicating that `some_hash` is a variable used to store a hash. 
-2. there seems to be no distinction made in syntax between keys and values. We'd expect `'name'` and `'age'` to be keys, and `'john'` and `39` to be values. Instead, this has the same syntax as a literal list. In fact, it _is_ just a list. Let's get back to our _contexts_. We already saw a _list context_ and a _scalar context_. The `%` on the left-hand side of the assignment, indicates a _hash context_ and whereas the right-hand side is indeed a list, we are trying to assign the list to a hash such that effectively we indeed store a hash (i.e, something we can access based on keys `'name'` and `'age'` as we will see in a bit.
+1. we used a new symbol `%` to indicate that `some_hash` is a variable used to store a hash. 
+2. there seems to be no syntactical distinction between keys and values. We'd expect `'name'` and `'age'` to be keys, and `'john'` and `39` to be values. Instead, this has the same syntax as a literal list. In fact, it _is_ just a list. Let's get back to our _contexts_. We already saw a _list context_ and a _scalar context_. The `%` on the left-hand side of the assignment, indicates a _hash context_ and whereas the right-hand side is indeed a list, we are trying to assign the list to a hash such that effectively we indeed store a hash (i.e, something we can access based on keys `'name'` and `'age'` as we will see in a bit).
 3. The keys `'name'` and `'age'` are strings while the values are strings or numbers (`39`). Indeed, the keys of a hash are always strings. The values are less strict and can be any _scalar_. As such we cannot nest hashes by embedding another hash as a value within a hash. At least not without a final concept called _references_ which we'll introduce later. For now, remember that values of a hash are always scalars.
 
 As the list syntax for hashes is obviously confusing, `perl` has a trick (of
-course it has). We can replace certain commands by so-called `fat commas`: `=>`.
+course it has). We can replace certain commas by so-called `fat commas`: `=>`.
 A fat comma `=>` is absolutely the same as a comma for the perl parser, but for
 us mere humans, it makes things a bit more palatable:
 
@@ -470,7 +470,7 @@ Same difference. We also used the scalar `$` symbol instead of the hash symbol
 that values in hashes have to be scalars) rather than a _hash_, so it makes
 sense to refer to it with `$`.
 
-Changing the value for a key is than as you'd expect:
+Changing the value for a key is can be done without surprises:
 
 ~~~perl
 $some_hash{name} = 'bill';
@@ -510,10 +510,10 @@ At first sight this restricts us to rather flat data structures, for example, I
 could not directly store a list of hashes. Or a hash that is an index of names
 (the key) to person's addresses (the value, consisting of street, zip code)).
 
-But of course, we can, but we need a new concept for it: the _reference_. To
+No-one wants to be restricted, the least of all to flat data structures. Enter: the _reference_. To
 some degree the reference is a bit like C/C++ style pointers. It is 
-a _scalar_ that _points_ to other _things_ (and those other other things could
-be other lists, hashes, or other scalars, and thus also other references).
+a _scalar_ that _points_ to other _things_. Those other other things could
+be other lists, hashes, or other scalars, and....other references.
 
 For example, say we have a reference `$a_ref` (note that references are
 scalars, so here we go with the `$` again) that points to an array `(1, 2, 3)`:
@@ -528,7 +528,7 @@ scalars, so here we go with the `$` again) that points to an array `(1, 2, 3)`:
 This now means that we can indeed have a hash with values that are pointing to arrays:
 
 ~~~perl
-my $array_value_hash = (john => $a_ref);
+my %array_value_hash = (john => $a_ref);
 ~~~
 
 I kept a crucial piece to myself though. How did I create that `$a_ref`
@@ -539,7 +539,7 @@ variable as follows:
 my @array = (1, 2, 3);
 ~~~
 
-I can now take a reference to `@array` using `\`:
+I can now take a reference to `@array` using the backslash \:
 
 ~~~perl
 my $a_ref = \@array;
@@ -588,7 +588,7 @@ my @copy = @{$a_ref};
 ~~~
 
 You can see that we just switched out the `array` part in `@array` by the
-dereferenced reference: `@{$a_ref}`.
+dereferenced reference: `{$a_ref}`.
 
 We can of course copy array references and one would expect that if I change a value in the copied array reference I'd be changing the original:
 
@@ -628,7 +628,7 @@ Indeed both `${$a_ref}[0]` and `${$copy_ref}[0]` will now be equal to `500`:
 *                                  *
 ************************************
 
-To always type `${$a_ref}` is not very succinct. But you we can do better. These are all the same:
+To always type `${$a_ref}` is not very succinct. We can do better. These are all the same:
 
 ~~~perl
 ${$a_ref}[0]; # what we saw before
@@ -637,7 +637,7 @@ $a_ref->[0];  # use an arrow notation to indicate that `$a_ref` is actually a re
 ~~~
 
 That's that for array references. What about hash references? Similarly to
-array references you can take a reference by using `\`:
+array references you can take a reference by using a backslash \:
 
 ~~~perl
 my %hash = (age => 9);
@@ -674,7 +674,7 @@ ${$hash_ref}{age};
 Also this form has an easier to read form using an `->` notation:
 
 ~~~perl
-$hash_ref->{age}
+$hash_ref->{age};
 ~~~
 
 which we will mostly use going forward.
@@ -711,8 +711,10 @@ if ( !($age == 18) ) {
 Note the extra parenthesis. This is needed in this case, indeed `!$age == 18`
 would lead to `!$age` being interpreted first. Since `$age` is a number but `!`
 forces a boolean context, and given that, any number other than `0` is
-considered truth, we have that `$age` is false. And false is never equal to
-`18` so `!$age == 18` would always be false.
+considered truth, we have that `!$age` is false if `$age` is not 0. And false
+is never equal to `18` so `!$age == 18` would always be false. Neither is true
+by the way, so even if `$age` is 0, we'd have that `!$age` is true. It's
+confusing, let's just say that.
 
 Other useful operators are `&&` for logical _and_, `||` for logical _or_.
 
@@ -744,7 +746,7 @@ else {
 Note that it's _not_ `elseif` nor `else if`. It's `elsif`.
 
 `perl` also has the `unless` keyword for the "`if` not" situation. Do not use
-`unless`. It's confusing to all of us. 
+`unless` unless you feel like getting confused. Are you confused? I am.
 
 Related to a condition is the concept of filtering an array to keep only the
 items that satisfy a certain condition. `perl` has `grep` for that (yes, named
