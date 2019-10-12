@@ -7,33 +7,25 @@
 
 # Introduction
 
-This article highlights language elements from `perl 5.x`, focusing on 1 way to
-do something, rather than explaining all the ways something can be done in
-perl.  To prepare for this article, I studied these 3 books, which when read in
-order will provide you with a solid perl basis:
+This article highlights language elements from `perl 5.x`. I focus on giving
+you one way to express a programming thought, rather than explaining all the
+ways `perl` allows for.  To prepare for this article, I studied these 3 books: 
 
-- [Learning Perl: Making Easy Things Easy and Hard Things Possible](https://www.goodreads.com/book/show/30413201-learning-perl) by Randal L. Schwartz, Brian D. Foy, Tom Phoenix,
+- [Learning Perl: Making Easy Things Easy and Hard Things
+Possible](https://www.goodreads.com/book/show/30413201-learning-perl) by Randal
+L. Schwartz, Brian D. Foy, Tom Phoenix,
 - [Intermediate Perl](https://www.goodreads.com/book/show/209276.Intermediate_Perl) by Randal L. Schwartz, Brian D. Foy, Tom Phoenix,
 - [Perl Best Practices: Standards and Styles for Developing Maintainable Code](https://www.goodreads.com/book/show/86379.Perl_Best_Practices) by Damian Conway.
 
 Compared to those books, this article is incomplete and opinionated. For
-example, there is a section on constants, purely because `Java` programmers
-will wonder _how do I do constants in perl?_ My hope is that the article
-represents some core of how to use `perl` most effectively, leaving what
-_effective_ means purposefully out of sight.
-In the best case, I managed to capture some _elements of_ perl, in the worst
-case, it's _my_ elements of `perl`.
+example, there is a section on constants in this article, because `Java`
+programmers will wonder _how do I do constants in perl?_ My hope is, however,
+that the article represents some core of how to use `perl` most effectively,
+leaving what _effective_ means purposefully undefined.  In the best case, I
+managed to capture some _elements of_ perl, in the worst case, it's _my_
+elements of `perl`.
 
-I have at the time of writing about 8 months of `perl` reading/writing
-experience under my belt from working at
-[ZipRecruiter](http://ziprecruiter.com). I'm of course still a beginner with
-`perl` but I bring some experience from other languages (Java, Python, Clojure,
-Lisp, ...).
-
-Enjoy reading and if you have questions, something I can clarify, or errors
-you found, please let me know at stijn.heymans@gmail.com
-
---Stijn Heymans, October 2019.
+--October 2019.
 
 # Scalars
 
@@ -1142,10 +1134,10 @@ so using the dereference `{ }`. Generally, the arrow notation is more readable.
 
 # Matching and Substituting
 
-We cannot talk about `perl` without regular expressions but I'll do my utter
-best to keep it short. There's a world of pain for you waiting, so let me
-introduce some elements. Say you have a string "there is a wolf somewhere". And
-you'd like to check whether to contain the word _wolf_ (it does). You could do:
+We cannot talk about `perl` without mentioning regular expressions. There's a
+world of pain for you waiting, so let me introduce some elements. For a string
+"there is a wolf somewhere", you'd like to check whether it contains the word
+_wolf_ (it does). You could do:
 
 ~~~perl
 my $test = "there is a wolf somewhere";
@@ -1154,15 +1146,15 @@ if ($test =~ /wolf/) {
 }
 ~~~
 
-Well that looked easy enough. The meat of this code is in the `if` test: `$test
-=~ /wolf/`. With the binding operator `=~` we are saying: I want to check the
-pattern on the right of `=~` in the text on the left of `=~`. What is the
-pattern? The pattern is between `/`: `/wolf/`. Note that you'll sometimes see
-`m/wolf/` so the pattern prefixed with `m`. That's because there's a version
-with `s` as well, which stands for _substitute_. Later more on that.
+The meat of this code is in the `if` test: `$test =~ /wolf/`. With the binding
+operator `=~` we are saying: I want to check the pattern on the right of `=~`
+in the text on the left of `=~`. What is the pattern? The pattern is between
+slashes`/`: `/wolf/`. Note that you'll sometimes see `m/wolf/`, i.e, the pattern prefixed
+with `m`. That's because there's a version with `s` as well, which stands for
+_substitute_. Later more on that.
 
-On important concept is _capture groups_. They allow you to refer to the
-matched pattern later:
+That was the basics, let's advance: _capture groups_. They allow you to refer
+to the matched pattern later:
 
 ~~~perl
 my $test = "there is a Wolf somewhere";
@@ -1174,16 +1166,16 @@ if ($test =~ /([wW]olf)/) {
 
 Some "fun" stuff is happening here: we used a _character class_ `[wW]` which
 stands for a match with either `w` or `W`. And we surrounded `[wW]olf` with
-parenthesis like so: `([wW]olf)`. The parenthesis created a capture group which
+parentheses like so: `([wW]olf)`. The parentheses created a capture group which
 we referenced later using `$1`. Note that you could have several capture groups
 in a pattern, and you can refer to these as `$1`, `$2`, etc. The ordering is
 following the order of the parenthesis. For example, if you have
 `((stuff)more)`, we'd have `stuffmore` being in `$1` and `stuff` being in `$2`.
 
-What else do you need to know? A lot more. But I'll say that the dot `.` stands
+What else do you need to know? A lot more. But I'll only say that the dot `.` stands
 for any character _except_ a newline.
 
-That was for matching, what about substituting? Very very similar. Let's try:
+That was for matching, what about substituting? Let's try:
 
 ~~~perl
 my $test = "there is a Wolf somewhere";
@@ -1203,7 +1195,7 @@ print $test;
 ~~~
 
 which would lead to `there is a bearwolf somewhere`. At which point, we should
-all just leave the building.
+all just leave the campground and find a hotel.
 
 # Constants
 
@@ -1228,8 +1220,8 @@ Things to note:
 - we use `=>` instead of `=`
 - we write `Readonly` before the variable declaration.
 
-The reader (you!) sees of course that this is probably just a subroutine call
-`Readonly(my $MEANING_OF_LIFE, 42)`. Maybe it is. Maybe it is.
+The reader sees of course that this is probably just a subroutine call
+`Readonly(my $MEANING_OF_LIFE, 42)`. Maybe it is. Maybe it isn't.
 
 In any case, try this:
 
@@ -1238,13 +1230,13 @@ $MEANING_OF_LIFE = 41;
 ~~~
 
 The compiler will complain with something along the lines of _Invalid
-initialization by assignment_, cause it's a READ-ONLY variable!
+initialization by assignment_, cause it's a READ-ONLY variable and it's also
+not the [meaning of
+life](https://en.wikipedia.org/wiki/The_Hitchhiker%27s_Guide_to_the_Galaxy).
 
 # Printing Anything
 
-You might end up adding more debugging `print` statements in `perl` than you're
-used in other languages. When printing structures, references, hashes, etc, the
-following package will be useful:
+When you need to print more than strings (but for example, objects or hashes), this may come in handy:
 
 ~~~perl
 use Data::Dumper;
@@ -1263,23 +1255,15 @@ $Data::Dumper::Maxdepth=2;
 # More
 
 We skipped objects and so much more, but this is called _elements of perl_ and
-not the _the art of perl_ so I'll refer you these 3 books once more:
+not the _the art of perl_ so I'll refer you these 3 books as I did in the introduction:
 
 - [Learning Perl: Making Easy Things Easy and Hard Things Possible](https://www.goodreads.com/book/show/30413201-learning-perl) by Randal L. Schwartz, Brian D. Foy, Tom Phoenix,
 - [Intermediate Perl](https://www.goodreads.com/book/show/209276.Intermediate_Perl) by Randal L. Schwartz, Brian D. Foy, Tom Phoenix,
 - [Perl Best Practices: Standards and Styles for Developing Maintainable Code](https://www.goodreads.com/book/show/86379.Perl_Best_Practices) by Damian Conway.
 
-Before doing something yourself, check [CPAN](https://metacpan.org) to see
-whether it has been done before.
-
 # Conclusion
 
-I hope the above is enough to get you started with `perl`. If you see errors I
-made or if something could use some more clarification, don't hesitate to reach
-out at stijn.heymans@gmail.com and I'd be happy to help or to help
-find the answer. 
-
-Thanks for reading!
+These were my elements of `perl`.  Thanks for reading!
 
 
 <link rel="stylesheet" href="https://casual-effects.com/markdeep/latest/latex.css?">
