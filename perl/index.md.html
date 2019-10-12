@@ -748,11 +748,11 @@ Note that it's _not_ `elseif` nor `else if`. It's `elsif`.
 `perl` also has the `unless` keyword for the "`if` not" situation. Do not use
 `unless` unless you feel like getting confused. Are you confused? I am.
 
-Related to a condition is the concept of filtering an array to keep only the
-items that satisfy a certain condition. `perl` has `grep` for that (yes, named
+Conditions are useful outside of `if`s to filter an array keeping only the
+items that satisfy a condition. `perl` has `grep` for that (yes, named
 after that [`grep`](http://linuxcommand.org/lc3_man_pages/grep1.html). 
 
-So say we want to create an array containing only negative numbers:
+Say we want to create an array containing only negative numbers:
 
 ~~~perl
 my @all_numbers = (9, -7, -6, 5, 4);
@@ -760,15 +760,16 @@ my @negatives = grep { $_ < 0 } @all_numbers;
 ~~~
 
 I was able to avoid `$_` for a long time, but no more. `$_` is a scalar
-variable (given away by the `$`). And the `_` is the _"I contain whatever makes
-sense at this point in the code"_. In this case `$_`, will contain, in
+variable (given away by the `$`). And the `_` can be memorized as something that points to _whatever makes
+sense at this point in the code_. When used in a `grep`,`$_`, will contain, in
 sequence, every number from `@all_numbers`. `grep` will apply the condition `$_
 < 0` and will keep only those numbers that satisfy that condition (and store it
 in `@negatives`).
 
 Thus, `@negatives` will contain `(-7, -6)`.
 
-Say you'd like to find out whether there's _any_ negative number (i.e., is there at least 1 negative number?) in a list `@all_numbers`. You could do this:
+How could figure out whether there is _any_ negative number (i.e., is there at
+least 1 negative number?) in a list `@all_numbers`. You could then do this:
 
 ~~~perl
 my @all_numbers = (9, -7, -6, 5, 4);
@@ -776,10 +777,11 @@ my @negatives = grep { $_ < 0 } @all_numbers;
 my $contains_negative = @negatives;
 ~~~
 
-You first used `grep` to get all negatives, and then you forced the array into
-a scalar and we know that when you force an array into a scalar it will store
-the length of that array. So `$contains_negative` will contain a `0` or
-strictly positive number. We can then use this in a condition:
+You first used `grep` to get all negatives, and then you forced the array
+`@negatives` into a scalar and we know that when you force an array into a
+scalar it will store the length of that array (do we know that? Well, now we do). We then have that`$contains_negative` contains
+a `0` or strictly positive number (in the example, it will contain a positive
+number as `@negatives` has 2 elements). We can then use this in a condition:
 
 ~~~perl
 if ($contains_negative) {
@@ -791,10 +793,10 @@ Indeed, since any non-zero positive number is considered true, this condition
 will be true if there was _any_ negative number.
 
 Besides being slightly involved, this also not as efficient as it could be:
-`grep` collects _all_ negative numbers and where just interested in whether
-there's `1` negative number. In other words, we'd want to short-circuit this.
-We have exactly that functionality in the core module `List::Util` and
-[`any`](https://perldoc.perl.org/List/Util.html#any):
+`grep` collects _all_ negative numbers and we are interested in whether there's
+at least `1` negative number. In other words, we'd want to short-circuit this.
+We have exactly that functionality in the core module `List::Util` with the
+function [`any`](https://perldoc.perl.org/List/Util.html#any):
 
 ~~~perl
 use List::Util qw(any);
@@ -814,12 +816,12 @@ use List::Util qw(any);
 ~~~
 
 You're used to such inclusions of modules/packages/languages (modules in `perl`
-parlance). So `use` announces _I'm making stuff available to use from the
+parlance) in other languages (Java has import). So `use` announces _I'm making stuff available to use from the
 module `List::Util`_. But what with `qw(any)`?
 
 Well, I did not tell you yet. `any` is a function/subroutine (`subroutine` in
 `perl`) defined in that `List::Util` module, so we're indicating that we'd like
-to import `any` from `List::Util`. But what about `qw`? Well, you essentially
+to import `any` from `List::Util`. But what about `qw`? You are not very patient. But OK, you essentially
 want to indicate what functions you'd want to include, so you could write a
 literal list of strings: `("any")`. And if you want also the subroutine
 `first`:
@@ -828,7 +830,7 @@ literal list of strings: `("any")`. And if you want also the subroutine
 use List::Util ("any", "first");
 ~~~
 
-`perl` programmers find double quotes and commans annoying it seemed, so you can write this as:
+`perl` programmers find double quotes and commans annoying because why not, so you can write this as:
 
 ~~~perl
 use List::Util qw(any first);
@@ -836,8 +838,8 @@ use List::Util qw(any first);
 
 where `qw` signifies, _hey, these are quoted words_. Or something like that.
 
-We already mentioned `first`: use `first` when you want rather than just `true`
-when there is an element in a list satisfying the condition, you'd like to see
+We already mentioned `first`: use `first` when rather than just `true`
+if there is an element in a list satisfying the condition like `any` does, you'd like to see
 that first element that matches the condition:
 
 ~~~perl
@@ -847,7 +849,7 @@ my $first_negative = first { $_ < 0 } @all_numbers;
 
 # Looping
 
-Besides the usual C-style `for` [syntax](https://perldoc.perl.org/perlsyn.html#For-Loops), I find myself often resorting to:
+Besides the usual C-style [`for` syntax](https://perldoc.perl.org/perlsyn.html#For-Loops), I find myself resorting to:
 
 ~~~perl
 for my $number (@all_numbers) {
@@ -857,8 +859,8 @@ for my $number (@all_numbers) {
 
 Given the above `@all_numbers` this will print: `el: 9 el: -7 el: -6 el: 5 el: 4 `.
 
-The syntax initializes using `my $number` with consecutive numbers from
-`@all_numbers`. Why is there `( )` around `@all_numbers` in that syntax. That
+The syntax loops through `@all_numbers`, initializing `my $number` with each consecutive number from
+`@all_numbers`. Why is there parentheses`( )` around `@all_numbers` in that syntax. That
 seems odd. The internet seems to think that the reason is that it's because
 [Larry wants
 it](https://stackoverflow.com/questions/3650000/what-is-the-purpose-of-the-parentheses-in-perls-foreach-statement).
@@ -873,7 +875,9 @@ for my $number (@all_numbers) {
 }
 ~~~
 
-Say I ask you to only use the condition `$number > 0` (testing for positive numbers) but I'd still like you to print negative numbers:
+Hypothetically speaking, I am an annoying persion, so I ask you to only use the
+condition `$number > 0` (testing for positive numbers) but I'd still like you
+to print negative numbers, you would come up with:
 
 ~~~perl
 for my $number (@all_numbers) {
@@ -886,7 +890,11 @@ for my $number (@all_numbers) {
 }
 ~~~
 
-I'm on a roll so I annoy you even more and ask you, _well, I'd like to see that without an `else`_. You're thinking, well, if there's a way to skip the rest of the loop I can just put the `print` as last statement, I just need to make sure I never reach that last statement for positive numbers. I'd just need to skip to the next iteration of the loop:
+I'm on a roll so I annoy you even more and ask, _well, I'd like to see that
+without an `else`_. You're thinking, which is a great start. If there's a way
+to skip the rest of the loop I can just put the `print` as last statement, I
+just need to make sure I never reach that last statement for positive numbers.
+I'd just need to skip to the _next_ iteration of the loop:
 
 ~~~perl
 for my $number (@all_numbers) {
@@ -907,7 +915,8 @@ for my $number (@all_numbers) {
 }
 ~~~
 
-For clarify, you can label your for-loops when having such control statements like `next`:
+For clarity and because you're big on labels, you can label your for-loops when
+having such control statements like `next`:
 
 ~~~perl
 NUMBER:
@@ -917,14 +926,15 @@ for my $number (@all_numbers) {
 }
 ~~~
 
-That's often useful when nesting loops.
+That's often useful when nesting loops (`next`, `next`? What do you mean
+`next`? `next NUMBER` ah ok, why didn't you say that right away?)
 
-So you can skip the current iteration, can I just exit the loop? Yes, use
-[last](https://perldoc.perl.org/functions/last.html).
+You can skip the current iteration. Doesn't it feel great to skip? Can I just
+leave the party alltogether. Aka, in what is a tired metaphore, exit the loop?
+Yes, use [last](https://perldoc.perl.org/functions/last.html).
 
-
-Let's do another example of a loop: let's construct a new array out of `@all_numbers` that contains the elements of `@all_numbers` but doubled:
-
+Let's do another example of a loop: let's construct a new array out of
+`@all_numbers` that contains the elements of `@all_numbers` but doubled:
 
 ~~~perl
 my @doubled_numbers = ();
@@ -934,13 +944,13 @@ for my $number (@all_numbers) {
 ~~~
 
 Great, we initialized a new array `@doubled_numbers` with the empty array `(
-)`, we looped through `@all_numbers` and using `push` we added all doubled numbers.
+)`. We looped through `@all_numbers` and using `push` we added all doubled numbers.
 `push` adds numbers from the back as we saw before so order nicely stays
 maintained. Is there a problem with this approach?
 
 It's fine, except that, as is usual in most programming languages, the memory
-allocated for `@doubled_numbers` has the potentially to be need to be
-re-allocated when we're running out of initial memory for `@doubled_numbers`.
+allocated for `@doubled_numbers` potentially has to be re-allocated
+we run out of initial memory for `@doubled_numbers`.
 This is inefficient. In cases where we're constructing a new _something_ out of
 an another _something_ consider using a
 [`map`](https://perldoc.perl.org/functions/map.html):
@@ -961,7 +971,7 @@ my @double_sight = map { $_, $_ } @all_numbers;
 ~~~
 
 will return a list of 2 elements for each number in `@all_numbers` which we'll
-the concatenate. For example, say `@all_numbers` is `(1, 2, 3)`, then
+then concatenate. For example, say `@all_numbers` is `(1, 2, 3)`, then
 `@double_sight` will be `(1, 1, 2, 2, 3, 3)`. Why will it not be `((1, 1), (2,
 2), (3, 3))`: `perl` does not allow such nested lists, so the inner lists will
 be implicitly flattened. We could make the list construction in that latter a
@@ -984,10 +994,11 @@ _could_ make sense.
 # Subroutines
 
 We talked about data structures and some ways to manipulate them using `perl`'s
-built-ins. But of course, you'd want to define your own subroutines that built
-on other subroutines that built on...
+built-ins. But of course, you'd want to define your own subroutines that build
+on other subroutines that build on...Because you're a builder, a creator, a
+maker, an inventor, oh whatever.
 
-In `perl` we indicate a subroutine by the keyword `sub`. Say I want to define a
+In `perl`, we indicate a subroutine by the keyword `sub`. You can define a
 function for the doubling that I used in the above `map`:
 
 ~~~perl
@@ -998,12 +1009,12 @@ sub double_it {
 }
 ~~~
 
-The `return 2 * $x` is intuitively clear. What is is _new_  at least for this
+The `return 2 * $x` is clear. What is is _new_  at least for this
 document, is the `return`. That's working as it works in other programming
 languages: it exits from the subroutine and returns the value `2 * $x` to the
 caller of the subroutine.
 
-The main thing you will notice is: where are the arguments to this function, it
+However, where are the arguments to this function? It
 _seems_ like `$x` is the argument but why are you extracting this in the
 weirdest way possible:
 
@@ -1011,22 +1022,22 @@ weirdest way possible:
   my ($x) = @_;
 ~~~
 
-What is happening here? Well, you will call `double_it` as you're used from other programming languages:
+What is happening here? What is wrong with me? Well, you will call `double_it` as you're used to from other programming languages:
 
 ~~~perl
 my $y = double_it(5);
 ~~~
 
 The argument list to `double_it` now gets implicitly bound to the special array
-variable `@_`. Note that we already say special variable `$_`, well, this is
-another special one, for arrays. It contains the weirdest stuff.
+variable `@_`. Note that we already saw special variable `$_`, well, this is
+another special one, for arrays. 
 
 In this case, we'd have that `@_` would be bound to `(5)`. Ok, cool, so `my
 ($x) = @_`is at that point the same as `my ($x) = (5)`. The left hand side is
 an array literal with a variable `$x` in it, the right hand side is just an
 array literal. `perl` matches those 2 for you such `$x` is now `5`. Exactly
-what we were hoping for.  Note this mechanism of matching allows you  in
-general to do neat things:
+what we were hoping for -- at least I was.  This mechanism of matching allows
+you to do neat things:
 
 ~~~perl
 my ($x, $y) = (5);
@@ -1096,7 +1107,7 @@ print "@a\n";
 
 will print `3 2` as the original `@a` is now indeed changed since we passed it by reference.
 
-Talking about references, can I use a reference to a subroutine as an argument?
+Talking about references, can I use a reference to a subroutine as an argument to another subroutine?
 
 Take a simple `print` function:
 
