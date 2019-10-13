@@ -7,23 +7,23 @@
 
 # Introduction
 
-This article highlights language elements from `perl 5.x`. I focus on giving
-you one way to express a programming thought, rather than explaining all the
-ways `perl` allows for.  To prepare for this article, I studied these 3 books: 
+This article gives an opinionated and incomplete introduction to `perl 5.x`. To
+prepare for this article, I studied these 3 books: 
 
 - [Learning Perl: Making Easy Things Easy and Hard Things Possible](https://www.goodreads.com/book/show/30413201-learning-perl) by Randal L. Schwartz, Brian D. Foy, Tom Phoenix,
 - [Intermediate Perl](https://www.goodreads.com/book/show/209276.Intermediate_Perl) by Randal L. Schwartz, Brian D. Foy, Tom Phoenix,
 - [Perl Best Practices: Standards and Styles for Developing Maintainable Code](https://www.goodreads.com/book/show/86379.Perl_Best_Practices) by Damian Conway.
 
-Compared to those books, this article is incomplete and opinionated. For
-example, there is a section on constants in this article, because `Java`
-programmers will wonder _how do I do constants in perl?_ My hope is, however,
-that the article represents some core of how to use `perl` most effectively,
-leaving what _effective_ means purposefully undefined.  In the best case, I
-managed to capture some _elements of_ perl, in the worst case, it's _my_
-elements of `perl`.
+Despite being incomplete and opinionated, my hope is that the article
+represents some core of how to use `perl` most effectively in a professional
+context, leaving what _effective_ means purposefully undefined.  In the best
+case, I managed to capture some _elements of_ perl, in the worst case, it's
+_my_ elements of `perl`.
 
---October 2019.
+Are there prerequisites to reading this? This is not a programming tutorial, so
+I'll assume you have knowledge of other languages (for example, Java, C, C++,
+Python, Javascript). From time to time, I'll refer to some of these
+languages to indicate a difference or similarity.
 
 # Scalars
 
@@ -32,10 +32,8 @@ elements of `perl`.
 ### Basics
 
 _Scalars_ or _scalar values_ are the smallest unit of data in perl. Numbers and
-strings are scalars.
-
-We store scalars in _scalar variables_, for example, let's look at how to store
-and manipulate strings in this section:
+strings are scalars.  We store scalars in _scalar variables_. Let's look at how
+to store and manipulate strings in this section:
 
 ~~~perl
 my $var = 'I am a string';
@@ -67,9 +65,9 @@ If you'd like to change `$var` by concatenating something to it, instead of
 $var .= ' and me too.';
 ~~~
 
-Note that we used single quotes for strings. What about double quotes?. You can
-use double quotes as well. Good practice is to use them only when you want to
-_interpolate_ variables appearing in such strings. For example:
+Note that we used single quotes for strings. What about double quotes? You can
+use double quotes as well. Good practice is to use double quotes only when you
+want to _interpolate_ variables appearing in such strings. For example:
 
 ~~~perl
 my $name = 'stijn';
@@ -93,7 +91,7 @@ my $money = "my password is !$guest";
 ~~~
 
 In this case `perl` will try to expand `$guest` which does not exist and will
-result in warning and an unexpected result in `$money`.
+result in a warning and an unexpected result in `$money`.
 
 You actually meant:
 
@@ -101,7 +99,7 @@ You actually meant:
 my $money = 'my password is !$guest';
 ~~~
 
-You can extract individual characters out of a string similar to you'd do it in
+You can extract individual characters out of a string similar to how you'd do it in
 other languages:
 
 ~~~perl
@@ -116,14 +114,15 @@ might know from `Python`:
 my $last = $string[-1];
 ~~~
 
-And yes, you'd get the next-to-last element, by accessing it using `-2`.
+And yes, you'd get the next-to-last element by accessing it using `-2`.
 
 
 ### Built-in Functions
 
 #### [`print`](https://perldoc.perl.org/functions/print.html)
 
-Printing to `STDOUT` will be mostly useful for debugging the odd statement here and there:
+Printing to `STDOUT` will be mostly useful for debugging the odd statement --
+and you'll have many odd statements:
 
 ~~~perl
 print "This is a printed string\n";
@@ -158,7 +157,7 @@ my $nonsense_substring = substr('concatenate', 3);
 #### [`split`](https://perldoc.perl.org/functions/split.html)
 
 `split` splits a string into parts based on a regular expression
-`/REGEXP/`. However, I will just mention the form you'll often spot in the
+`/REGEXP/`. You'll often spot this form in the
 wild:
 
 ~~~perl
@@ -172,7 +171,7 @@ about regular expressions.
 
 
 !!! 
-   Note the `split //, 'yeah'` without parenthesis. Based on
+   Note that `split //, 'yeah'` has no parentheses. Based on
    how I wrote `substr` you expected to see `split(//,'yeah')` and you'd been
    right as well! `perl` is playing loose with parentheses, so for
    built-in functions you'll often see parentheses dropped. For functions you
@@ -202,7 +201,7 @@ which is of course the same as if we would have done:
 my $doubling = 2 * $numero;
 ~~~
 
-Similar like in other languages, there is a short hand for `$numero = $numero + 42`:
+Similar like in other languages, there is a shorthand for `$numero = $numero + 42`:
 
 ~~~perl
 $numero += 42;
@@ -220,6 +219,10 @@ You can `print` numbers and a good conversion (the `%d` in the below template st
 ~~~perl
 print "The meaning of life is %d", 42;
 ~~~
+
+You can find other built-in functions on the Internet. Never write code that
+was already written better by someone else, with a better attitude and a more
+positive outlook on life.
 
 ## `undef`
 
@@ -241,7 +244,7 @@ What's with the
 # stuff
 ~~~
 
-A `#` marks comments. Anything following it is ignored by the `perl` compiler.
+A `#` marks comments. Anything following it is ignored by the `perl` compiler. Programmers ignore at their own peril.
 
 # Array Variables
 
@@ -265,7 +268,7 @@ variable, that variable will be a _scalar variable_.
 I have find this probably the most confusing _thing_ (so I'd store my confusion
 in a scalar).
 
-Let's complicate this slightly more. Try getting the first element of the array `@array`:
+Let's complicate this slightly more. Try to get the first element of the array `@array`:
 
 ~~~perl
 my $first_element = $array[0];
@@ -277,13 +280,13 @@ differently put, while `@array` is an array, `$array[0]` is a scalar which
 could be a reminder for why we use `$` in that case rather than `@`.
 
 The last element is usually easily retrieved using the `-1` index (similar to
-for accessing characters in a string we saw before):
+how we access characters in a string):
 
 ~~~perl
 my $last_element = $array[-1];
 ~~~
 
-We can change an element similarly as retrieving. Change the first element of `@array`:
+Changing the first element of an `@array` has no surprises:
 
 ~~~perl
 $array[0] = 'You';
@@ -421,7 +424,7 @@ Note:
 
 1. we used a new symbol `%` to indicate that `some_hash` is a variable used to store a hash. 
 2. there seems to be no syntactical distinction between keys and values. We'd expect `'name'` and `'age'` to be keys, and `'john'` and `39` to be values. Instead, this has the same syntax as a literal list. In fact, it _is_ just a list. Let's get back to our _contexts_. We already saw a _list context_ and a _scalar context_. The `%` on the left-hand side of the assignment, indicates a _hash context_ and whereas the right-hand side is indeed a list, we are trying to assign the list to a hash such that effectively we indeed store a hash (i.e, something we can access based on keys `'name'` and `'age'` as we will see in a bit).
-3. The keys `'name'` and `'age'` are strings while the values are strings or numbers (`39`). Indeed, the keys of a hash are always strings. The values are less strict and can be any _scalar_. As such we cannot nest hashes by embedding another hash as a value within a hash. At least not without a final concept called _references_ which we'll introduce later. For now, remember that values of a hash are always scalars.
+3. The keys `'name'` and `'age'` are strings while the values are strings or numbers (`39`). Indeed, the keys of a hash are always strings. The values are less strict and can be any _scalar_. As such we cannot nest hashes by embedding another hash as a value within a hash. At least not without a concept called _references_ which we'll introduce later. For now, remember that values of a hash are always scalars.
 
 As the list syntax for hashes is obviously confusing, `perl` has a trick (of
 course it has). We can replace certain commas by so-called `fat commas`: `=>`.
@@ -460,7 +463,7 @@ Same difference. We also used the scalar `$` symbol instead of the hash symbol
 that values in hashes have to be scalars) rather than a _hash_, so it makes
 sense to refer to it with `$`.
 
-Changing the value for a key is can be done without surprises:
+Changing the value for a key can be done without surprises:
 
 ~~~perl
 $some_hash{name} = 'bill';
@@ -485,7 +488,7 @@ values `39` and `john` from the hash:
 my @values = values %some_hash;
 ~~~
 
-Indeed `@values` will be the array `(39, 'john')`. Note that even though we
+Indeed, `@values` will be the array `(39, 'john')`. Note that even though we
 defined `%some_hash` using the literal `('name', 'john', 'age', '39')` which
 hints at some _ordering_, neither `values` nor `keys` need to satisfy that
 original order. 
@@ -496,16 +499,16 @@ _References_ or the concept that makes nested structures possible. Recall that
 arrays can store lists of scalars and hashes are key-value maps where the key
 needs to be a string and the value needs to be a scalar.
 
-At first sight this restricts us to rather flat data structures, for example, I
+At first sight this restricts us to rather flat data structures. For example, I
 could not directly store a list of hashes. Or a hash that is an index of names
 (the key) to person's addresses (the value, consisting of street, zip code)).
 
 No-one wants to be restricted, the least of all to flat data structures. Enter: the _reference_. To
 some degree the reference is a bit like C/C++ style pointers. It is 
 a _scalar_ that _points_ to other _things_. Those other other things could
-be other lists, hashes, or other scalars, and....other references.
+be other lists, other hashes, or other scalars, and even other references.
 
-For example, say we have a reference `$a_ref` (note that references are
+Say we have a reference `$a_ref` (note that references are
 scalars, so here we go with the `$` again) that points to an array `(1, 2, 3)`:
 
 ***********************************
@@ -515,7 +518,7 @@ scalars, so here we go with the `$` again) that points to an array `(1, 2, 3)`:
 *   '--------'       '----------' *
 ***********************************
 
-This now means that we can indeed have a hash with values that are pointing to arrays:
+Since `$a_ref` is a scalar, we can now have a hash with values that are pointing to arrays:
 
 ~~~perl
 my %array_value_hash = (john => $a_ref);
@@ -667,7 +670,7 @@ Also this form has an easier to read form using an `->` notation:
 $hash_ref->{age};
 ~~~
 
-which we will mostly use going forward.
+which is the preferable form.
 
 
 # Conditions
@@ -700,7 +703,7 @@ if ( !($age == 18) ) {
 
 Note the extra parenthesis. This is needed in this case, indeed `!$age == 18`
 would lead to `!$age` being interpreted first. Since `$age` is a number but `!`
-forces a boolean context, and given that, any number other than `0` is
+forces a Boolean context, and given that, any number other than `0` is
 considered truth, we have that `!$age` is false if `$age` is not 0. And false
 is never equal to `18` so `!$age == 18` would always be false. Neither is true
 by the way, so even if `$age` is 0, we'd have that `!$age` is true. It's
@@ -740,7 +743,7 @@ Note that it's _not_ `elseif` nor `else if`. It's `elsif`.
 
 Conditions are useful outside of `if`s to filter an array keeping only the
 items that satisfy a condition. `perl` has `grep` for that (yes, named
-after that [`grep`](http://linuxcommand.org/lc3_man_pages/grep1.html). 
+after that [`grep`](http://linuxcommand.org/lc3_man_pages/grep1.html)). 
 
 Say we want to create an array containing only negative numbers:
 
@@ -751,15 +754,15 @@ my @negatives = grep { $_ < 0 } @all_numbers;
 
 I was able to avoid `$_` for a long time, but no more. `$_` is a scalar
 variable (given away by the `$`). And the `_` can be memorized as something that points to _whatever makes
-sense at this point in the code_. When used in a `grep`,`$_`, will contain, in
+sense at this point in the code_. When used in a `grep`, `$_`, will contain, in
 sequence, every number from `@all_numbers`. `grep` will apply the condition `$_
 < 0` and will keep only those numbers that satisfy that condition (and store it
 in `@negatives`).
 
 Thus, `@negatives` will contain `(-7, -6)`.
 
-How could figure out whether there is _any_ negative number (i.e., is there at
-least 1 negative number?) in a list `@all_numbers`. You could then do this:
+How could you figure out whether there is _any_ negative number (i.e., is there
+at least 1 negative number?) in a list `@all_numbers`. You could do this:
 
 ~~~perl
 my @all_numbers = (9, -7, -6, 5, 4);
@@ -769,9 +772,10 @@ my $contains_negative = @negatives;
 
 You first used `grep` to get all negatives, and then you forced the array
 `@negatives` into a scalar and we know that when you force an array into a
-scalar it will store the length of that array (do we know that? Well, now we do). We then have that`$contains_negative` contains
-a `0` or strictly positive number (in the example, it will contain a positive
-number as `@negatives` has 2 elements). We can then use this in a condition:
+scalar it will store the length of that array (do we know that? Well, now we
+do). We then have that `$contains_negative` contains a `0` or strictly positive
+number (in the example, it will contain a positive number as `@negatives` has 2
+elements). We can then use this in a condition:
 
 ~~~perl
 if ($contains_negative) {
@@ -782,7 +786,7 @@ if ($contains_negative) {
 Indeed, since any non-zero positive number is considered true, this condition
 will be true if there was _any_ negative number.
 
-Besides being slightly involved, this also not as efficient as it could be:
+Besides being slightly involved, this is also not as efficient as it could be:
 `grep` collects _all_ negative numbers and we are interested in whether there's
 at least `1` negative number. In other words, we'd want to short-circuit this.
 We have exactly that functionality in the core module `List::Util` with the
@@ -806,7 +810,7 @@ use List::Util qw(any);
 ~~~
 
 You're used to such inclusions of modules/packages/languages (modules in `perl`
-parlance) in other languages (Java has import). So `use` announces _I'm making stuff available to use from the
+parlance) in other languages (Java has import). In this example, `use` announces _I'm making stuff available to use from the
 module `List::Util`_. But what with `qw(any)`?
 
 Well, I did not tell you yet. `any` is a function/subroutine (`subroutine` in
@@ -826,11 +830,10 @@ use List::Util ("any", "first");
 use List::Util qw(any first);
 ~~~
 
-where `qw` signifies, _hey, these are quoted words_. Or something like that.
+where `qw` signifies, _hey, these are quoted words_. 
 
-We already mentioned `first`: use `first` when rather than just `true`
-if there is an element in a list satisfying the condition like `any` does, you'd like to see
-that first element that matches the condition:
+We already mentioned `first`: use `first` when you'd like to find
+the first element that matches the condition:
 
 ~~~perl
 my @all_numbers = (9, -7, -6, 5, 4);
@@ -839,7 +842,7 @@ my $first_negative = first { $_ < 0 } @all_numbers;
 
 # Looping
 
-Besides the usual C-style [`for` syntax](https://perldoc.perl.org/perlsyn.html#For-Loops), I find myself resorting to:
+Besides the usual C-style [`for` syntax](https://perldoc.perl.org/perlsyn.html#For-Loops) that is supported in `perl` as well, I find myself resorting to:
 
 ~~~perl
 for my $number (@all_numbers) {
@@ -851,7 +854,7 @@ Given the above `@all_numbers` this will print: `el: 9 el: -7 el: -6 el: 5 el: 4
 
 The syntax loops through `@all_numbers`, initializing `my $number` with each consecutive number from
 `@all_numbers`. Why is there parentheses`( )` around `@all_numbers` in that syntax. That
-seems odd. The internet seems to think that the reason is that it's because
+seems odd? The internet seems to think that the reason is that it's because
 [Larry wants
 it](https://stackoverflow.com/questions/3650000/what-is-the-purpose-of-the-parentheses-in-perls-foreach-statement).
 
@@ -865,7 +868,7 @@ for my $number (@all_numbers) {
 }
 ~~~
 
-Hypothetically speaking, I am an annoying persion, so I ask you to only use the
+Hypothetically speaking, I am an annoying persion, so if I ask you to only use the
 condition `$number > 0` (testing for positive numbers) but I'd still like you
 to print negative numbers, you would come up with:
 
@@ -917,10 +920,10 @@ for my $number (@all_numbers) {
 ~~~
 
 That's often useful when nesting loops (`next`, `next`? What do you mean
-`next`? `next NUMBER` ah ok, why didn't you say that right away?)
+`next`? `next NUMBER` ah OK, why didn't you say that right away?)
 
 You can skip the current iteration. Doesn't it feel great to skip? Can I just
-leave the party alltogether. Aka, in what is a tired metaphore, exit the loop?
+leave the party altogether. Aka -- this metaphor is tired -- exit the loop?
 Yes, use [last](https://perldoc.perl.org/functions/last.html).
 
 Let's do another example of a loop: let's construct a new array out of
@@ -940,7 +943,7 @@ maintained. Is there a problem with this approach?
 
 It's fine, except that, as is usual in most programming languages, the memory
 allocated for `@doubled_numbers` potentially has to be re-allocated
-we run out of initial memory for `@doubled_numbers`.
+when we run out of initial memory for `@doubled_numbers`.
 This is inefficient. In cases where we're constructing a new _something_ out of
 an another _something_ consider using a
 [`map`](https://perldoc.perl.org/functions/map.html):
@@ -950,9 +953,9 @@ my @doubled_numbers = map { 2 * $_ } @all_numbers;
 ~~~
 
 As with `grep`, the variable `$_` will be _each element from `@all_numbers`_.
-We will take that element and execute the expresssion within `{ }`, and then we
+We will take that element and execute the expression within `{ }`, and then we
 will put the results of all those executions in 1 list. That list is the result
-of the `map`. Note that we can generate multiple elements for each element, so
+of the `map`. Note that we can generate multiple elements for each element of the list that we apply the `map` to, so
 we can increase the size of the list. Say we want to repeat each occurrence of
 each element:
 
@@ -999,12 +1002,12 @@ sub double_it {
 }
 ~~~
 
-The `return 2 * $x` is clear. What is is _new_  at least for this
+The `2 * $x` is clear. What is new  at least for this
 document, is the `return`. That's working as it works in other programming
 languages: it exits from the subroutine and returns the value `2 * $x` to the
 caller of the subroutine.
 
-However, where are the arguments to this function? It
+Where are the arguments to this function? It
 _seems_ like `$x` is the argument but why are you extracting this in the
 weirdest way possible:
 
@@ -1022,10 +1025,10 @@ The argument list to `double_it` now gets implicitly bound to the special array
 variable `@_`. Note that we already saw special variable `$_`, well, this is
 another special one, for arrays. 
 
-In this case, we'd have that `@_` would be bound to `(5)`. Ok, cool, so `my
+In this case, we'd have that `@_` would be bound to `(5)`. OK, cool, so `my
 ($x) = @_`is at that point the same as `my ($x) = (5)`. The left hand side is
 an array literal with a variable `$x` in it, the right hand side is just an
-array literal. `perl` matches those 2 for you such `$x` is now `5`. Exactly
+array literal. `perl` matches those 2 for you such that `$x` is now `5`. Exactly
 what we were hoping for -- at least I was.  This mechanism of matching allows
 you to do neat things:
 
@@ -1097,39 +1100,6 @@ print "@a\n";
 
 will print `3 2` as the original `@a` is now indeed changed since we passed it by reference.
 
-Talking about references, can I use a reference to a subroutine as an argument to another subroutine?
-
-Take a simple `print` function:
-
-~~~perl
-sub print_double {
-  my ($x) = @_;
-  print $x * 2;
-}
-~~~
-
-Now say you want to write a function that applies another function to a scalar.
-For example a `do_it` function:
-
-~~~perl
-sub do_it {
-  my ($function_ref, $x) = @_;
-  $function_ref->($x);
-}
-
-do_it(\&print_double, 3);
-~~~
-
-We gave a reference to the function `print_double` to the `do_it` function:
-`\&print_double`. And in the `do_it` function, we called the function using the
-`->` notation. We could also have called it as follows:
-
-~~~perl
-&{$function_ref}($x);
-~~~
-
-so using the dereference `{ }`. Generally, the arrow notation is more readable.
-
 # Matching and Substituting
 
 We cannot talk about `perl` without mentioning regular expressions. There's a
@@ -1197,7 +1167,7 @@ all just leave the campground and find a hotel.
 
 # Constants
 
-I know you miss your `private static final` variables, my dear `java`
+I know you miss your `private static final` variables, my dear Java
 aficionado. For the rest of the world, constants, how do I declare something as
 constant, you can't change it, don't touch it, don't even look at it!?
 
@@ -1228,13 +1198,13 @@ $MEANING_OF_LIFE = 41;
 ~~~
 
 The compiler will complain with something along the lines of _Invalid
-initialization by assignment_, cause it's a READ-ONLY variable and it's also
+initialization by assignment_, cause it's a READ-ONLY variable and `41` is also
 not the [meaning of
 life](https://en.wikipedia.org/wiki/The_Hitchhiker%27s_Guide_to_the_Galaxy).
 
 # Printing Anything
 
-When you need to print more than strings (but for example, objects or hashes), this may come in handy:
+When you need to print more than strings, this may come in handy:
 
 ~~~perl
 use Data::Dumper;
