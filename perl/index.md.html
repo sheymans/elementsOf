@@ -1,9 +1,11 @@
 
 
+
 <meta charset="utf-8">
                             **Elements of Perl**
                             Stijn Heymans
-                            12 October 2019
+                            published: 12 October 2019
+                            last updated: 25 October 2019 
 
 # Introduction
 
@@ -1102,10 +1104,11 @@ will print `3 2` as the original `@a` is now indeed changed since we passed it b
 
 # Matching and Substituting
 
-We cannot talk about `perl` without mentioning regular expressions. There's a
-world of pain for you waiting, so let me introduce some elements. For a string
-"there is a wolf somewhere", you'd like to check whether it contains the word
-_wolf_ (it does). You could do:
+We cannot talk about `perl` without mentioning regular expressions. Let's go
+through examples to explain common constructs.
+
+Assume you have a string "there is a wolf somewhere" and you'd like to check
+whether it contains the word _wolf_: 
 
 ~~~perl
 my $test = "there is a wolf somewhere";
@@ -1119,10 +1122,10 @@ operator `=~` we are saying: I want to check the pattern on the right of `=~`
 in the text on the left of `=~`. What is the pattern? The pattern is between
 slashes`/`: `/wolf/`. Note that you'll sometimes see `m/wolf/`, i.e, the pattern prefixed
 with `m`. That's because there's a version with `s` as well, which stands for
-_substitute_. Later more on that.
+_substitute_. 
 
-That was the basics, let's advance: _capture groups_. They allow you to refer
-to the matched pattern later:
+That was the absolute basics. Let's advance to _capture groups_. They allow you
+to use the matched pattern later:
 
 ~~~perl
 my $test = "there is a Wolf somewhere";
@@ -1132,18 +1135,18 @@ if ($test =~ /([wW]olf)/) {
 }
 ~~~
 
-Some "fun" stuff is happening here: we used a _character class_ `[wW]` which
-stands for a match with either `w` or `W`. And we surrounded `[wW]olf` with
-parentheses like so: `([wW]olf)`. The parentheses created a capture group which
-we referenced later using `$1`. Note that you could have several capture groups
-in a pattern, and you can refer to these as `$1`, `$2`, etc. The ordering is
-following the order of the parenthesis. For example, if you have
-`((stuff)more)`, we'd have `stuffmore` being in `$1` and `stuff` being in `$2`.
+We used a _character class_ `[wW]` which stands for a match with either `w` or
+`W`. And we surrounded `[wW]olf` with parentheses like so: `([wW]olf)`. The
+parentheses created a capture group which we referenced later using `$1`. Note
+that you could have several capture groups in a pattern, and you can refer to
+these as `$1`, `$2`, etc. The ordering in those variable names is following the
+order of the parentheses. For example, if you have pattern `((stuff)more)` and
+a text `somestuffmore`, you'd have `stuffmore` matched in `$1` and `stuff` in
+`$2`.
 
-What else do you need to know? A lot more. But I'll only say that the dot `.` stands
-for any character _except_ a newline.
+I'll further say that the dot `.` stands for any character _except_ a newline.
 
-That was for matching, what about substituting? Let's try:
+That was for matching, what about substituting those matches? Let's try:
 
 ~~~perl
 my $test = "there is a Wolf somewhere";
@@ -1152,9 +1155,11 @@ print $test;
 ~~~
 
 will predictably announce to us that _there is a bear somewhere_. We already
-mentioned the `s` for `substitute`. The first part of that `s//` construct is
-the pattern to replace, the second part is the pattern to replace it with. We
-can refer to the capturing groups of the first pattern in the 2nd pattern:
+mentioned the `s` for `substitute`. The first part `([wW]olf)` of that `s//`
+construct is the pattern to replace, the second part `bear` is the pattern to
+replace it with.
+
+We can refer to the capturing groups of the first pattern in the 2nd pattern:
 
 ~~~perl
 my $test = "there is a wolf somewhere";
@@ -1162,24 +1167,20 @@ $test =~ s/([wW]olf)/bear$1/;
 print $test;
 ~~~
 
-which would lead to `there is a bearwolf somewhere`. At which point, we should
+which would lead to printing `there is a bearwolf somewhere`. At which point, we should
 all just leave the campground and find a hotel.
 
 # Constants
 
-I know you miss your `private static final` variables, my dear Java
-aficionado. For the rest of the world, constants, how do I declare something as
-constant, you can't change it, don't touch it, don't even look at it!?
+Java programmers might wonder how to declare something as constant (`private
+static final`), i.e., you can define it once, but you can afterward no longer
+re-assign it.
 
-You have to use a package:
+You can use the `ReadOnly` module:
 
 ~~~perl
 use Readonly;
-~~~
 
-And then:
-
-~~~perl
 Readonly my $MEANING_OF_LIFE => 42;
 ~~~
 
@@ -1188,8 +1189,9 @@ Things to note:
 - we use `=>` instead of `=`
 - we write `Readonly` before the variable declaration.
 
-The reader sees of course that this is probably just a subroutine call
-`Readonly(my $MEANING_OF_LIFE, 42)`. Maybe it is. Maybe it isn't.
+While this looks a lot like a variable declaration, you can see that, given
+`perl`'s looseness with parentheses, this is probably just a subroutine call
+`Readonly(my $MEANING_OF_LIFE, 42)` made to look like a variable declaration.
 
 In any case, try this:
 
@@ -1197,14 +1199,20 @@ In any case, try this:
 $MEANING_OF_LIFE = 41;
 ~~~
 
-The compiler will complain with something along the lines of _Invalid
-initialization by assignment_, cause it's a READ-ONLY variable and `41` is also
-not the [meaning of
-life](https://en.wikipedia.org/wiki/The_Hitchhiker%27s_Guide_to_the_Galaxy).
+The compiler will complain with an _Invalid initialization by assignment_,
+because we declared the variable to be read-only and `41` is not the [meaning
+of life](https://en.wikipedia.org/wiki/The_Hitchhiker%27s_Guide_to_the_Galaxy).
 
 # Printing Anything
 
-When you need to print more than strings, this may come in handy:
+If you print, for example, a hash reference:
+
+```
+print {a => 1, b => 2};
+```
+
+you'll see a useless `HASH(0x7f8d43004ee8)` printed. In order to print more
+than strings or numbers, the `Data::Dumper` module is there to help:
 
 ~~~perl
 use Data::Dumper;
@@ -1214,7 +1222,7 @@ print Dumper($hash_ref);
 ~~~
 
 Often the thing you'd like to print is a deeply nested structure. If you want
-to limit the levels you'd like to print you can do:
+to limit the levels of that nested structure you'd like to print you can do:
 
 ~~~perl
 $Data::Dumper::Maxdepth=2;
@@ -1222,8 +1230,9 @@ $Data::Dumper::Maxdepth=2;
 
 # More
 
-We skipped objects and so much more, but this is called _elements of perl_ and
-not the _the art of perl_ so I'll refer you these 3 books as I did in the introduction:
+We skipped an introduction to objects and so many other topics as I wanted to
+keep this article restricted to what I consider _elements_. Go check out the
+following books if you're looking for a topic we did not tackle:
 
 - [Learning Perl: Making Easy Things Easy and Hard Things Possible](https://www.goodreads.com/book/show/30413201-learning-perl) by Randal L. Schwartz, Brian D. Foy, Tom Phoenix,
 - [Intermediate Perl](https://www.goodreads.com/book/show/209276.Intermediate_Perl) by Randal L. Schwartz, Brian D. Foy, Tom Phoenix,
@@ -1231,7 +1240,9 @@ not the _the art of perl_ so I'll refer you these 3 books as I did in the introd
 
 # Conclusion
 
-These were my elements of `perl`.  Thanks for reading!
+I presented my interpretation of the basic elements of `perl`. Like with all
+selections of this nature, I hope that, in some way, this will be useful for
+you as well.
 
 <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-12447521-1"></script>
@@ -1249,3 +1260,4 @@ These were my elements of `perl`.  Thanks for reading!
 
 <link rel="stylesheet" href="https://casual-effects.com/markdeep/latest/latex.css?">
 <!-- Markdeep: --><style class="fallback">body{visibility:hidden}</style><script src="https://casual-effects.com/markdeep/latest/markdeep.min.js?" charset="utf-8"></script>
+
