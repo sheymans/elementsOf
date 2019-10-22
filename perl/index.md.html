@@ -988,13 +988,12 @@ _could_ make sense.
 
 # Subroutines
 
-We talked about data structures and some ways to manipulate them using `perl`'s
-built-ins. But of course, you'd want to define your own subroutines that build
-on other subroutines that build on...Because you're a builder, a creator, a
-maker, an inventor, oh whatever.
+We have talked about data, ways to store it, and ways to manipulate it using
+`perl`'s built-ins. How do we write our own functions/methods to manipulate
+data? In `perl`, functions/methods are called _subroutines_. We indicate that
+we're defining a subroutine by the keyword `sub`.
 
-In `perl`, we indicate a subroutine by the keyword `sub`. You can define a
-function for the doubling that I used in the above `map`:
+For example, let's define a subroutine that doubles a number:
 
 ~~~perl
 sub double_it {
@@ -1004,20 +1003,19 @@ sub double_it {
 }
 ~~~
 
-The `2 * $x` is clear. What is new  at least for this
-document, is the `return`. That's working as it works in other programming
-languages: it exits from the subroutine and returns the value `2 * $x` to the
-caller of the subroutine.
+What `2 * $x` does is clear. What is new is the `return`: it tells `perl` to
+exit from the subroutine and to return double the value of `$x` to the caller
+of the subroutine.
 
-Where are the arguments to this function? It
-_seems_ like `$x` is the argument but why are you extracting this in the
-weirdest way possible:
+Where are the arguments to this function? It _seems_ like `$x` is the argument
+but it's first mentioned in an unexpected way:
 
 ~~~perl
-  my ($x) = @_;
+my ($x) = @_;
 ~~~
 
-What is happening here? What is wrong with me? Well, you will call `double_it` as you're used to from other programming languages:
+Let's walk through a subroutine call to see how the argument to a subroutine
+call gets stored in `$x` in this example. Say we want to double `5`:
 
 ~~~perl
 my $y = double_it(5);
@@ -1027,12 +1025,13 @@ The argument list to `double_it` now gets implicitly bound to the special array
 variable `@_`. Note that we already saw special variable `$_`, well, this is
 another special one, for arrays. 
 
-In this case, we'd have that `@_` would be bound to `(5)`. OK, cool, so `my
+In this case, we'd have that `@_` would be bound to the list `(5)`. So `my
 ($x) = @_`is at that point the same as `my ($x) = (5)`. The left hand side is
 an array literal with a variable `$x` in it, the right hand side is just an
-array literal. `perl` matches those 2 for you such that `$x` is now `5`. Exactly
-what we were hoping for -- at least I was.  This mechanism of matching allows
-you to do neat things:
+array literal. `perl` matches those 2 for you such that `$x` is now `5`. 
+
+Let's take a quick detour around this mechanism of matching. It allows you to
+do:
 
 ~~~perl
 my ($x, $y) = (5);
@@ -1045,18 +1044,16 @@ my ($x) = (5, 6);
 ~~~
 
 Again, `$x` is `5`, but what happened with `6`? Nothing. It fell on the floor.
-Looking back at `double_it` it also means, we could have done `double_it(5, 6)`
-and this would have run without complaints. It's just that when doing `my ($x)
-= @_` we'd have dropped `6` on the floor and only have assigned `5`.
 
-I'll mention an alternative way to get to the arguments as you'll see that one as well frequently:
+I'll mention an alternative way to get to the arguments as you'll see that one
+as well frequently used:
 
 ~~~perl
 my $x = shift;
 my $y = shift;
 ~~~
 
-as an alternative for 
+This is an alternative for 
 
 ~~~perl
 my ($x, $y) = @_;
