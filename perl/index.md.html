@@ -844,23 +844,25 @@ my $first_negative = first { $_ < 0 } @all_numbers;
 
 # Looping
 
-Besides the usual C-style [`for` syntax](https://perldoc.perl.org/perlsyn.html#For-Loops) that is supported in `perl` as well, I find myself resorting to:
+For `for`-loops, I prefer this form:
 
 ~~~perl
 for my $number (@all_numbers) {
-  print "el: $number";
+  print "el: $number ";
 }
 ~~~
 
-Given the above `@all_numbers` this will print: `el: 9 el: -7 el: -6 el: 5 el: 4 `.
+With the above `@all_numbers`, this will print: `el: 9 el: -7 el: -6 el: 5 el: 4 `.
 
-The syntax loops through `@all_numbers`, initializing `my $number` with each consecutive number from
-`@all_numbers`. Why is there parentheses`( )` around `@all_numbers` in that syntax. That
-seems odd? The internet seems to think that the reason is that it's because
-[Larry wants
+The first line of that loop: `for my $number (@all_numbers)`, indicates that we
+are going to loop through the elements of the array `@all_numbers`. We
+initialize `my $number` with each such element from `@all_numbers`. 
+
+Why are there parentheses`( )` around `@all_numbers` in that syntax? That seems
+odd, but it seems that there are not many reasons apart from that [Larry wants
 it](https://stackoverflow.com/questions/3650000/what-is-the-purpose-of-the-parentheses-in-perls-foreach-statement).
 
-Let's print only negative numbers:
+Let's modify the above loop to only print negative numbers:
 
 ~~~perl
 for my $number (@all_numbers) {
@@ -870,9 +872,8 @@ for my $number (@all_numbers) {
 }
 ~~~
 
-Hypothetically speaking, I am an annoying persion, so if I ask you to only use the
-condition `$number > 0` (testing for positive numbers) but I'd still like you
-to print negative numbers, you would come up with:
+Let's rewrite that loop using the opposite condition: `$number > 0` (testing
+for positive numbers) but let's still print negative numbers:
 
 ~~~perl
 for my $number (@all_numbers) {
@@ -885,11 +886,11 @@ for my $number (@all_numbers) {
 }
 ~~~
 
-I'm on a roll so I annoy you even more and ask, _well, I'd like to see that
-without an `else`_. You're thinking, which is a great start. If there's a way
-to skip the rest of the loop I can just put the `print` as last statement, I
-just need to make sure I never reach that last statement for positive numbers.
-I'd just need to skip to the _next_ iteration of the loop:
+Let's take that one step further and try to write that without an `else`.  If
+there's a way to skip the rest of the loop I can just put the `print` as last
+statement. I just need to make sure I never reach that last statement when a
+number is positive.  I could do that by skiping to the _next_ iteration of the
+loop when a number is positive.
 
 ~~~perl
 for my $number (@all_numbers) {
@@ -900,8 +901,8 @@ for my $number (@all_numbers) {
 }
 ~~~
 
-You can use `next`. Usually, when using `next` in such a simple case, you'd
-like it to more prominent, so you'd use the postfix notation:
+Usually, when using `next` in such a simple case, you'd like it to be more
+prominent, so you'd use the postfix notation:
 
 ~~~perl
 for my $number (@all_numbers) {
@@ -910,7 +911,7 @@ for my $number (@all_numbers) {
 }
 ~~~
 
-For clarity and because you're big on labels, you can label your for-loops when
+For additional clarity, you can label your for-loops when
 having such control statements like `next`:
 
 ~~~perl
@@ -921,14 +922,14 @@ for my $number (@all_numbers) {
 }
 ~~~
 
-That's often useful when nesting loops (`next`, `next`? What do you mean
-`next`? `next NUMBER` ah OK, why didn't you say that right away?)
+That's often useful when nesting loops as it adds clarity as to where your
+`next` is jumping to.
 
-You can skip the current iteration. Doesn't it feel great to skip? Can I just
-leave the party altogether. Aka -- this metaphor is tired -- exit the loop?
-Yes, use [last](https://perldoc.perl.org/functions/last.html).
+That `next` showed how to skip the current iteration. You can also break out of
+the loop entirely by using
+[last](https://perldoc.perl.org/functions/last.html).
 
-Let's do another example of a loop: let's construct a new array out of
+Let's do another example of a loop. Construct a new array out of
 `@all_numbers` that contains the elements of `@all_numbers` but doubled:
 
 ~~~perl
@@ -938,16 +939,16 @@ for my $number (@all_numbers) {
 }
 ~~~
 
-Great, we initialized a new array `@doubled_numbers` with the empty array `(
+We initialized a new array `@doubled_numbers` with the empty array `(
 )`. We looped through `@all_numbers` and using `push` we added all doubled numbers.
 `push` adds numbers from the back as we saw before so order nicely stays
 maintained. Is there a problem with this approach?
 
-It's fine, except that, as is usual in most programming languages, the memory
-allocated for `@doubled_numbers` potentially has to be re-allocated
-when we run out of initial memory for `@doubled_numbers`.
-This is inefficient. In cases where we're constructing a new _something_ out of
-an another _something_ consider using a
+It works, but the caveat is that, as is usual in most programming languages,
+the memory allocated for `@doubled_numbers` potentially has to be re-allocated
+when we run out of initial memory for `@doubled_numbers`.  This is inefficient.
+In cases where we're constructing a new _something_ out of an another
+_something_ consider using a
 [`map`](https://perldoc.perl.org/functions/map.html):
 
 ~~~perl
@@ -984,7 +985,10 @@ array. In other words, something like this:
 my %hash = map { $_ => $_ } @something;
 ~~~
 
-_could_ make sense.
+creates a `%hash` with as keys the elements from `@something` and as values
+those same elements. So if `@something` is `("stijn", "stijn")`, we'll have
+that `%hash` is `(stijn => 'stijn', stijn => 'stijn')`.
+
 
 # Subroutines
 
