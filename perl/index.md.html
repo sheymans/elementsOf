@@ -197,7 +197,7 @@ Easy enough. We can add numbers:
 my $sum = $numero + 42;
 ~~~
 
-which is of course the same as if we would have done:
+which is of course the same as if we do:
 
 ~~~perl
 my $doubling = 2 * $numero;
@@ -214,7 +214,7 @@ and for the other operations _la même chose_.
 ### Built-in Functions
 
 This is where you'd see an enlightening _this is how to take the square
-root_ using the built-in `sqrt`. You would.
+root_ using the built-in `sqrt`. 
 
 You can `print` numbers and a good conversion (the `%d` in the below template string) is...`%d`:
 
@@ -352,7 +352,7 @@ This adds `4` to the front of `@array`. Note that you can also pre-pend lists li
 unshift @array, (4, 5)
 ~~~
 
-This would turn an `@array` that is `(6, 7)` into `(4, 5, 6, 7)`. Note that the order is
+This turns an `@array` that is `(6, 7)` into `(4, 5, 6, 7)`. Note that the order is
 preserved (so it does not loop through `(4, 5)` and adds the elements one by
 one)
 
@@ -497,21 +497,21 @@ original order.
 
 # References
 
-_References_ or the concept that makes nested structures possible. Recall that
+_References_ are the concept that makes nested structures possible. Recall that
 arrays can store lists of scalars and hashes are key-value maps where the key
 needs to be a string and the value needs to be a scalar.
 
-At first sight this restricts us to rather flat data structures. For example, I
+At first sight this restricts us to flat data structures. For example, I
 could not directly store a list of hashes. Or a hash that is an index of names
-(the key) to person's addresses (the value, consisting of street, zip code)).
+(the key) to addresses (the value, consisting of street, zip code)).
 
-No-one wants to be restricted, the least of all to flat data structures. Enter: the _reference_. To
-some degree the reference is a bit like C/C++ style pointers. It is 
-a _scalar_ that _points_ to other _things_. Those other other things could
-be other lists, other hashes, or other scalars, and even other references.
+No-one wants to be restricted, the least of all to flat data structures. Enter:
+the _reference_. The reference is like C/C++ style pointers. It
+is a _scalar_ that _points_ to other _things_. Those other other things could
+be other lists, other hashes, other scalars, or other references.
 
 Say we have a reference `$a_ref` (note that references are
-scalars, so here we go with the `$` again) that points to an array `(1, 2, 3)`:
+scalars, hence the `$`) that points to an array `(1, 2, 3)`:
 
 ***********************************
 *                                 *
@@ -520,14 +520,14 @@ scalars, so here we go with the `$` again) that points to an array `(1, 2, 3)`:
 *   '--------'       '----------' *
 ***********************************
 
-Since `$a_ref` is a scalar, we can now have a hash with values that are pointing to arrays:
+Since `$a_ref` is a scalar, we can have a hash with values that are pointing to arrays:
 
 ~~~perl
 my %array_value_hash = (john => $a_ref);
 ~~~
 
-I kept a crucial piece to myself though. How did I create that `$a_ref`
-reference to the array `(1, 2, 3)`? Recall that we would create an array
+We skipped a crucial piece though. How did I create that `$a_ref`
+reference to the array `(1, 2, 3)`? Recall that we can create an array
 variable as follows:
 
 ~~~perl
@@ -546,7 +546,7 @@ There's a shorthand for taking a reference to an array _literal_ though:
 my $a_ref = [1, 2, 3];
 ~~~
 
-So use square brackets `[ ]` instead of `( )`. Effectively, this:
+So using square brackets `[ ]` instead of `( )`. Effectively, this:
 
 ~~~perl
 my @array = (1, 2, 3);
@@ -559,11 +559,11 @@ is the same as:
 my $a_ref = [1, 2, 3];
 ~~~
 
-How could I now get values out of that array, given the reference `$a_ref`
-rather than using the `@array`. Well, recall that you could get the first
-element (or change the first element) of `@array`, doing `$array[0]`. We can
+How could I get values out of that array using the reference `$a_ref`
+rather than using `@array` directly? Recall that you could get the first
+element (or change the first element) of `@array` with `$array[0]`. We can
 get to the underlying array based on the `$a_ref` reference, by
-_de-referencing_ it (pointers anyone?) using curly brackets `{$a_ref}`. Getting
+_de-referencing_ it using curly braces `{$a_ref}`. Getting
 the first element based on `$a_ref` can then be done by:
 
 ~~~perl
@@ -585,7 +585,7 @@ my @copy = @{$a_ref};
 You can see that we just switched out the `array` part in `@array` by the
 dereferenced reference: `{$a_ref}`.
 
-We can of course copy array references and one would expect that if I change a value in the copied array reference I'd be changing the original:
+We can copy array references:
 
 ~~~perl
 my $copy_ref = $a_ref;
@@ -639,7 +639,7 @@ my %hash = (age => 9);
 my $hash_ref = \%hash;
 ~~~
 
-Note again that `$hash_ref` is a scalar and thus indicated with `$`. We can
+Note again that `$hash_ref` is a scalar and thus prefixed with `$`. We can
 thus use this hash reference as values in other hashes or as members of an
 array.
 
@@ -649,18 +649,18 @@ As with arrays there is a shorthand for creating such hash references:
 my $hash_ref = { age => 9 };
 ~~~
 
-Namely, use `{ }` instead of `( )`. You will see that frequently and it will
+Namely, use `{ }` instead of `( )`. You will see that notation frequently and it will
 comfort you as it is similar notation to JSON or Python `dict`s.
 
-Accessing values from hash references is similar. Recall that if you'd want the value `9` of the above `%hash`, you'd do:
+Accessing values from hash references is similar. Recall that if you'd want the
+value `9` of the above `%hash`, you'd do:
 
 ~~~perl
 $hash{age};
 ~~~
 
-We have a similar _trick_ when you want to get that value via the `$hash_ref`
-where we replace the name `hash` by dereferencing the `{$hash_ref}` that refers
-to it:
+We have a similar _trick_ as with arrays when you want to get that value via the `$hash_ref` rather than the `%hash`.
+We replace the name `hash` by `{$hash_ref}` -- the dereferenced reference: 
 
 ~~~perl
 ${$hash_ref}{age};
@@ -677,7 +677,7 @@ which is the preferable form.
 
 # Conditions
 
-We all want control, _if_ we only could have it:
+The syntax for `if`-conditions has no suprises if you're familiar with `C`, `Java`, ... :
 
 ~~~perl
 if ( $age == 18 ) {
@@ -685,9 +685,8 @@ if ( $age == 18 ) {
 }
 ~~~
 
-The syntax for `if` is as you're used to from C, Java, JavaScript, ....
-
-Note the equality test using `==`. Inequality would be tested with `!=`:
+Note the equality test `==` for numbers (strings are compared with `eq`).
+Inequality is tested with `!=` for numbers (and `neq` for strings):
 
 ~~~perl
 if ( $age != 18 ) {
@@ -703,15 +702,12 @@ if ( !($age == 18) ) {
 }
 ~~~
 
-Note the extra parenthesis. This is needed in this case, indeed `!$age == 18`
-would lead to `!$age` being interpreted first. Since `$age` is a number but `!`
-forces a Boolean context, and given that, any number other than `0` is
-considered truth, we have that `!$age` is false if `$age` is not 0. And false
-is never equal to `18` so `!$age == 18` would always be false. Neither is true
-by the way, so even if `$age` is 0, we'd have that `!$age` is true. It's
-confusing, let's just say that.
+Note the extra parentheses in `!($age == 18)`. This is needed as in `!$age == 18`, 
+`!$age` is interpreted first. This is unwanted as `$age` is assumed to be a
+number and the negation `!` of a number is false for all numbers except
+`0`.
 
-Other useful operators are `&&` for logical _and_, `||` for logical _or_.
+Other useful operators to use in conditions are `&&` for logical _and_, `||` for logical _or_.
 
 We have the usual `else`:
 
@@ -741,13 +737,11 @@ else {
 Note that it's _not_ `elseif` nor `else if`. It's `elsif`.
 
 `perl` also has the `unless` keyword for the "`if` not" situation. Do not use
-`unless` unless you feel like getting confused. Are you confused? I am.
+`unless` unless you feel like getting confused. 
 
-Conditions are useful outside of `if`s to filter an array keeping only the
-items that satisfy a condition. `perl` has `grep` for that (yes, named
-after that [`grep`](http://linuxcommand.org/lc3_man_pages/grep1.html)). 
-
-Say we want to create an array containing only negative numbers:
+Conditions can also be used to filter arrays. Using `grep` you can reduce an
+array to keep only the items that satisfy a certain condition.  Say we want to
+create an array containing only negative numbers:
 
 ~~~perl
 my @all_numbers = (9, -7, -6, 5, 4);
@@ -805,28 +799,29 @@ if ( any { $_ < 0 } @all_numbers ) {
 You see that `any { $_ < 0 } @all_numbers` returns true if the condition `$_ <
 0` is true for _any_ of the numbers in `@all_numbers`.
 
-I sprung something else on you (you're welcome):
+I sprung something else on you:
 
 ~~~perl
 use List::Util qw(any);
 ~~~
 
 You're used to such inclusions of modules/packages/languages (modules in `perl`
-parlance) in other languages (Java has import). In this example, `use` announces _I'm making stuff available to use from the
-module `List::Util`_. But what with `qw(any)`?
+parlance) in other languages (Java has import). In this example, `use`
+announces _I'm making stuff available to use from the module `List::Util`_. But
+what with `qw(any)`?
 
-Well, I did not tell you yet. `any` is a function/subroutine (`subroutine` in
-`perl`) defined in that `List::Util` module, so we're indicating that we'd like
-to import `any` from `List::Util`. But what about `qw`? You are not very patient. But OK, you essentially
-want to indicate what functions you'd want to include, so you could write a
-literal list of strings: `("any")`. And if you want also the subroutine
+`any` is a function/subroutine (`subroutine` in `perl`) defined in that
+`List::Util` module, so we're indicating that we'd like to import `any` from
+`List::Util`. But what about `qw`? You
+essentially want to indicate what functions you'd want to include, so you could
+write a literal list of strings: `("any")`. And if you want also the subroutine
 `first`:
 
 ~~~perl
 use List::Util ("any", "first");
 ~~~
 
-`perl` programmers find double quotes and commans annoying because why not, so you can write this as:
+`perl` programmers find double quotes and commans burdensome, so you can write this as:
 
 ~~~perl
 use List::Util qw(any first);
@@ -1029,7 +1024,7 @@ The argument list to `double_it` now gets implicitly bound to the special array
 variable `@_`. Note that we already saw special variable `$_`, well, this is
 another special one, for arrays. 
 
-In this case, we'd have that `@_` would be bound to the list `(5)`. So `my
+In this case, we'd have that `@_` is be bound to the list `(5)`. So `my
 ($x) = @_`is at that point the same as `my ($x) = (5)`. The left hand side is
 an array literal with a variable `$x` in it, the right hand side is just an
 array literal. `perl` matches those 2 for you such that `$x` is now `5`. 
@@ -1168,7 +1163,7 @@ $test =~ s/([wW]olf)/bear$1/;
 print $test;
 ~~~
 
-which would lead to printing `there is a bearwolf somewhere`. At which point, we should
+which prints `there is a bearwolf somewhere`. At which point, we should
 all just leave the campground and find a hotel.
 
 # Constants
