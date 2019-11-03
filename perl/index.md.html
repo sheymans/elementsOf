@@ -2,23 +2,19 @@
                             **Elements of Perl**
                             Stijn Heymans
                             published: 12 October 2019
-                            last updated: 28 October 2019 
+                            last updated: 2 November 2019 
 
 # Introduction
 
-This article introduces the elements of `perl 5.x`.
-
-At least, my hope is that the article represents some core of how to use `perl`
-most effectively in a professional context, leaving what _effectively_ and
-_professional context_  mean purposefully undefined.  In the best case, I
-managed to capture some _elements of_ perl, in the worst case, it's _my_
-elements of `perl`.
+This article introduces the elements of `perl 5.x`.  Or better, my hope is that
+the article represents a core of how to use `perl` effectively in a
+professional context, leaving what _effectively_ and _professional context_
+mean purposefully undefined.  
 
 This is not a programming tutorial, so I'll assume you have knowledge of other
-languages (for example, Java, C, C++, Python, Javascript). From time to time,
-I'll refer to some of these languages to indicate a difference or similarity.
+programming languages such as Java, Python, or Javascript.
 
-Finally, to prepare for this article, I studied 3 books: 
+Finally, to prepare for this article, I studied 3 books:
 
 - [Learning Perl: Making Easy Things Easy and Hard Things Possible](https://www.goodreads.com/book/show/30413201-learning-perl) by Randal L. Schwartz, Brian D. Foy, Tom Phoenix,
 - [Intermediate Perl](https://www.goodreads.com/book/show/209276.Intermediate_Perl) by Randal L. Schwartz, Brian D. Foy, Tom Phoenix,
@@ -31,8 +27,8 @@ Finally, to prepare for this article, I studied 3 books:
 ### Basics
 
 _Scalars_ or _scalar values_ are the smallest unit of data in perl, for
-example, numbers and strings.  We store scalars in _scalar variables_. In
-particular, let's look at how to store and manipulate strings:
+example, numbers and strings.  We store scalars in _scalar variables_. This is
+how you can store a string `'I am a string'` in a scalar variable `$var`:
 
 ~~~perl
 my $var = 'I am a string';
@@ -44,12 +40,12 @@ my $var = 'I am a string';
 The `my` keyword _declares_ the variable `$var` (similar to a `let` in
 Javascript) and `$var` consists of the symbol `$` and the name `var`. The
 symbol `$` hints that the variable is used or accessed as a scalar. In this
-case, it declares and initializes a string, a scalar.
+case, it declares and initializes a string, which is indeed a scalar.
 
 You'll later see a symbol `@` for array usage and `%` for hash usage (a `hash`
 is Python's `dict` or generally a key-value structure such as a `Map` in Java).
 
-A common operation is concatenating 2 strings:
+A common operation is concatenating 2 strings which you do using the dot-operator `.` :
 
 ~~~perl
 my $concat = $var . ' and me too.';
@@ -86,7 +82,7 @@ my $hello_conc = 'my name is ' . $name;
 ~~~
 
 You can extract individual characters out of a string similar to how you'd do it in
-other languages:
+other languages. Here I get the first character out of string:
 
 ~~~perl
 my $string = 'what';
@@ -100,14 +96,11 @@ might know from `Python`:
 my $last = $string[-1];
 ~~~
 
-And yes, you'd get the next-to-last element by accessing it using `-2`.
-
-
 ### Built-in Functions
 
 #### [`print`](https://perldoc.perl.org/functions/print.html)
 
-Printing to `STDOUT` will be mostly useful for debugging the odd statement:
+Printing to standard output is useful for debugging the odd statement:
 
 ~~~perl
 print "This is a printed string\n";
@@ -119,7 +112,7 @@ print "This is a printed string\n";
 
 #### [`substr`](https://perldoc.perl.org/functions/substr.html)
 
-Extract a substring out of a string. For example, to get `cat` out of the string `concatenate`, do:
+Extract a substring out of a string. For example, to get `cat` out of the string `concatenate`:
 
 ~~~perl
 my $cat = substr('concatenate', 3, 3);
@@ -130,8 +123,8 @@ is the length of the substring you want (_cat_ has 3 letters). You'll see this
 pattern occur frequently: an _offset_ followed by a _length_, in the arguments
 of a function.
 
-If you leave off the length, you can take the substring until the end of
-the string, for example to get `catenate`:
+If you leave off the length, you can take the substrin from the offset until the end of
+the string. For example to get `catenate` out `concatenate`:
 
 ~~~perl
 my $nonsense_substring = substr('concatenate', 3);
@@ -194,7 +187,7 @@ and for the other operations _la même chose_.
 ### Built-in Functions
 
 This is where I am not going to write about _how to take the square
-root_ using the built-in `sqrt`. 
+root_ using the built-in `sqrt` as you will never need it.
 
 You can `print` numbers and a good conversion (the `%d` in the below template string) is...`%d`:
 
@@ -204,9 +197,10 @@ print "The meaning of life is %d", 42;
 
 ## `undef`
 
-I talked about scalars like strings and numbers. But what about `null`? `null`
-is a _thing_! Does `perl` have a `null`? Yes: `undef`. And where you'll see in
-other languages a lot of null-checks, in `perl`, you'll see a lot of:
+I talked about scalars like strings and numbers. But what about the `null` we
+have come to hate from other languages? In `perl`, we have `undef`. And where
+you'll see in other languages a lot of null-checks, in `perl` you'll see a lot
+of:
 
 ~~~perl
 if (defined $x) {
@@ -228,13 +222,11 @@ A `#` marks comments. Anything following it is ignored by the `perl` compiler.
 
 ## Basics
 
-Most people distinguish between an _array_ and a _list_. I'll mostly talk about
-arrays when I am referring to a variable storing lists of elements, but I'll
-also be fairly inconsistent about it. This is how you create an array with
-elements `I`, `do`, `not`, `care`:
+You can use array variables to store ordered lists of _things_.  This is how
+you create an array with elements `here`, `I`, `am`:
 
 ~~~perl
-my @array = ('I', 'do', 'not', 'care');
+my @array = ('here', 'I', 'am');
 ~~~
 
 Note the `@` symbol prefixing the variable name. In contrast to other languages
@@ -244,9 +236,6 @@ smallest unit of _things_ (for example, numbers or strings). The `@` signifies
 this is an _array_ variable and stores a _list of such small-unit-things_. As a
 consequence, if a list contains a variable, that variable will be a _scalar
 variable_.
-
-I have find this probably the most confusing _thing_ about `perl` (so I'd store
-my confusion in a scalar).
 
 Try to get the first element of the array `@array`:
 
@@ -266,7 +255,7 @@ how we access the last character in a string):
 my $last_element = $array[-1];
 ~~~
 
-Changing the first element of an `@array` has no surprises:
+Changing the first element of an `@array` can be done as follows:
 
 ~~~perl
 $array[0] = 'You';
@@ -290,8 +279,8 @@ individual elements in `@array`: the array is used in a _list_ context).
 
 ### Adding and Removing from Back of an Array
 
-
-You can remove elements from the back/end of an array, using [`pop`](https://perldoc.perl.org/functions/pop.html):
+You can remove elements from the back of an array, using
+[`pop`](https://perldoc.perl.org/functions/pop.html):
 
 ~~~perl
 my @array = (4, 5);
@@ -348,11 +337,11 @@ to the _left_ and thus dropping the first element.
 
 ### Length of an Array with a detour to contexts
 
-The notion of _context_ (briefly mentioned before) is important in `perl`. For
-example, assigning an array to a scalar variable, will cause the _length_ of
-that array to be assigned to the scalar. Indeed, you cannot store an array into
-a scalar, so what do you store?  Well, a reasonable thing to store is the
-length of that array. So for this:
+The notion of _context_ is important in `perl`. For example, assigning an array
+to a scalar variable, will cause the _length_ of that array to be assigned to
+the scalar. Indeed, you cannot store an array into a scalar, so what do you
+store?  Well, a reasonable thing to store is the length of that array. So for
+this:
 
 ~~~perl
 my @array = ('hey', 'you');
@@ -372,9 +361,7 @@ my @array = $scalar;
 You're now trying to store a scalar variable `$scalar` into an array variable,
 or in other words, into a _list context_. `perl` will try to make a list out of
 the scalar, and the natural way to do so is by treating your scalar as a list
-with 1 element in it (the scalar). So `@array` will effectively be the list
-`('a')`.
-
+with 1 element in it. So `@array` will effectively be the list `('a')`.
 
 ### [`reverse`](https://perldoc.perl.org/functions/reverse.html)
 
@@ -385,9 +372,12 @@ my @array = (1, 2);
 my @rev = reverse @array;
 ~~~
 
-`@rev` will be `(2, 1)` and `@array` will have stayed the same (so `reverse` is
-non-destructive on its argument). Contrast that with `pop`/`push` and
-`shift/unshift`, all of which are destructive on the lists they operate on.
+`@rev` will be `(2, 1)` and `@array` will have stayed the same.
+
+!!!
+    `reverse` is non-destructive on its argument. Contrast that with
+    `pop`/`push` and `shift/unshift`, all of which are destructive on the lists
+    they operate on.
 
 # Hash Variables
 
