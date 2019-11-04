@@ -2,23 +2,38 @@
                             **Elements of Perl**
                             Stijn Heymans
                             published: 12 October 2019
-                            last updated: 2 November 2019 
+                            last updated: 3 November 2019 
 
 # Introduction
 
-This article introduces the elements of `perl 5.x`.  Or better, my hope is that
-the article represents a core of how to use `perl` effectively in a
-professional context, leaving what _effectively_ and _professional context_
-mean purposefully undefined.  
+This article introduces the elements of `perl 5.x`. I'll start with introducing
+what `perl` considers the smallest unit of things in the Scalars section. I'll
+then show how to use those scalars in list-type data structures in the Array Variables section
+as well as in map-like data structures in the Hash Variables
+section. I'll tie the concepts of scalars, arrays, and hashes together to be
+able construct arbitrary data structures in the References section.
 
-This is not a programming tutorial, so I'll assume you have knowledge of other
-programming languages such as Java, Python, or Javascript.
+After introducing the basic data structures, I'll show how to
+control flow in the Conditions section, and how to use such conditions when
+looping in the Looping section. 
+Once I tackled basic data structures and control flow, I'll show how to
+encapsulate logic into functions in the Subroutines section.
 
-Finally, to prepare for this article, I studied 3 books:
+We end the article with what `perl` got (in)famous for, regular expressions, in the
+Matching and Substituting section, as well as 2 more practical sections: a
+Constants section explaining how to define constants and a Printing Anything
+section that will be useful when you're debugging.
+
+As this is the _elements_ of `perl`, I made choices on what to leave out of this
+article (for example, I did not introduce objects). You can read more in those
+3 books:
 
 - [Learning Perl: Making Easy Things Easy and Hard Things Possible](https://www.goodreads.com/book/show/30413201-learning-perl) by Randal L. Schwartz, Brian D. Foy, Tom Phoenix,
 - [Intermediate Perl](https://www.goodreads.com/book/show/209276.Intermediate_Perl) by Randal L. Schwartz, Brian D. Foy, Tom Phoenix,
 - [Perl Best Practices: Standards and Styles for Developing Maintainable Code](https://www.goodreads.com/book/show/86379.Perl_Best_Practices) by Damian Conway.
+
+Reading the first 2 books in order and front-to-back works well to build
+deep knowledge, where the last one, _Perl Best Practices_, can be sampled from.
 
 # Scalars
 
@@ -123,7 +138,7 @@ is the length of the substring you want (_cat_ has 3 letters). You'll see this
 pattern occur frequently: an _offset_ followed by a _length_, in the arguments
 of a function.
 
-If you leave off the length, you can take the substrin from the offset until the end of
+If you leave off the length, you can take the substring from the offset until the end of
 the string. For example to get `catenate` out `concatenate`:
 
 ~~~perl
@@ -397,7 +412,7 @@ my %some_hash = ('name', 'john', 'age', 39);
 I did not make a syntactical distinction between keys and values when writing
 `('name', 'john', 'age', 39)`. You expect `'name'` and `'age'` to be keys, and
 `'john'` and `39` to be values, but there is no apparent syntactical distinction
-with a literal list in this example. 
+with a literal _list_ in this example. So why is this defining a hash and not a list? 
 
 Let's get back to our _contexts_. We already saw a _list context_ and a _scalar
 context_. The `%` on the left-hand side of the assignment, indicates a _hash
@@ -415,14 +430,14 @@ hash are always scalars.
 
 As the list syntax for hashes can be confusing, `perl` has a trick: it treats
 the _fat comma_ `=>` exactly the same as a comma `,`, and thus we can replace
-certain commas by so-called fat commas to introduce clarity around what is a
-key and what is a value:
+certain commas by so-called fat commas to introduce syntactical clarity around
+what is a key and what is a value:
 
 ~~~perl
 my %some_hash = ('name' => 'john', 'age' => 39);
 ~~~
 
-When using the fat arrow notation, you can also leave of the quotes on the keys:
+When using the fat arrow notation, you can also leave off the quotes on the keys:
 
 ~~~perl
 my %some_hash = (name => 'john', age => 39);
@@ -500,9 +515,9 @@ scalars, hence the `$`) that points to an array `(1, 2, 3)`:
 
 ***********************************
 *                                 *
-*   .--------.       .----------. *    
-*   | $a_ref +----->| (1, 2, 3)  |*
-*   '--------'       '----------' *
+*   .--------.       .---------.  *    
+*   | $a_ref +----->| (1, 2, 3) | *
+*   '--------'       '---------'  *
 ***********************************
 
 Since `$a_ref` is a scalar, we can have a hash with values that are pointing to arrays:
@@ -525,13 +540,13 @@ I can now take a reference to `@array` using the backslash \:
 my $a_ref = \@array;
 ~~~
 
-There's a shorthand for taking a reference to an array _literal_ though:
+There's a shorthand for taking a reference to an array _literal_:
 
 ~~~perl
 my $a_ref = [1, 2, 3];
 ~~~
 
-So using square brackets `[ ]` instead of `( )`. Effectively, this:
+where I use square brackets `[ ]` instead of `( )`. Effectively, this:
 
 ~~~perl
 my @array = (1, 2, 3);
@@ -570,7 +585,7 @@ my @copy = @{$a_ref};
 You can see that I just switched out the `array` part in `@array` by the
 dereferenced reference: `{$a_ref}`.
 
-We can copy array references:
+I can copy array references:
 
 ~~~perl
 my $copy_ref = $a_ref;
@@ -578,9 +593,9 @@ my $copy_ref = $a_ref;
 
 ***********************************
 *                                 *
-*   .--------.       .----------. *    
-*   | $a_ref +----->| (1, 2, 3)  |*
-*   '--------'       '----------' *
+*   .--------.       .---------.  *    
+*   | $a_ref +----->| (1, 2, 3) | *
+*   '--------'       '---------'  *
 *                         ^       *
 *   .-----------.         |       * 
 *   | $copy_ref +--------'        *
@@ -588,13 +603,13 @@ my $copy_ref = $a_ref;
 *                                 *
 ***********************************
 
-If we then change `$copy_ref` we'd expect to change the underlying array:
+If I then change `$copy_ref` I change the underlying array:
 
 ~~~perl
 ${$copy_ref}[0] = 500;
 ~~~
 
-Indeed both `${$a_ref}[0]` and `${$copy_ref}[0]` will now be equal to `500`:
+Indeed both `${$a_ref}[0]` and `${$copy_ref}[0]` are now equal to `500`:
 
 ************************************
 *                                  *
@@ -608,7 +623,7 @@ Indeed both `${$a_ref}[0]` and `${$copy_ref}[0]` will now be equal to `500`:
 *                                  *
 ************************************
 
-To always type `${$a_ref}` is not very succinct. We can do better. These are all the same:
+To always type `${$a_ref}` is not very succinct. These are all the same:
 
 ~~~perl
 ${$a_ref}[0]; # what we saw before
@@ -662,7 +677,7 @@ which is the preferable form.
 
 # Conditions
 
-The syntax for `if`-conditions has no surprises if you're familiar with `C`, `Java`, ... :
+The syntax for `if`-conditions has no surprises:
 
 ~~~perl
 if ( $age == 18 ) {
@@ -742,7 +757,7 @@ in `@negatives`).
 
 Thus, `@negatives` will contain `(-7, -6)`.
 
-How could you figure out whether there is _any_ negative number (i.e., is there
+How to check whether there is _any_ negative number (i.e., is there
 at least 1 negative number?) in a list `@all_numbers`. You could do this:
 
 ~~~perl
@@ -751,12 +766,12 @@ my @negatives = grep { $_ < 0 } @all_numbers;
 my $contains_negative = @negatives;
 ~~~
 
-You first used `grep` to get all negatives, and then you forced the array
-`@negatives` into a scalar and we know that when you force an array into a
-scalar it will store the length of that array (do we know that? Well, now we
-do). We then have that `$contains_negative` contains a `0` or strictly positive
-number (in the example, it will contain a positive number as `@negatives` has 2
-elements). We can then use this in a condition:
+I first used `grep` to get all negatives, and then I forced the array
+      `@negatives` into a scalar. When you force an array into
+      a scalar it will store the length of that array, such that
+      `$contains_negative` contains a `0` or strictly positive number (in the
+      example, it will contain a positive number as `@negatives` has 2
+      elements). You can use this in a condition:
 
 ~~~perl
 if ($contains_negative) {
@@ -814,7 +829,7 @@ use List::Util qw(any first);
 
 where `qw` signifies, _hey, these are quoted words_. 
 
-We already mentioned `first`: use `first` when you'd like to find
+I already mentioned `first`: use `first` when you'd like to find
 the first element that matches the condition:
 
 ~~~perl
@@ -832,13 +847,13 @@ for my $number (@all_numbers) {
 }
 ~~~
 
-With the above `@all_numbers`, this will print: `el: 9 el: -7 el: -6 el: 5 el: 4 `.
+With the above `@all_numbers`, this prints: `el: 9 el: -7 el: -6 el: 5 el: 4 `.
 
 The first line of that loop: `for my $number (@all_numbers)`, indicates that we
 are going to loop through the elements of the array `@all_numbers`. We
 initialize `my $number` with each such element from `@all_numbers`. 
 
-Why are there parentheses`( )` around `@all_numbers` in that syntax? That seems
+Why are there parentheses `( )` around `@all_numbers` in that syntax? That seems
 odd, but it seems that there are not many reasons apart from that [Larry wants
 it](https://stackoverflow.com/questions/3650000/what-is-the-purpose-of-the-parentheses-in-perls-foreach-statement).
 
@@ -867,7 +882,7 @@ for my $number (@all_numbers) {
 ~~~
 
 Let's take that one step further and try to write that without an `else`.  If
-there's a way to skip the rest of the loop I can just put the `print` as last
+there's a way to skip the rest of the loop I can just put the `print` as the last
 statement. I just need to make sure I never reach that last statement when a
 number is positive.  I could do that by skipping to the _next_ iteration of the
 loop when a number is positive.
@@ -973,7 +988,7 @@ that `%hash` is `(stijn => 'stijn', stijn => 'stijn')`.
 # Subroutines
 
 We have talked about data, ways to store it, and ways to manipulate it using
-`perl`'s built-ins. How do we write our own functions/methods to manipulate
+`perl`'s built-ins and control structures such as conditions and loops. How do we write our own functions/methods to manipulate
 data? In `perl`, functions/methods are called _subroutines_. We indicate that
 we're defining a subroutine by the keyword `sub`.
 
@@ -1085,8 +1100,8 @@ will print `3 2` as the original `@a` is now indeed changed since we passed it b
 
 # Matching and Substituting
 
-We cannot talk about `perl` without mentioning regular expressions. Let's go
-through examples to explain common constructs.
+We cannot talk about `perl` without mentioning regular expressions. Let's look
+at some examples to explain common constructs.
 
 Assume you have a string "there is a wolf somewhere" and you'd like to check
 whether it contains the word _wolf_: 
@@ -1101,7 +1116,7 @@ if ($test =~ /wolf/) {
 The meat of this code is in the `if` test: `$test =~ /wolf/`. With the binding
 operator `=~` we are saying: I want to check the pattern on the right of `=~`
 in the text on the left of `=~`. What is the pattern? The pattern is between
-slashes`/`: `/wolf/`. Note that you'll sometimes see `m/wolf/`, i.e, the pattern prefixed
+slashes `/`: `/wolf/`. Note that you'll sometimes see `m/wolf/`, i.e, the pattern prefixed
 with `m`. That's because there's a version with `s` as well, which stands for
 _substitute_. 
 
@@ -1116,13 +1131,13 @@ if ($test =~ /([wW]olf)/) {
 }
 ~~~
 
-We used a _character class_ `[wW]` which stands for a match with either `w` or
-`W`. And we surrounded `[wW]olf` with parentheses like so: `([wW]olf)`. The
-parentheses created a capture group which we referenced later using `$1`. Note
+I used a _character class_ `[wW]` which stands for a match with either `w` or
+`W`. And I surrounded `[wW]olf` with parentheses like so: `([wW]olf)`. The
+parentheses created a capture group which I referenced later using `$1`. Note
 that you could have several capture groups in a pattern, and you can refer to
 these as `$1`, `$2`, etc. The ordering in those variable names is following the
 order of the parentheses. For example, if you have pattern `((stuff)more)` and
-a text `somestuffmore`, you'd have `stuffmore` matched in `$1` and `stuff` in
+a text `somestuffmore`, `stuffmore` is matched in `$1` and `stuff` in
 `$2`.
 
 I'll further say that the dot `.` stands for any character _except_ a newline.
@@ -1208,22 +1223,6 @@ to limit the levels of that nested structure you'd like to print you can do:
 ~~~perl
 $Data::Dumper::Maxdepth=2;
 ~~~
-
-# More
-
-We skipped an introduction to objects and so many other topics as I wanted to
-keep this article restricted to what I consider _elements_. Go check out the
-following books if you're looking for a topic we did not tackle:
-
-- [Learning Perl: Making Easy Things Easy and Hard Things Possible](https://www.goodreads.com/book/show/30413201-learning-perl) by Randal L. Schwartz, Brian D. Foy, Tom Phoenix,
-- [Intermediate Perl](https://www.goodreads.com/book/show/209276.Intermediate_Perl) by Randal L. Schwartz, Brian D. Foy, Tom Phoenix,
-- [Perl Best Practices: Standards and Styles for Developing Maintainable Code](https://www.goodreads.com/book/show/86379.Perl_Best_Practices) by Damian Conway.
-
-# Conclusion
-
-I presented my interpretation of the basic elements of `perl`. Like with all
-selections of this nature, I hope that, in some way, this will be useful for
-you as well.
 
 <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-12447521-1"></script>
