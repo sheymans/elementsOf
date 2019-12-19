@@ -4,6 +4,69 @@
 
 # Introduction
 
+TODO
+
+TODO: add link to book
+
+Note that even though I use examples like _Bank Of America_ or _mint_, I use
+them for illustration purposes. These companies will be doing things
+differently as they operate in the _real world_. A concept I'm not directly
+bothered with.
+
+# The User Accesses A Resource Directly
+
+You keep neat budgets, so you decide you want to check your transactions at
+[Bank of America](https://bankofamerica.com). You open up your favorite browser
+and you go to said site. You click _Sign-in_ and are presented with the
+classical login form:
+
+![Classical Login](./images/classic_login.png width=150px)
+
+You faithfully enter your username and password and get to see all your
+transactions of the past month. Both Whole Foods and Amazon got too much money
+from you this month, again.
+
+We'll your username/login combo, your _credentials_ and add to that:
+
+!!! Tip
+    OAuth 2 is not about credentials.
+
+This example also sets the stage for identifying you (aka the human) with your
+browser (your _user-agent_), we'll refer to you and your browser as one (at
+this point in history, a fair assumption) and name you/your browser, the
+_User_.
+
+We will call _Bank of America_, the _Resource Owner_: they own your
+transactions (the resource).
+
+TODO: sequence diagram of interaction between _User_ and _Resource_.
+
+
+# The User Does not access the Resource Directly
+
+Say you are [mint](mint.com). How could mint solve this?
+
+List the problems with this.
+
+Solution. An OAuth 2 dance.
+
+# The OAuth 2 Dance
+
+## The Players
+
+## The Dance
+
+Explain the interaction and all the concepts.  (Why do I need authorization
+tokens versus access tokens. What are refresh tokens)
+
+## Does OAuth 2 Solve My Problems
+
+Go back to the mint problems, list them, and describe for each of them how
+OAuth solves/does not solve.
+
+# Conclusion
+
+
 <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-12447521-1"></script>
 <script>
