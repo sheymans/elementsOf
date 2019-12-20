@@ -1,0 +1,4 @@
+@startuml
+User -> ResourceOwner: credentials
+ResourceOwner --> User: accepted
+@enduml
