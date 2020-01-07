@@ -26,7 +26,7 @@ You faithfully enter your username and password and get to see all your
 transactions of the past month. Both Whole Foods and Amazon got too much money
 from you this month, again.
 
-![Simple OAuth](./images/simple_auth.png width=250px)
+![Simple OAuth](./images/simple_auth.png)
 
 We'll your username/login combo, your _credentials_ and add to that:
 
@@ -47,11 +47,43 @@ transactions (the resource).
 
 # The User Does not access the Resource Directly
 
-Say you are [mint](mint.com). How could mint solve this?
+If you do not access the resource directly, for example, you are using a
+budgetting tool like [mint](mint.com) that pulls the Bank of America
+transaction data for you and shows it to you nicely categorized by budget.
+In this case, clearly [mint](mint.com) somehow needs access to the _Resource
+Owner_ on behalf of you the _User_.
 
-List the problems with this.
+The first approach that comes to mind is, well, let [mint](mint.com) ask you
+for your credentials and pass them through to Bank of America whenever you it
+needs Bank of America transaction data:
 
-Solution. An OAuth 2 dance.
+![Mint First Version](./images/mint_first_version.png)
+
+We'll usually call something like [mint](mint.com) the _Client_, so that the
+general scheme looks like this:
+
+![Mint First Version Abstracted](./images/mint_first_version_abstracted.png)
+
+Of course, [mint](mint.com) having to ask you each time to give your
+credentials is terribly annoying for you, the _User_. So [mint](mint.com) might
+be tempted to think _we'll ask you once, and then we'll store it so we don't
+have to ask you again_.
+
+The flow looks exactly like above, except that now [mint](mint.com) asks you
+for credentials once and then stops asking you.
+
+
+What is the problem with this approach?
+
+If [mint](mint.com) gets compromised and your credentials get stolen, someone
+else now can access your Bank Of America account.  You have the same problem
+with if Bank of America itself gets compromised of course, but this increased
+your risk with a factor of 2 (from 1 place that has your credentials, to 2
+places that have your credentials). Imagine, you're using other clients than
+[mint](mint.com) to access your data. That's a third place that can get
+compromised. 
+
+TODO: does the book mention other problems
 
 # The OAuth 2 Dance
 
@@ -62,12 +94,12 @@ Solution. An OAuth 2 dance.
 Explain the interaction and all the concepts.  (Why do I need authorization
 tokens versus access tokens. What are refresh tokens)
 
-## Does OAuth 2 Solve My Problems
-
-Go back to the mint problems, list them, and describe for each of them how
-OAuth solves/does not solve.
+Start without authorization tokens and explain why that solves the problem but
+has other problem (token can be intercepted) so you need authorization token.
 
 # Conclusion
+
+Restate that OAuth states your problem. Many things left out but answers the basic why with the basic players.
 
 
 <!-- Global site tag (gtag.js) - Google Analytics -->

@@ -1,0 +1,9 @@
+@startuml
+You -> Mint: credentials
+Mint -> BankOfAmerica: credentials
+rnote over BankOfAmerica
+  check credentials
+endrnote
+BankOfAmerica --> Mint: here's the data you asked for
+Mint --> You: here's your transactions by category
+@enduml
