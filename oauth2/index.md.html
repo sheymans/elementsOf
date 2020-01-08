@@ -72,22 +72,44 @@ have to ask you again_.
 The flow looks exactly like above, except that now [mint](mint.com) asks you
 for credentials once and then stops asking you.
 
+What are the problems with this approach?
 
-What is the problem with this approach?
+- _clients store your credentials_. If [mint](mint.com) gets compromised and your credentials get stolen, someone else now can access your Bank Of America account as if they were you.  You have the same problem with if Bank of America itself gets compromised of course, but this increased your risk with a factor of 2 (from 1 place that has your credentials, to 2 places that have your credentials). Imagine, you're using other clients than [mint](mint.com) to access your data. That's a third place that can get compromised.
 
-If [mint](mint.com) gets compromised and your credentials get stolen, someone
-else now can access your Bank Of America account.  You have the same problem
-with if Bank of America itself gets compromised of course, but this increased
-your risk with a factor of 2 (from 1 place that has your credentials, to 2
-places that have your credentials). Imagine, you're using other clients than
-[mint](mint.com) to access your data. That's a third place that can get
-compromised. 
+- _anyone with your credentials has the same access you have_. Depending on what you can do as a user, someone having your credentials can do exactly what you can do. 
 
-TODO: does the book mention other problems
+# OAuth 2.0
 
-# The OAuth 2 Dance
+The above leads us to wanting to rethink this and find a way to give clients
+appropriate access to resources you own -- giving [mint](mint.com) access to
+Bank of America without that they store your credentials. If those get stolen
+they'd give the thief the same access to the resource as they were you and this
+until you go and change your credentials at the resource (Bank of America). In
+addition, we want to make sure that clients only have the access that you
+deemed appropriate (for example,  [mint](mint.com) should only be allowed to
+read your transaction data but not change it).
+
+Let's try to find solutions for a client ( [mint](mint.com) ) needing access
+on your behalf without that they need to store your credentials nor ask you all
+the time for your credentials. The _on behalf_ part in that sentence is why
+OAuth 2.0 is considered a _delegation_ protocol rather than an authorization
+protocol (so far for naming things).
 
 ## The Players
+
+We already identified 3 players in the OAuth 2.0 delegation:
+
+- the User (you, or a proxy for you, for example your browser)
+- the Client (the application your interacting with, for example [mint](mint.com))
+- the Resource Owner (the place that is the origin of your data, for example Bank Of America).
+
+OAuth 2.0 introduces a 4th player that takes care of the actual authorization:
+
+- the Authorization Server.
+
+In our running example, we'll assume the authorization server is owned by Bank
+Of America which makes sense as they'd be able to check your credentials which
+is stored on some of their systems to be able to give you access).
 
 ## The Dance
 
@@ -97,9 +119,14 @@ tokens versus access tokens. What are refresh tokens)
 Start without authorization tokens and explain why that solves the problem but
 has other problem (token can be intercepted) so you need authorization token.
 
+TODO: refresh tokens
+
 # Conclusion
 
 Restate that OAuth states your problem. Many things left out but answers the basic why with the basic players.
+
+We left out scopes: access tokens can control what access you have to the
+resource (just read the transaction data, delete the transaction data).
 
 
 <!-- Global site tag (gtag.js) - Google Analytics -->
