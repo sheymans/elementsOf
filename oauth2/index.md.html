@@ -113,6 +113,49 @@ is stored on some of their systems to be able to give you access).
 
 ## The Dance
 
+Let's follow the following thought: Bank of America clearly knows how to
+identify your credentials, so could the client mint redirect you to Bank of
+America's authorization server, have the authorization server verify your
+credentials and then send the client a _sign_ indicating _yes, you can give
+that user access to this transaction data_.
+
+What would this require?
+
+- the client (mint) would need to be able to send you, the user (or your browser) over to Bank of America's authorization server
+- the authorization server would verify your credentials and would need to conclude _yes, you have access_
+- the authorization server would have to tell the client _that particular user has access and you can come pull the data from the Resource Owner_.
+- the client would use that authorization and go the resource owner and ask it to give the client the user's data
+
+We could accomplish the above as follows:
+
+- sending the browser of to the authorization server can happen using HTTP redirects (code 301). The user wants to access the data from the client, but the client instead sends the user's browser a redirect to the authorization server. The browser subsequently follows that redirect and lands at the authorization server.
+- the authorization server can then start a flow with the user's browser to enter the user's credentials and would subsequently check the user's credentials
+- the authorization server can tell the client that the user's credentials are OK by similarly redirecting the user's browser back to the client by including in the redirect URL something called an _access token_.
+- the client would then use that _access token_ (which it keeps associated with the user) to go and ask the Resource Owner for the user's data. Since the Resource Owner is presumably able to interpret the access token (both the Resource Owner as well as the Authorization Server are Bank of America, so when the authorization server creates a token for the user's the resource owner would be able to verify that the access token is indeed valid).
+
+We'd have something like this:
+
+![Mint with Access Token](./images/access_token_only_mint.png)
+
+Or abstractly:
+
+![Flow with Access Token](./images/access_token_only_abstract.png)
+
+
+Let's see how this solves the original problems:
+
+-  TODO
+
+
+- TODO
+
+
+This scheme works nicely except that the we share the access token over the
+frontend channel and it can be intercepted. How do we solve for that?
+
+TODO
+
+----
 Explain the interaction and all the concepts.  (Why do I need authorization
 tokens versus access tokens. What are refresh tokens)
 

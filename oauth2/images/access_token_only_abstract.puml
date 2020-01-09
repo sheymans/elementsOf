@@ -1,0 +1,18 @@
+@startuml
+User -> Client:  get data
+Client --> User: I can't, I'll redirect you
+User -> AuthorizationServer: I want to give Client access to data
+AuthorizationServer --> User: give me your credentials
+User -> AuthorizationServer: credentials
+rnote over AuthorizationServer
+  check credentials
+endrnote
+AuthorizationServer -> User: you're good, I'm redirecting you back to the Client with an access token
+User -> Client: I'm back with an access token from the authorization server
+Client -> ResourceOwner: access token for the user, get data
+rnote over ResourceOwner
+  check access token
+endrnote
+ResourceOwner --> Client: data
+Client --> User: data
+@enduml
