@@ -144,32 +144,42 @@ Or abstractly:
 
 Let's see how this solves the original problems:
 
--  TODO
+- The client indeed no longer stores your credentials. The client would store the access token. How is that different from storing credentials?  The access token that has been provided by the authorization server is unique for the client. Thus, when your access token is stolen from the client and used by someone else, the resource owner can verify that the access token is not belong to the right client. Furthermore, once access tokens are stolen, the resource owner could disable all access tokens for the client and ask all users to authenticate again. A client being compromised would not affect you, the User, to get data from the resource owner directly (i.e., by logging into Bank of America directly).
+
+- Someone with the access token does not have the same privileges you as the user have directly with the resource owner. We left that out of the above discussion but clients would redirect you to the authorization server specifically asking for a certain _scope_ of access (read-only to certain parts of your data etc). So even if someone can use your access token, they would be able to do only what the scope for that access token allows them to do (which would presumably for example not be to transfer money or change your original credentials at Bank of America, but just use your transaction data, which is bad, but not as bad as having the full access you as a user have).
+
+That was not too complicated. However, there is one problem with this access
+token flow. Can you spot it?
+
+Let's zoom in on the interaction between you, mint, and the Bank of America authorization server:
 
 
-- TODO
+![Frontend channel](./images/access_token_only_mint_zoom.png)
 
+As we explained above, this interaction happens mostly via HTTP redirects over your browser:
 
-This scheme works nicely except that the we share the access token over the
-frontend channel and it can be intercepted. How do we solve for that?
+- the authorization server sends your browser a redirect with the access token in the url or body
+- the browser hits mint with that access token in the url where mint stores it and uses it to gain access to the resource (Bank of America)
 
-TODO
+The problematic part here is the _browser_. This part of the communcation, the
+back-and-forth using redirects is called the _front-channel_ communication and
+since it goes via your browser it is vulnerable to having the access token
+intercepted. The _back-channel_ communication (for example from mint to the
+resource owner) is much more secure in that respect; there is no user browser
+involved, just service to service communication.
 
-----
-Explain the interaction and all the concepts.  (Why do I need authorization
-tokens versus access tokens. What are refresh tokens)
+The way OAuth 2.0 deals with this is to have the authorization server not redirect you to the client with the magical access token, but with an authorization tokenn:
 
-Start without authorization tokens and explain why that solves the problem but
-has other problem (token can be intercepted) so you need authorization token.
+![The OAuth 2.0 Dancel](./images/authorization_token_abstract.png)
 
-TODO: refresh tokens
+TODO: what if someone captures the authorization token?
 
 # Conclusion
 
 Restate that OAuth states your problem. Many things left out but answers the basic why with the basic players.
 
 We left out scopes: access tokens can control what access you have to the
-resource (just read the transaction data, delete the transaction data).
+resource (just read the transaction data, delete the transaction data). We did not touch on refresh tokens, we did not touch on the format of access tokens etc etc.
 
 
 <!-- Global site tag (gtag.js) - Google Analytics -->
