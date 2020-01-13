@@ -4,14 +4,18 @@
 
 # Introduction
 
-TODO
+In this article, I try to given an intuition of what the OAuth 2.0 flow is and
+what problems it solves. This is not intended to be a detailed overview of
+OAuth 2 and as such is just the tip of the iceberg. My hope is that this give
+you a good intuition of the _why_ leaving other parts intentionaly vague and
+conceptual. I gained most of my intuition from the book [OAuth 2 in
+Action](https://www.goodreads.com/book/show/30102872-oauth-2-in-action) which
+has great code-along examples if you want to see the OAuth 2 flow at work.
 
-TODO: add link to book
-
-Note that even though I use examples like _Bank Of America_ or _mint_, I use
-them for illustration purposes. These companies will be doing things
-differently as they operate in the _real world_. A concept I'm not directly
-bothered with.
+A final note, before diving in: even though I use examples like _Bank Of
+America_ or _mint_, I use them for illustration purposes. These companies will
+be doing things differently as they operate in the _real world_. A concept I'm
+not directly bothered with.
 
 # The User Accesses A Resource Directly
 
@@ -172,14 +176,38 @@ The way OAuth 2.0 deals with this is to have the authorization server not redire
 
 ![The OAuth 2.0 Dancel](./images/authorization_token_abstract.png)
 
-TODO: what if someone captures the authorization token?
+So now the front-channel no longer sees the access token. It does see the
+authorization token though. What if that authorization token gets stolen? Can
+the thief access our data at the _Resource Owner_ with that information?
+
+The authorization token does not give you access to the data at the _Resource
+Owner_ as the _Resource Owner_ needs an access token. Can the thief get an
+access token from the _AuthorizationServer_ given the authorization token?
+
+The getting of the access token happens on the back-channel from the _Client_
+to the _Authorization Server_ and as such can be protected (no _User_ involved)
+for example by requiring the _Client_ to send a _client id_ and _client secret_
+for example which the _Authorization Server_ can verify.
+
 
 # Conclusion
 
-Restate that OAuth states your problem. Many things left out but answers the basic why with the basic players.
+We showed the different problems one has when delegating your user credentials to a client directly:
 
-We left out scopes: access tokens can control what access you have to the
-resource (just read the transaction data, delete the transaction data). We did not touch on refresh tokens, we did not touch on the format of access tokens etc etc.
+- clients store your credentials
+- someone with your credentials has the same access you have
+
+We gradually introduce the OAuth 2.0 flow (_The Dance_) that solves these
+problems, including an intuition on the difference between front-channel and
+back-channel communcation as well as why we need the authorization flow as well
+as the access token (and not just the access token).
+
+In order to convey that basic intuition (the _why_ of OAuth 2.0) we left out
+many parts of this story such as the different authorization code grants, the
+particular format of access tokens, what refresh tokens are and where they come
+into play.  If you're interested in learning more check out [OAuth 2 in
+Action](https://www.goodreads.com/book/show/30102872-oauth-2-in-action) or,
+better, implement OAuth 2.0 yourself to secure your service.
 
 
 <!-- Global site tag (gtag.js) - Google Analytics -->
