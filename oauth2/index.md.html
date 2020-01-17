@@ -27,14 +27,12 @@ has great code-along examples if you want to see the OAuth 2 flow at work.
 You don't spend your money blindly on Mondays, so you want to check your transactions at
 [Bank of America](https://bankofamerica.com). You open up your favorite browser
 and you go to said site. You click _Sign-in_ and are presented with the
-classical login form:
-
-![Classical Login](./images/classic_login.png)
+classical login form.
 
 You enter your username and password full of anticipation and get to see all your
 transactions of the past month.
 
-![Simple OAuth](./images/simple_auth.png)
+(insert ./images/simple_auth.atxt.html here)
 
 While a sense of dread sets in, we'll agree that I will refer to your
 username/login combo as your _credentials_. To add to your existential crisis,
@@ -51,9 +49,7 @@ officially name you and your browser, the _User_.
 We will call [Bank of America](bankofamerica.com), the _Resource Owner_: they own your
 transactions (the resource). This how this story looks after dehumanizing it:
 
-
-![Simple OAuth](./images/simple_auth2.png)
-
+(insert ./images/simple_auth2.atxt.html here)
 
 # Use Mint to see your Bank of America Data
 
@@ -67,12 +63,12 @@ The first approach that comes to mind is, well, let [mint](mint.com) ask you
 for your credentials and pass them through to Bank of America whenever you it
 needs Bank of America transaction data:
 
-![Mint First Version](./images/mint_first_version.png)
+(insert ./images/mint_first_version.atxt.html here)
 
 We'll usually call something like [mint](mint.com) the _Client_, so that the
 general scheme looks like this:
 
-![Mint First Version Abstracted](./images/mint_first_version_abstracted.png)
+(insert ./images/mint_first_version_abstracted.atxt.html here)
 
 Of course, [mint](mint.com) having to ask you each time to give your
 credentials is terribly annoying for you, the _User_. So [mint](mint.com) might
@@ -145,11 +141,11 @@ We could accomplish the above as follows:
 
 We'd have something like this:
 
-![Mint with Access Token](./images/access_token_only_mint.png)
+(insert ./images/access_token_only_mint.atxt.html here)
 
 Or abstractly:
 
-![Flow with Access Token](./images/access_token_only_abstract.png)
+(insert ./images/access_token_only_abstract.atxt.html here)
 
 
 Let's see how this solves the original problems:
@@ -164,7 +160,7 @@ token flow. Can you spot it?
 Let's zoom in on the interaction between you, mint, and the Bank of America authorization server:
 
 
-![Frontend channel](./images/access_token_only_mint_zoom.png)
+(insert ./images/access_token_only_mint_zoom.atxt.html here)
 
 As we explained above, this interaction happens mostly via HTTP redirects over your browser:
 
@@ -180,7 +176,7 @@ involved, just service to service communication.
 
 The way OAuth 2.0 deals with this is to have the authorization server not redirect you to the client with the magical access token, but with an authorization tokenn:
 
-![The OAuth 2.0 Dancel](./images/authorization_token_abstract.png)
+(insert ./images/authorization_token_abstract.atxt.html here)
 
 So now the front-channel no longer sees the access token. It does see the
 authorization token though. What if that authorization token gets stolen? Can
