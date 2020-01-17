@@ -4,52 +4,58 @@
 
 # Introduction
 
-In this article, I try to given an intuition of what the OAuth 2.0 flow is and
-what problems it solves. This is not intended to be a detailed overview of
-OAuth 2 and as such is just the tip of the iceberg. My hope is that this give
-you a good intuition of the _why_ leaving other parts intentionaly vague and
-conceptual. I gained most of my intuition from the book [OAuth 2 in
+Lots of OAuth 2.0 explanations are full of terminology or tied to specific
+implementations of the protocol.  I'm not very interested in specific
+implementations but I do want to know what problem it solves and what the
+elements of the OAuth 2.0 solution are.
+
+In this article, we'll start of with a simple example of you using a financial
+budgeting tool like [mint](mint.com) that you want to allow access to your
+finances at bank, for example [Bank of America](bankofamerica.com). We'll start
+of with a naive solution for this problem and end up with how OAuth 2.0 would
+presumably solve this. I say _Presumably_ as I'm not making claims on how these
+companies actually do this in the real world. I'm not immediately bothered by
+the real world but using an actual example that you can imagine works better
+than staying conceptual.
+
+I gained most of my intuition from the book [OAuth 2 in
 Action](https://www.goodreads.com/book/show/30102872-oauth-2-in-action) which
 has great code-along examples if you want to see the OAuth 2 flow at work.
 
-A final note, before diving in: even though I use examples like _Bank Of
-America_ or _mint_, I use them for illustration purposes. These companies will
-be doing things differently as they operate in the _real world_. A concept I'm
-not directly bothered with.
+# Login at Bank of America
 
-# The User Accesses A Resource Directly
-
-You keep neat budgets, so you decide you want to check your transactions at
+You don't spend your money blindly on Mondays, so you want to check your transactions at
 [Bank of America](https://bankofamerica.com). You open up your favorite browser
 and you go to said site. You click _Sign-in_ and are presented with the
 classical login form:
 
 ![Classical Login](./images/classic_login.png)
 
-You faithfully enter your username and password and get to see all your
-transactions of the past month. Both Whole Foods and Amazon got too much money
-from you this month, again.
+You enter your username and password full of anticipation and get to see all your
+transactions of the past month.
 
 ![Simple OAuth](./images/simple_auth.png)
 
-We'll your username/login combo, your _credentials_ and add to that:
+While a sense of dread sets in, we'll agree that I will refer to your
+username/login combo as your _credentials_. To add to your existential crisis,
+I'll shout at you:
 
 !!! Tip
     OAuth 2 is not about credentials.
 
-This example also sets the stage for identifying you (aka the human) with your
-browser (your _user-agent_), we'll refer to you and your browser as one (at
-this point in history, a fair assumption) and name you/your browser, the
-_User_.
+As if things did not start of bad enough, I will also identify you (aka the
+human) with your browser, and will refer to you and your browser as one (at
+this point in history of humanity, a fair assumption in my defense) and
+officially name you and your browser, the _User_.
 
-We will call _Bank of America_, the _Resource Owner_: they own your
-transactions (the resource).
+We will call [Bank of America](bankofamerica.com), the _Resource Owner_: they own your
+transactions (the resource). This how this story looks after dehumanizing it:
 
 
 ![Simple OAuth](./images/simple_auth2.png)
 
 
-# The User Does not access the Resource Directly
+# Use Mint to see your Bank of America Data
 
 If you do not access the resource directly, for example, you are using a
 budgetting tool like [mint](mint.com) that pulls the Bank of America
