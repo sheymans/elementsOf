@@ -4,6 +4,6 @@ Mint -> BankOfAmerica: credentials
 rnote over BankOfAmerica
   check credentials
 endrnote
-BankOfAmerica --> Mint: here's the data you asked for
-Mint --> You: here's your transactions by category
+BankOfAmerica --> Mint: transactions
+Mint --> You: transactions
 @enduml
