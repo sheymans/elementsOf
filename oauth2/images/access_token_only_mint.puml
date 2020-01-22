@@ -1,18 +1,18 @@
 @startuml
-You -> Mint: show me my data
+You -> Mint: show my transactions
 Mint --> You: I can't, I'll redirect you
-You -> AuthorizationServerBoA: I want to give mint access to my data
+You -> AuthorizationServerBoA: give mint access to my transactions
 AuthorizationServerBoA --> You: give me your credentials
 You -> AuthorizationServerBoA: credentials
 rnote over AuthorizationServerBoA
   check credentials
 endrnote
-AuthorizationServerBoA --> You: you're good, I'm redirecting you back to the client with an access token
-You -> Mint: I'm back with an access token from the authorization server
-Mint -> BankOfAmerica: great, here's the access token for the user, give me data
+AuthorizationServerBoA --> You: OK, redirecting you to mint with an access token
+You -> Mint: show transactions \ngiven my access token
+Mint -> BankOfAmerica: here's the access token,\n give me data
 rnote over BankOfAmerica
   check access token
 endrnote
-BankOfAmerica --> Mint: here you go
-Mint --> You: here's your transactions by category
+BankOfAmerica --> Mint: transactions
+Mint --> You: transactions
 @enduml

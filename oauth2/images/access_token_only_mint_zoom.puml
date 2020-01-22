@@ -2,6 +2,6 @@
 rnote over AuthorizationServerBoA
   check credentials
 endrnote
-AuthorizationServerBoA --> You: you're good, I'm redirecting you back to the client with an access token
-You -> Mint: I'm back with an access token from the authorization server
+AuthorizationServerBoA --> You: OK, redirecting you to mint with an access token
+You -> Mint: show transactions \ngiven my access token
 @enduml

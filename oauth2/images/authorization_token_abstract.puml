@@ -7,14 +7,14 @@ User -> AuthorizationServer: credentials
 rnote over AuthorizationServer
   check credentials
 endrnote
-AuthorizationServer -> User: you're good, I'm redirecting you back to the Client with an authorization token
-User -> Client: I'm back with an authorization token from the authorization server
-Client -> AuthorizationServer: here's an authorization token for this user, can I get an access token
+AuthorizationServer -> User: OK, redirecting you to Client with an authorization code grant
+User -> Client: authorization code grant
+Client -> AuthorizationServer: get access token given authorization code grant
 rnote over AuthorizationServer
-  check authorization token
+  check authorization code grant
 endrnote
-AuthorizationServer -> Client: here's your access token
-Client -> ResourceOwner: access token for the user, get data
+AuthorizationServer -> Client: your access token
+Client -> ResourceOwner: get data with access token
 rnote over ResourceOwner
   check access token
 endrnote
