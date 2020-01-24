@@ -4,19 +4,14 @@
 
 # Introduction
 
-Lots of OAuth 2.0 explanations are full of terminology or tied to specific
-implementations of the protocol.  I'm not very interested in specific
-implementations but I do want to know what problem it solves and what the
-elements of the OAuth 2.0 solution are.
-
-In this article, we'll start of with a simple example of you using a financial
-budgeting tool like [mint](mint.com) that you want to allow access to your
-finances at bank, for example [Bank of America](bankofamerica.com). We'll start
-of with a naive solution for this problem and end up with how OAuth 2.0 would
-presumably solve this. I say _Presumably_ as I'm not making claims on how these
-companies actually do this in the real world. I'm not immediately bothered by
-the real world but using an actual example that you can imagine works better
-than staying conceptual.
+Existing OAuth 2.0 protocol explanations are riddled with terminology or tied
+to specific implementations of the protocol.  I'm only interested in
+understanding what problem OAuth 2.0 solves and what the elements of its
+solution are.  In this article, I start with the simple situation that you want
+to give a budgeting tool like [mint](mint.com) access to your transaction data
+at [Bank of America](bankofamerica.com).  I'll show the problems with the naive
+approach and will gradually move toward explaining why OAuth 2.0 solves these
+problems and how.
 
 I gained most of my intuition from the book [OAuth 2 in
 Action](https://www.goodreads.com/book/show/30102872-oauth-2-in-action) which
@@ -24,26 +19,25 @@ has great code-along examples if you want to see the OAuth 2 flow at work.
 
 # Login at Bank of America
 
-You don't spend your money blindly on Mondays, so you want to check your transactions at
-[Bank of America](https://bankofamerica.com). You open up your favorite browser
-and you go to said site. You click _Sign-in_ and are presented with the
-classical login form.
-
-You enter your username and password full of anticipation and get to see all your
-transactions of the past month.
+On Mondays you come to your sense and you want to check your transactions at
+[Bank of America](https://bankofamerica.com) in order to see the weekend's
+damages.  You open up your browser and you navigage to said site. You click
+_Sign-in_ and are presented with the classical login form.  Full of
+anticipation, you enter your username and password get to see your poor
+monetary decision making in all its glory. The flow that makes this happen is as follows:
 
 (insert ./images/simple_auth.atxt.html here)
 
 While a sense of dread sets in, we'll agree that I will refer to your
-username/login combo as your _credentials_. To add to your existential crisis,
+username/password combo as your _credentials_. To add to your existential crisis,
 I'll shout at you:
 
 !!! Tip
     OAuth 2 is not about credentials.
 
 As if things did not start of bad enough, I will also identify you (aka the
-human) with your browser, and will refer to you and your browser as one (at
-this point in history of humanity, a fair assumption in my defense) and
+human) with your browser, and will refer to you and your browser as one (in my defense, at
+this point in human history, a fair assumption) and
 officially name you and your browser, the _User_.
 
 We will call [Bank of America](bankofamerica.com), the _Resource Owner_: they own your
@@ -53,28 +47,27 @@ transactions (the resource). This how this story looks after dehumanizing it:
 
 # Use Mint to see your Bank of America Data
 
-While it is useful to go to [Bank of America](bankofamerica.com) to observe any
-damages yourself, you might also be using budgeting tools like for example
-[mint](mint.com). Most of those tools allow you to pull in your transaction
-data from a wide variety of resources. [Bank of America](bankofamerica.com) may
-be one of them, as could be your retirement accounts at Vanguard or Fidelity,
-your stocks at Morgan Stanley etc.  In this scenario, [mint](mint.com) needs
-access to the _Resource Owner_ ([Bank of America](bankofamerica.com), Vanguard,
-...) on behalf of you the _User_.
+As you live in the illusion that life can be better, you want to start using a
+budgeting tool like [mint](mint.com). [mint](mint.com) allows you to pull in
+your transaction data from a wide variety of resources. [Bank of
+America](bankofamerica.com) may be one of them, as could be your retirement
+accounts at Vanguard or Fidelity, your stocks at Morgan Stanley etc.  In this
+scenario, [mint](mint.com) needs access to the _Resource Owner_ ([Bank of
+America](bankofamerica.com), Vanguard, ...) on behalf of you the _User_.
 
-The first approach that comes to mind is to let [mint](mint.com) ask you for
-your credentials and pass them through to [Bank of America](bankofamerica.com)
-whenever you it needs transaction data:
+The first approach that comes to mind to make this access work is to let
+[mint](mint.com) ask you for your credentials and pass them straight through to
+[Bank of America](bankofamerica.com) whenever you it needs transaction data:
 
 (insert ./images/mint_first_version.atxt.html here)
 
-We'll call [mint](mint.com) the _Client_ in this scenario, so that the
+We'll call [mint](mint.com) the _Client_ in this scenario, such that the
 general scheme looks like this:
 
 (insert ./images/mint_first_version_abstracted.atxt.html here)
 
 Of course, [mint](mint.com) having to ask you each time for your
-credentials is terribly annoying. So [mint](mint.com) might
+credentials is annoying. So [mint](mint.com) might
 be tempted to think _we'll ask you once, and then we'll store it so we don't
 have to ask you again_.
 The flow looks exactly like above, except that now [mint](mint.com) asks you
@@ -82,7 +75,7 @@ for credentials once and then stops asking you as they would store them.
 
 What are the problems with this approach?
 
-- _the client stores your credentials_. If [mint](mint.com) gets compromised and your credentials get stolen, someone else now can access your [Bank of America](bankofamerica.com) account as if they were you.  You have the same problem with if Bank of America itself gets compromised of course, but this increased your risk with a factor of 2 (from 1 place that has your credentials, to 2 places that have your credentials). With each client, your risk goes up. 
+- _the client stores your credentials_. If [mint](mint.com) gets compromised and your credentials get stolen, someone else now can access your [Bank of America](bankofamerica.com) account as if they were you.  You have the same problem with Bank of America itself getting compromised, but this increased your risk with a factor of 2 (from 1 place that has your credentials, to 2 places that have your credentials). With each client, your risk goes up. 
 
 - _anyone with your credentials has the same access you have_. Depending on what you can do as a user, someone having your credentials can do exactly what you can do. Whereas you want [mint](mint.com) to see your transactions and categorize them, you would not want [mint](mint.com) to able to transfer money. However, someone having stolen your credentials from [mint](mint.com) could exactly do that.
 
@@ -93,15 +86,15 @@ We're thus looking for a solution where:
 - the client gets read-only access to your transaction data without having to ask you each time for your credentials, aka _on your behalf_,
 - the client does not store your credentials directly as this is unacceptable risk
 
-In comes, OAuth 2.0, a delegation protocol that solves exactly the above. It's
-named a _delegation protocol_ as it concerns itself with exactly the _on
-behalf_ part in the above: how can you, the _User_ delegate access to the
-_Resource_ to a _Client_ without that it exposes you to unacceptable risk. So
-why call it _OAuth_ and not _ODel_? Left to the reader as an exercise.
+OAuth 2.0, a delegation protocol, solves exactly the above. It's named a
+_delegation protocol_ as it concerns itself with the _on your behalf_ part in
+the above: how can you, the _User_ delegate _Resource_ access to the
+_Client_ without that it exposes you to unacceptable risk? We leave it as an
+exercise to the reader why the name is _OAuth_ and not _ODel_. 
 
 ## The Players
 
-We already identified 3 players in the OAuth 2.0 delegation:
+So far we identified 3 players in the OAuth 2.0 delegation protocol:
 
 - the _User_ (you, or a proxy for you, for example your browser)
 - the _Client_ (the application you're interacting with and you want to delegate your access rights to, for example [mint](mint.com))
@@ -113,7 +106,7 @@ OAuth 2.0 introduces a 4th player that takes care of the actual authorization:
 
 In our running example, we'll assume the authorization server is owned by [Bank
 of America](bankofamerica.com), a logical choice as [Bank of
-America](bankofamerica.com) are the ones that can verify your credentials
+America](bankofamerica.com) is the one that can verify your credentials
 directly.
 
 ## The Dance

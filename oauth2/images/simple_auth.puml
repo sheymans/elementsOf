@@ -1,4 +1,4 @@
 @startuml
 You -> BankOfAmerica: here's my username/password
-BankOfAmerica --> You: thanks, look at your transactions
+BankOfAmerica --> You: thanks, here's your transactions
 @enduml
