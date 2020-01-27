@@ -1,4 +1,5 @@
 @startuml
+You -> AuthorizationServerBoA: credentials
 rnote over AuthorizationServerBoA
   check credentials
 endrnote
