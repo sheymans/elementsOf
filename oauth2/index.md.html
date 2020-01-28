@@ -83,12 +83,12 @@ What are the problems with this approach?
 
 We're thus looking for a solution where:
 
-- the client gets read-only access to your transaction data without having to ask you each time for your credentials, aka _on your behalf_,
+- the client gets read-only access to your transaction data without having to ask you each time for your credentials, aka the client can get the data _on your behalf_,
 - the client does not store your credentials directly as this is unacceptable risk
 
 OAuth 2.0, a delegation protocol, solves exactly the above. It's named a
 _delegation protocol_ as it concerns itself with the _on your behalf_ part in
-the above: how can you, the _User_ delegate _Resource_ access to the
+the above: how can you, the _User_, delegate _Resource_ access to the
 _Client_ without that it exposes you to unacceptable risk? We leave it as an
 exercise to the reader why the name is _OAuth_ and not _ODel_. 
 
@@ -96,9 +96,9 @@ exercise to the reader why the name is _OAuth_ and not _ODel_.
 
 So far we identified 3 players in the OAuth 2.0 delegation protocol:
 
-- the _User_ (you, or a proxy for you, for example your browser)
-- the _Client_ (the application you're interacting with and you want to delegate your access rights to, for example [mint](mint.com))
-- the _Resource Owner_ (the place that is the origin of your data, for example [Bank of America](bankofamerica.com))
+- the _User_: you, or a proxy for you, for example, your browser
+- the _Client_: the application you're interacting with and you want to delegate your access rights to, for example [mint](mint.com)
+- the _Resource Owner_: the place that is the origin of your data, for example [Bank of America](bankofamerica.com)
 
 OAuth 2.0 introduces a 4th player that takes care of the actual authorization:
 
@@ -112,7 +112,7 @@ directly.
 ## The Dance
 
 Given such an authorization server, can we instruct the client to delegate
-authorizing you the user to the authorization server? If yes, the authorization
+authorizing you to the authorization server? If yes, the authorization
 server can then verify your credentials and inform the client that _yes, you
 can give that user access to the transaction data_.
 
@@ -120,15 +120,15 @@ What are the elements of such a delegation? Let's see:
 
 - the client ([mint](mint.com)) needs to send you, the user (or your browser), to [Bank of America](bankofamerica.com)'s authorization server
 - the authorization server needs to verify your credentials and needs to conclude _yes, you have access_
-- the authorization server needs to tell the client _that particular user has access and you can go pull the data from the Resource Owner_.
-- the client needs to use that authorization and go the _Resource Owner_ and ask it to give the client the user's data
+- the authorization server needs to tell the client that _the particular user has access and can get the data from the Resource Owner_.
+- the client needs to take that authorization to the _Resource Owner_ to ask for the user's data
 
 Each of those elements can be accomplished as follows:
 
-- sending the browser to the authorization server can happen using [HTTP redirects (code 301)](https://moz.com/learn/seo/redirection). The user wants to access the data from the client, but the client instead sends the user's browser a redirect to the authorization server. The browser subsequently follows that redirect and lands at the authorization server.
+- sending the browser to the authorization server can happen using an [HTTP redirect (code 301)](https://moz.com/learn/seo/redirection). The user wants to access the data from the client, but the client instead sends the user's browser a redirect to the authorization server. The browser subsequently follows that redirect and lands at the authorization server.
 - the authorization server then starts an interaction with the user's browser to get and check the user's credentials
 - the authorization server can tell the client that the user's credentials are OK by similarly redirecting the user's browser back to the client by including in the redirect URL something called an _access token_.
-- the client would then use that _access token_ (which it keeps associated with the user) to go and ask the Resource Owner for the user's data. Since the _Resource Owner_ is presumably able to interpret the access token (both the _Resource Owner_ as well as the Authorization Server are [Bank of America](bankofamerica.com), so when the authorization server creates a token for the user, the _Resource Owner_ can verify that the access token is indeed valid).
+- the client would then use that _access token_ (which it keeps associated with the user) to go and ask the _Resource Owner_ for the user's data. Since the _Resource Owner_ is presumably able to interpret the access token (both the _Resource Owner_ as well as the Authorization Server are [Bank of America](bankofamerica.com), so when the authorization server creates a token for the user, the _Resource Owner_ can verify that the access token is indeed valid).
 
 That flow looks like this:
 
@@ -140,8 +140,8 @@ Or abstractly:
 
 Recall that we had the following problems with the naive approach:
 
-- _the client stores your credentials_. 
-- _anyone with your credentials has the same access you have_. 
+- _the client stores your credentials_ 
+- _anyone with your credentials has the same access you have_
 
 Let's see whether this new flow solves those problems:
 
@@ -164,7 +164,7 @@ As we explained above, this interaction happens mostly via HTTP redirects over y
 The problematic part here is the _browser_. This part of the communication, the
 back-and-forth using redirects is called the _front-channel_ communication and
 since it goes via your browser it is vulnerable to having the access token
-intercepted. The _back-channel_ communication (for example from mint to the
+intercepted. The _back-channel_ communication (for example, from mint to the
 _Resource Owner_) is much more secure in that respect; there is no user browser
 involved, just service to service communication.
 
@@ -189,17 +189,17 @@ _Authorization Server_ can verify.
 
 # Conclusion
 
-We showed the different problems one has when giving credentials
-to a client directly:
+We illustrated two problems with giving your credentials to a client such as
+[mint](mint.com) directly:
 
-- the clients store your credentials
-- someone with your credentials has the same access you have
+- the client stores your credentials
+- someone that stole your credentials has the same access you have
 
 We gradually introduced the OAuth 2.0 flow (_The Dance_) that solves these
-problems, including why we need the authorization code grant as well
-as the access token (and not just the access token).
+problems, moving from an incomplete solution with just an access token to a
+solution with both access token and authorization code grant.
 
-In order to convey that basic intuition (the _why_ of OAuth 2.0) we left out
+In order to convey the basic intuition (the _why_ of OAuth 2.0) we left out
 many parts such as the different types of authorization code grants, the
 particular format of access tokens, what refresh tokens are and where they come
 into play.  If you're interested in learning more check out [OAuth 2 in
