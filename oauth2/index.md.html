@@ -1,30 +1,31 @@
 <meta charset="utf-8">
                             **Elements of OAuth 2.0**
                             Stijn Heymans
+                            published: 31 January 2020
 
 # Introduction
 
 Existing OAuth 2.0 protocol explanations are riddled with terminology or tied
 to specific implementations of the protocol.  I'm only interested in
 understanding what problem OAuth 2.0 solves and what the elements of its
-solution are.  In this article, I start with the simple situation that you want
+solution are.  In this article, I start with the scenario that you want
 to give a budgeting tool like [mint](mint.com) access to your transaction data
 at [Bank of America](bankofamerica.com).  I'll show the problems with the naive
 approach and will gradually move toward explaining why OAuth 2.0 solves these
 problems and how.
 
-I gained most of my intuition from the book [OAuth 2 in
+I gained my intuition from the book [OAuth 2 in
 Action](https://www.goodreads.com/book/show/30102872-oauth-2-in-action) which
-has great code-along examples if you want to see the OAuth 2 flow at work.
+has code-along examples if you want to see the OAuth 2.0 flow at work.
 
 # Login at Bank of America
 
-On Mondays you come to your sense and you want to check your transactions at
-[Bank of America](https://bankofamerica.com) in order to see the weekend's
-damages.  You open up your browser and you navigage to said site. You click
-_Sign-in_ and are presented with the classical login form.  Full of
-anticipation, you enter your username and password get to see your poor
-monetary decision making in all its glory. The flow that makes this happen is as follows:
+On Mondays you check your transactions at [Bank of
+America](https://bankofamerica.com) to see the weekend's damages.  You open up
+your browser and you navigate to said site. You click _Sign-in_ and are
+presented with the classical login form.  Full of anticipation, you enter your
+username and password get to see your poor monetary decision making. This is
+the flow that makes this happen:
 
 (insert ./images/simple_auth.atxt.html here)
 
@@ -41,7 +42,7 @@ this point in human history, a fair assumption) and
 officially name you and your browser, the _User_.
 
 We will call [Bank of America](bankofamerica.com), the _Resource Owner_: they own your
-transactions (the resource). This how this story looks after dehumanizing it:
+transactions (the resources). This how this story looks after dehumanizing it:
 
 (insert ./images/simple_auth2.atxt.html here)
 
@@ -49,15 +50,15 @@ transactions (the resource). This how this story looks after dehumanizing it:
 
 As you live in the illusion that life can be better, you want to start using a
 budgeting tool like [mint](mint.com). [mint](mint.com) allows you to pull in
-your transaction data from a wide variety of resources. [Bank of
+your transaction data from a variety of resources. [Bank of
 America](bankofamerica.com) may be one of them, as could be your retirement
-accounts at Vanguard or Fidelity, your stocks at Morgan Stanley etc.  In this
+accounts at Vanguard, or your stocks at Morgan Stanley.  In this
 scenario, [mint](mint.com) needs access to the _Resource Owner_ ([Bank of
 America](bankofamerica.com), Vanguard, ...) on behalf of you the _User_.
 
-The first approach that comes to mind to make this access work is to let
+The first approach that comes to mind to make this access possible is to let
 [mint](mint.com) ask you for your credentials and pass them straight through to
-[Bank of America](bankofamerica.com) whenever you it needs transaction data:
+[Bank of America](bankofamerica.com) whenever it needs transaction data:
 
 (insert ./images/mint_first_version.atxt.html here)
 
@@ -66,8 +67,8 @@ general scheme looks like this:
 
 (insert ./images/mint_first_version_abstracted.atxt.html here)
 
-Of course, [mint](mint.com) having to ask you each time for your
-credentials is annoying. So [mint](mint.com) might
+Of course, [mint](mint.com) asking you each time for your
+credentials is unpleasant. So [mint](mint.com) might
 be tempted to think _we'll ask you once, and then we'll store it so we don't
 have to ask you again_.
 The flow looks exactly like above, except that now [mint](mint.com) asks you
@@ -75,7 +76,7 @@ for credentials once and then stops asking you as they would store them.
 
 What are the problems with this approach?
 
-- _the client stores your credentials_. If [mint](mint.com) gets compromised and your credentials get stolen, someone else now can access your [Bank of America](bankofamerica.com) account as if they were you.  You have the same problem with Bank of America itself getting compromised, but this increased your risk with a factor of 2 (from 1 place that has your credentials, to 2 places that have your credentials). With each client, your risk goes up. 
+- _the client stores your credentials_. If [mint](mint.com) gets compromised and your credentials get stolen, someone else now can access your [Bank of America](bankofamerica.com) account.  You have the same problem with Bank of America itself getting compromised, but this increased your risk with a factor of 2 (from 1 place that has your credentials, to 2 places that have your credentials). With each client, your risk goes up. 
 
 - _anyone with your credentials has the same access you have_. Depending on what you can do as a user, someone having your credentials can do exactly what you can do. Whereas you want [mint](mint.com) to see your transactions and categorize them, you would not want [mint](mint.com) to able to transfer money. However, someone having stolen your credentials from [mint](mint.com) could exactly do that.
 
@@ -180,7 +181,7 @@ the thief access our data at the _Resource Owner_ with that information?
 
 The authorization code grant does not give you access to the data at the _Resource
 Owner_ as the _Resource Owner_ needs an access token. Can the thief get an
-access token from the _AuthorizationServer_ given the authorization code grant?
+access token from the _Authorization Server_ given the authorization code grant?
 
 The getting of the access token happens on the back-channel from the _Client_
 to the _Authorization Server_ and as such can be protected (no _User_ involved)
