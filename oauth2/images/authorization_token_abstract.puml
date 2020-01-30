@@ -7,7 +7,7 @@ User -> AuthorizationServer: credentials
 rnote over AuthorizationServer
   check credentials
 endrnote
-AuthorizationServer -> User: OK, redirecting you to Client with an authorization code grant
+AuthorizationServer -> User: OK, redirecting you to Client with authorization code grant
 User -> Client: authorization code grant
 Client -> AuthorizationServer: get access token given authorization code grant
 rnote over AuthorizationServer
