@@ -58,6 +58,6 @@ write_file($file_name_surrounded, '<meta charset="utf-8"  "-*-">' . "\n\n");
 append_file($file_name_surrounded, $asterisks_line);
 append_file($file_name_surrounded, @file_content);
 append_file($file_name_surrounded, $asterisks_line);
-append_file($file_name_surrounded, ".\n" . '<script src="https://casual-effects.com/markdeep/latest/markdeep.min.js?" charset="utf-8"></script>');
+append_file($file_name_surrounded, "\n" . '<script src="https://casual-effects.com/markdeep/latest/markdeep.min.js?" charset="utf-8"></script>');
 
 
