@@ -2,6 +2,7 @@
                             **Elements of OAuth 2.0**
                             Stijn Heymans
                             published: 30 January 2020
+                            last updated: 23 February 2020
 
 # Introduction
 
@@ -36,7 +37,7 @@ I'll shout at you:
 !!! Tip
     OAuth 2 is not about credentials.
 
-As if things did not start of bad enough, I will also identify you (aka the
+As if things did not start off bad enough, I will also identify you (aka the
 human) with your browser, and will refer to you and your browser as one (in my defense, at
 this point in human history, a fair assumption) and
 officially name you and your browser, the _User_.
@@ -76,7 +77,7 @@ for credentials once and then stops asking you as they now store them.
 
 What are the problems with this approach?
 
-- _the client stores your credentials_. If [mint](mint.com) gets compromised and your credentials get stolen, someone else now can access your [Bank of America](bankofamerica.com) account.  You have the same problem with Bank of America itself getting compromised, but this scenario increases your risk with a factor of 2 (from 1 place that has your credentials, to 2 places that have your credentials). With each additional client, your risk goes up. 
+- _the client stores your credentials_. If [mint](mint.com) gets compromised and your credentials get stolen, someone else now can access your [Bank of America](bankofamerica.com) account.  You have the same problem with Bank of America itself getting compromised, but this scenario increases your risk with a factor of 2 (from 1 place that has your credentials, to 2 places that have your credentials). With each additional client, your risk goes up.
 
 - _anyone with your credentials has the same access you have_. Depending on what you can do as a user, someone having your credentials can do exactly what you can do. Whereas you want [mint](mint.com) to _see_ your transactions and categorize them, you would not want [mint](mint.com) to able to transfer money. However, someone with your credentials from [mint](mint.com) could exactly do that.
 
@@ -91,7 +92,7 @@ OAuth 2.0, a delegation protocol, solves exactly the above. It's named a
 _delegation protocol_ as it concerns itself with the _on your behalf_ part in
 the above: how can you, the _User_, delegate _Resource_ access to the
 _Client_ without that it exposes you to unacceptable risk? We leave it as an
-exercise to the reader why the name is _OAuth_ and not _ODel_. 
+exercise to the reader why the name is _OAuth_ and not _ODel_.
 
 ## The Players
 
@@ -141,7 +142,7 @@ Or abstractly:
 
 Recall that we had the following problems with the naive approach:
 
-- _the client stores your credentials_ 
+- _the client stores your credentials_
 - _anyone with your credentials has the same access you have_
 
 Let's see whether this new flow solves those problems:
