@@ -4,6 +4,52 @@
 
 # Introduction
 
+See the demo at [demo](https://github.com/sheymans/elementsOf/tree/master/docker/demo).
+
+# The Demo App
+
+Before we jump into containers, let's introduce the demo application, we'll be
+want to run _in a container_. I'm going to use the simple web framework
+[Express](expressjs.com) for [node](nodejs.org) to write an app that says `Hi`. This is a simple `hi.js`:
+
+~~~js
+const express = require('express');
+const app = express();
+
+app.get('/', (request, result) => result.send('Hi'));
+
+app.listen(8111, () => console.log('hi: listening on port 8111'));
+~~~
+
+As I'm using `express`, I'll have a `package.json` file, that looks like this:
+
+~~~
+{
+  "name": "hi",
+  "version": "1.0.0",
+  "author": "Stijn Heymans",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
+~~~
+
+You're probably used to this, so just note that I indicated that my app will need `express` in this line:
+
+~~~
+    "express": "^4.17.1"
+~~~
+
+TODO: show directory structure of app
+
+# Containerizing the App
+
+
+# Publishing the Container
+
+
+# Running the Container
+
 # Conclusion
 
 TODO: left out of discussion Docker Swarm, Docker Networking and the Container Network Model (CNM).
