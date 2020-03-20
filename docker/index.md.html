@@ -40,7 +40,55 @@ You're probably used to this, so just note that I indicated that my app will nee
     "express": "^4.17.1"
 ~~~
 
-TODO: show directory structure of app
+To make sure we can run this app, we'll install that `express` dependency as follows:
+
+~~~bash
+npm install
+~~~
+
+We use the node package manager [npm](https://www.npmjs.com/) to do that. `npm`
+will look at the `package.json` file, will see that there's a `dependency`
+`express` and will then install `express` into the directory `node_modules`.
+
+To start your app, then type:
+
+~~~bash
+node hi.js
+~~~
+
+You can navigate to http://localhost:8111 to be said Hi to.
+
+Here's roughly what assumptions we made to run this app on your laptop/computer:
+
+- Your laptop allows for running software such as `npm`, `node`.  For example, it's a Linux or Mac Os X based machine.
+- You had `npm` installed to install the required dependencies of your app (`express`); if you did not have it installed, you had to go and install it.
+- You then ran `npm install` from the command-line
+- You had `node` installed to actually run the application
+- You then ran `node hi.js` from the command-line
+
+If you want to install and run your app on another laptop (or, on an [EC2
+instance](https://en.wikipedia.org/wiki/Amazon_Elastic_Compute_Cloud) cause
+that's how you roll), you'd repeat those steps. 
+
+_"Well, of course, I would not repeat these steps, I'd put them all in a little
+script so I just have to run the script"_. Of course you would. But you'd be
+forgetten that a laptop and an EC2 instance are very different things. You'd
+probably want scripts per different Operation System at the minimumn.
+
+What if you could package your app while specifying:
+
+- a small Operating System to start from, for example [alpine](https://alpinelinux.org/)
+- an installation of `npm` and `node` layered on that
+- instructions to install your application (`npm install`)
+- instructions to run your application (`node hi.js`)
+
+In other words, what if you could define a small container that specifies the
+above and that you run anywhere where such containers can run? (You're getting
+the container reference: a standard packaging solution that you can stuff in
+there and as long as your stuff fits into a container, you can put it on a ship
+and ship it off anywhere in the world).
+
+Next up, let's see how that containerization works.
 
 # Containerizing the App
 
