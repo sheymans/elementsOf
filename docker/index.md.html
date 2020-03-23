@@ -4,6 +4,10 @@
 
 # Introduction
 
+While writing these elements I mostly used [Docker Deep
+Dive](https://www.goodreads.com/book/show/39933970-docker-deep-dive) by Nigel
+Poulton as a reference.
+
 See the demo at [demo](https://github.com/sheymans/elementsOf/tree/master/docker/demo).
 
 # The Demo App
@@ -92,13 +96,52 @@ Next up, let's see how that containerization works.
 
 # Containerizing the App
 
+To containerize your app, we'll use [docker](docker.com). In this article, I'll
+mostly focus on what `docker` _does_ rather than _how_ it does it. If you want
+to learn more about how docker does what it does, please refer to [Docker Deep
+Dive]() or for more on for example `containerd` and `runc`, check out this
+[blog
+series](https://www.ianlewis.org/en/container-runtimes-part-1-introduction-container-r).
+
+Central to containerizing an app is the concept of an `image`. While there's a certain mysticism around an image, fundamentally it's just an abstraction that can be understood by `docker` when it needs to actually run your application. In that sense, we can compare to several other abstractions in computer science:
+
+- a _Java class_ specifies the behavior of a particular instance of that class
+- a _`jar` file_ packages up your Java application and can then be run by the Java runtime.
+- an ISO image for Linux packages up the Operation System so you can download the image, install the image, and run the Operating System
+- a Python script specifies which instructions to run for the Python interpreter
+
+All of these comparisons are imperfect, but have in common that there is the
+aspect of a specification (the `image`) that can then be run/executed on a
+machine.
+
+Let's recap the aspects that we'd like to specify for our demo app:
+
+- a small Operating System to start from, for example [alpine](https://alpinelinux.org/)
+- an installation of `npm` and `node` layered on that
+- instructions to install your application (`npm install`)
+- instructions to run your application (`node hi.js`)
+
+Now let's write up that specification more formally (i.e., such that `docker`
+can use to build an `image`) in a file named `Dockerfile` -- specifications to
+build docker images will always be in a file named `Dockerfile` so similarly as
+a `package.json` can teach you a lot of how the application is structured, have
+a look at `Dockerfile`s in apps you meet in the wild.
+
+
+
 
 # Publishing the Container
 
-
 # Running the Container
 
+# Persistence
+
+TODO: volumes
+
 # Conclusion
+
+- build: image
+- execute: run
 
 TODO: left out of discussion Docker Swarm, Docker Networking and the Container Network Model (CNM).
 
