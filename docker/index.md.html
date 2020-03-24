@@ -127,6 +127,79 @@ build docker images will always be in a file named `Dockerfile` so similarly as
 a `package.json` can teach you a lot of how the application is structured, have
 a look at `Dockerfile`s in apps you meet in the wild.
 
+We want our app to be layered on the Linux alpine OS system, so the first line of our `Dockerfile` is:
+
+
+FROM alpine
+
+
+Next, up we need an installation of `npm` and `node` layered over that, so let's specify that in the `Dockerfile`:
+
+~~~
+RUN apk add --update nodejs nodejs-npm
+~~~
+
+`apk add --update nodejs nodejs-npm` is just the command you'd run on alpine to
+install `node` and `npm` (see
+[apk](https://wiki.alpinelinux.org/wiki/Alpine_Linux_package_management). If
+you picked a different image to start from, you'd might need a different
+install command. The important part is `RUN` which runs whatever comes after it
+and the installation of `node` and `npm` will constitute a new layer on top of
+`alpine`.
+
+Note that the directory where your `Dockerfile` exists is usually called the
+_build-context_. We'll then copy all the files from this directory (in our
+case, it will copy over `hi.js` and `package.json`) into a root directory
+`/src` of the new image we're creating:
+
+~~~
+COPY . /src
+~~~
+
+The `.` is the current directory (i.e., where the `Dockerfile` lives). This
+`COPY` command will create a new layer in the resulting image.
+
+Alright, so we have an image consisting of a Linux (`alpine`), we've installed `node` and `npm` into that image and copied our app's source code into the directory `/src` on the image. Next up, let's use `npm` to install the `app`. For this, we'll make the `/src` directory our _current_ working directory and execute `npm install`:
+
+~~~
+WORKDIR /src
+RUN npm install
+~~~
+
+`WORKDIR` changes the working directory to `/src` and you already know the
+`RUN` command, it just executes `npm install` in this case. The latter will
+just like it did on your laptop, look for `package.json`, find your
+dependencies in there (`express`) and install those.
+
+Almost there. Let's run our application:
+
+~~~
+ENTRYPOINT ["node", "./app.js"]
+~~~
+
+This command sets the application to run when we `run` the container. Note that
+we did not use `RUN` for this; `RUN` adds a new image layer, whereas
+`ENTRYPOINT` just adds metadata and appears only once in the `Dockerfile` to
+indicate _this is what you run once the container is ready to be run_.
+
+We forgot one thing, which is that our app will be listening on port `8111`.
+Our app would run entirely in the container so we'd not be able to access it
+via `localhost` on our laptop unless we expose the container's port:
+
+~~~
+EXPOSE 8111
+~~~
+
+TODO: add maintainer metadata
+
+TODO: show full DOckerfile
+
+TODO: run build command
+
+TOOD: show image layers
+
+TODO: show inspect to see metadata etc
+
 
 
 
@@ -134,11 +207,16 @@ a look at `Dockerfile`s in apps you meet in the wild.
 
 # Running the Container
 
+TODO: map localhost 8000 to app's 8111 from command-line
+
 # Persistence
 
 TODO: volumes
 
 # Conclusion
+
+
+TODO: add picture of container building/running cycle.
 
 - build: image
 - execute: run
