@@ -130,8 +130,9 @@ a look at `Dockerfile`s in apps you meet in the wild.
 We want our app to be layered on the Linux alpine OS system, so the first line of our `Dockerfile` is:
 
 
+~~~
 FROM alpine
-
+~~~
 
 Next, up we need an installation of `npm` and `node` layered over that, so let's specify that in the `Dockerfile`:
 
@@ -174,7 +175,7 @@ dependencies in there (`express`) and install those.
 Almost there. Let's run our application:
 
 ~~~
-ENTRYPOINT ["node", "./app.js"]
+ENTRYPOINT ["node", "./hi.js"]
 ~~~
 
 This command sets the application to run when we `run` the container. Note that
@@ -190,17 +191,63 @@ via `localhost` on our laptop unless we expose the container's port:
 EXPOSE 8111
 ~~~
 
-TODO: add maintainer metadata
+To round it of, we add some more metadata to the image:
 
-TODO: show full DOckerfile
+~~~
+LABEL maintainer="ben@ny.com"
+~~~
 
-TODO: run build command
+This is the whole `Dockerfile`:
 
-TOOD: show image layers
+~~~
+FROM alpine
+RUN apk add --update nodejs nodejs-npm
+COPY . /src
+WORKDIR /src
+RUN npm install
+ENTRYPOINT ["node", "./hi.js"]
+EXPOSE 8111
+LABEL maintainer="ben@ny.com"
+~~~
+
+Let's build an image:
+
+~~~
+ docker image build -t hi:latest .
+~~~
+
+Dissected:
+
+- `docker`: the `docker` program that we use to build images, run images, etc
+- `image`: tell `docker` that we're doing involves images (you'd also have `docker container` to indicate that you're working with containers)
+- `build`: build an image
+- `-t hi:latest`: we're *t*argetting an image with name `hi` and with tag `latest`. A tag can be used to identified different versions of your software (`v1`, etc).
+- `.`: don't forget the `.`. The `.` stands for _look into your current directory for the Dockerfile_. 
+
+Let's have a look at whether we now indeed have an image available:
+
+~~~
+docker image ls
+~~~
+
+Dissecting that again:
+
+- `docker`: the `docker` program (no, really?)
+- `image`: we're dealing with images (what's the images around?)
+- `ls`: the usual listing command
+
+This should give as output something like:
+
+~~~
+REPOSITORY                                                                     TAG                             IMAGE ID            CREATED             SIZE
+hi                                                                             latest                          5d3095b79194        5 minutes ago       57.2MB
+~~~
+
+So we're seeing a created image with repository name `hi`, tag `latest`, and image id `5d3095b79194` (this will be different when you do it). 
+
+TODO: show format to get only the image id.
 
 TODO: show inspect to see metadata etc
-
-
 
 
 # Publishing the Container
