@@ -243,12 +243,64 @@ REPOSITORY                                                                     T
 hi                                                                             latest                          5d3095b79194        5 minutes ago       57.2MB
 ~~~
 
-So we're seeing a created image with repository name `hi`, tag `latest`, and image id `5d3095b79194` (this will be different when you do it). 
+So we're seeing a created image with repository name `hi`, tag `latest`, and
+image id `5d3095b79194` (this will be different when you do it). 
 
-TODO: show format to get only the image id.
+Often it's nice to be able to just get the `IMAGE ID`s (for example to pipe them to another command), you can use `--format` for that which uses [Go templates](https://golang.org/pkg/text/template/) to extract the data you like to see formatted. For example, let's say we want to see the size:
 
-TODO: show inspect to see metadata etc
+~~~
+docker image ls --format "{{.Size}}"
+~~~
 
+This will show:
+
+~~~
+57.2MB
+~~~
+
+More useful is often getting the Image Ids, so you try:
+
+~~~
+docker image ls --format "{{.ImageId}}"
+~~~
+
+and you get:
+
+~~~
+Template parsing error: template: :1:2: executing "" at <.ImageId>: can't evaluate field ImageId in type formatter.imageContext
+~~~
+
+So while `docker image ls` shows `IMAGE ID` as a column name, that's not how you can access this. There's a nice [hint](https://docs.docker.com/config/formatting/) on how you can see the attributes that you can actually use in `--format`:
+
+~~~
+docker image ls --format "{{json .}}"
+~~~
+
+This will make a json out of _everything_ and will show:
+
+~~~
+{"Containers":"N/A","CreatedAt":"2020-03-25 08:11:44 -0700 PDT","CreatedSince":"2 days ago","Digest":"\u003cnone\u003e","ID":"5d3095b79194","Repository":"hi","SharedSize":"N/A","Size":"57.2MB","Tag":"latest","UniqueSize":"N/A","VirtualSize":"57.23MB"}
+~~~
+
+From which you can see that the `IMAGE ID` is actually under attribute `ID`:
+
+~~~
+docker image ls --format "{{.ID}}"
+~~~
+
+will give you `5d3095b79194`.
+
+Finally, let's have a look at our created image:
+
+~~~
+docker image inspect 5d3095b79194
+~~~
+
+You'll see your label `maintainer` added, you'll see the entrypoint `node
+./hi.js`, and you'll see the different layers with different ids that were
+created as part of this image (recall that each `RUN` created a different
+layer). Grab a cup of coffee and spend some time quality time with that `docker
+image inspect` output, cause you're worth it.
 
 # Publishing the Container
 
