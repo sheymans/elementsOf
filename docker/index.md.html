@@ -304,9 +304,25 @@ image inspect` output, cause you're worth it.
 
 # Publishing the Container
 
+In this elemental example, we'll keep working with the local image we just
+created. However, if you want other users to be able to use your image, you'd
+upload it, for example to the [Docker Hub](https://hub.docker.com/). After you
+uploaded your image to a Docker Hub repository, other developers could then
+pull it down. Have a look at this
+[tutorial](https://ropenscilabs.github.io/r-docker-tutorial/04-Dockerhub.html)
+if you'd like to see some of the steps involved.
+
 # Running the Container
 
+Now that we have an image `hi:latest`, let's try to create a running instance of that image. Where before we used `docker image` to do image manipulation, we'll now use `docker container` indicating that we're running containers based off an image:
+
+~~~
+docker container run -it hi:latest bash
+~~~
+
 TODO: map localhost 8000 to app's 8111 from command-line
+
+TODO: jump into running container with `exec`
 
 # Persistence
 
