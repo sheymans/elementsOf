@@ -314,11 +314,35 @@ if you'd like to see some of the steps involved.
 
 # Running the Container
 
-Now that we have an image `hi:latest`, let's try to create a running instance of that image. Where before we used `docker image` to do image manipulation, we'll now use `docker container` indicating that we're running containers based off an image:
+Now that we have an image `hi:latest`, let's try to create a running instance
+of that image. Where before we used `docker image` to do image manipulation,
+we'll now use `docker container` indicating that we're running containers based
+off an image:
 
 ~~~
-docker container run -it hi:latest bash
+docker container run -d hi:latest
 ~~~
+
+This basic command starts the container in detached/background mode (hence the
+`-d`) and uses the image `hi:latest` to instantiate the container with. Since
+we specified that this container should be running `node ./hi.js` using its
+`ENTRYPOINT` statement in the `Dockerfile`, we expect to see this app running
+when we _jump into_ the container.
+
+Let's first check what the ID or name of this freshly started container is:
+
+~~~
+docker container ls
+~~~
+
+We'd see something like this as output:
+
+~~~
+CONTAINER ID        IMAGE                COMMAND                  CREATED             STATUS              PORTS                    NAMES
+885288159d28        hi:latest            "node ./hi.js"           2 minutes ago       Up 2 minutes        8111/tcp                 boring_dijkstra
+~~~
+
+
 
 TODO: map localhost 8000 to app's 8111 from command-line
 
