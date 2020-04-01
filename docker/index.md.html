@@ -342,11 +342,42 @@ CONTAINER ID        IMAGE                COMMAND                  CREATED       
 885288159d28        hi:latest            "node ./hi.js"           2 minutes ago       Up 2 minutes        8111/tcp                 boring_dijkstra
 ~~~
 
+You'll see that a name was created for your running container
+`boring_dijkstra`. We could have decided on that name ourselves by using
+`docker container run --name your_own_name -d hi:latest`.
 
+We see from that `docker container ls` that there's a container running with id
+`885288159d28` and it's executing the command `node ./hi.js` which is exactly
+what we expected from the `Dockerfile`.
+
+We can quickly jump into the container to see that in action:
+
+~~~
+docker container exec -it boring_dijkstra sh
+~~~
+
+Note that I used the name of the container `boring_dijkstra`, but I could as well have used its ID `885288159d28`.
+
+You'll see a shell prompt appear and if you see what processes are running in this container, you'll indeed see our `node` app:
+
+~~~
+/src # ps
+PID   USER     TIME  COMMAND
+  1   root     0:00  node ./hi.js
+ 32   root     0:00  sh
+ 37   root     0:00  ps
+~~~
+
+You'll also `sh` which is the command we executed as part of `docker container
+exec -it boring_dijkstra sh` and of course `ps` which is the command we just
+ran in that shell.
+
+TODO: explain `-it` in detail using https://docs.docker.com/engine/reference/commandline/exec/
+
+TODO: explain then `-d` on how it also runs the command but in detached mode and that the command when left out is implicit in the `ENTRYPOINT`.
 
 TODO: map localhost 8000 to app's 8111 from command-line
 
-TODO: jump into running container with `exec`
 
 # Persistence
 
