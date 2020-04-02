@@ -368,16 +368,80 @@ PID   USER     TIME  COMMAND
  37   root     0:00  ps
 ~~~
 
-You'll also `sh` which is the command we executed as part of `docker container
+You'll also see `sh` which is the command we executed as part of `docker container
 exec -it boring_dijkstra sh` and of course `ps` which is the command we just
 ran in that shell.
 
-TODO: explain `-it` in detail using https://docs.docker.com/engine/reference/commandline/exec/
+Let's analyze `docker container exec -it boring_dijkstra sh` in detail:
 
-TODO: explain then `-d` on how it also runs the command but in detached mode and that the command when left out is implicit in the `ENTRYPOINT`.
+- `docker container`: you're executing docker and it involves containers (in contrast to `image` or `volume` see later)
+- `exec`: you're going to execute a command in the container, which command? `sh`.
+- `boring_dijkstra`: the container you're executing the command `sh` in
+- `-it`: `-t` is short for `--tty` and attaches you to a terminal in the container. `-i` is to make input and output from the container flow to your terminal on your docker host (your laptop). You almost always see `-it` being used together: try out `-t` on its own in the previous command press `return`; you'll see nothing happen as the output of the container is not flowing to the output of your laptop terminal. I find it most useful to thin of `-it` as `interactive mode` and `-d` as detached mode (the container runs but you're not _in it_).
+- `sh`: the command you're executing on your container.
 
-TODO: map localhost 8000 to app's 8111 from command-line
+The page explaining
+[exec](https://docs.docker.com/engine/reference/commandline/exec/) as well as
+this [stackoverflow
+article](https://stackoverflow.com/questions/22272401/what-does-it-mean-to-attach-a-tty-std-in-out-to-dockers-or-lxc)
+have more details that are worth skimming through.
 
+
+So we know our app is running in the container. We also know that we wrote it so it runs on port `8111`. Indeed in `hi.js`:
+
+~~~
+app.listen(8111, () => console.log('hi: listening on port 8111'));
+~~~
+
+In the `Dockerfile` we also exposed that port:
+
+~~~
+EXPOSE 8111
+~~~
+
+In contrast to what you'd think this does not actually make the port `8111`
+_reachable_; you can see this more as documentation that your service listens
+to this port (`8111`).
+
+To actually make your port `8111` from your container reachable from outside your container from your laptop, you'd publish it with the `-p` option.
+
+Before using that `-p` option, let's first `stop` and `rm` our currenty running container:
+
+~~~
+docker container stop boring_dijkstra
+docker container rm boring_dijkstra
+~~~
+
+And let's now start a container from the `hi:latest` image where we map the
+Docker host's port `8000` (if you're following along this is most likely your
+laptop) to the `8111`. For reading-left-to-right oriented cultures, this is
+roughly from outward to inward (left to right).
+
+~~~
+docker container run -d -p 8000:8111 hi:latest
+~~~
+
+After this you can navigate to `localhost:8000` on your browser and see `Hi`.
+Note that `localhost:8111` as `8111` is exposed in your container, not your
+`localhost` (laptop).
+
+Before diving into persistence, let's dive shortly into these `stop` and `rm`
+commands we executed before starting a new container.
+
+What's the difference? If you remove (`rm`) a container, you'll no longer be
+able to start it again, you'll no longer be able to refer to it using its name,
+and `docker container ls -a` (show all containers) will no longer show your
+container. It's a goner. Anything your application wrote (for example, to
+`/tmp`, any logs, anything) will be gone.
+
+If you `stop` a container, you merely, suspend it. After having stopped it, you
+can restart it with `docker container start your_container_name`. After
+starting it again, whatever you wrote to `/tmp` for example is still there
+after starting it again. While your container is stopped your app will not be
+running, for example, if you stop your container with `docker container stop
+your_container_name`, you'll no longer be able to navigate to `localhost:8000`.
+Restarting the container on the other hand, brings `localhost:8000` back to
+life.
 
 # Persistence
 
@@ -391,7 +455,7 @@ TODO: add picture of container building/running cycle.
 - build: image
 - execute: run
 
-TODO: left out of discussion Docker Swarm, Docker Networking and the Container Network Model (CNM).
+TODO: left out of discussion Docker Swarm, Docker Networking and the Container Network Model (CNM), `docker-compose`.
 
 <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-12447521-1"></script>
