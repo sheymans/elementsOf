@@ -1,31 +1,55 @@
 <meta charset="utf-8">
-                            **Elements of Docker**
+                            **Elements of Docker Containers**
                             Stijn Heymans
 
 # Introduction
 
+Docker and containers in particular are presented as magic ("don't you dare
+persisting anything in a container, it will be lost forever!"). As that's a
+non-argument to start with (we all be lost forever!), I was interested in
+figuring out some basics around containers. This article does not go terribly
+deep. Staying elemental, I'll use the simplest of simple demo apps, I'll show
+you how to _containerize_ it: build an image from it, publish the image, run
+the image in a container. On that containerization road, I'll show you the
+basic commands of manipulating container images, running containers, as well as
+_volumes_ (_oh no, persistence, so difficult, don't even mention it_).
+
 While writing these elements I mostly used [Docker Deep
 Dive](https://www.goodreads.com/book/show/39933970-docker-deep-dive) by Nigel
-Poulton as a reference.
+Poulton as a reference which seems fairly complete to my layman eye but also
+includes a lot of details that are not immediately relevant if you want to get
+just the basics. 
 
-See the demo at [demo](https://github.com/sheymans/elementsOf/tree/master/docker/demo).
+You can download the demo code on
+[github](https://github.com/sheymans/elementsOf/tree/master/docker/demo) and
+follow along which is for this article probably the best approach for learning.
+The demo is a Javascript app, but there's so little code it should not cause
+too many side effects when consuming.
 
 # The Demo App
 
-Before we jump into containers, let's introduce the demo application, we'll be
-want to run _in a container_. I'm going to use the simple web framework
-[Express](expressjs.com) for [node](nodejs.org) to write an app that says `Hi`. This is a simple `hi.js`:
+There's nothing quite like a toy example that is absolutely nothing like you
+will ever encounter in the real world, and I did my utter best to not
+disappoint.  I'm going to use the simple web framework
+[Express](expressjs.com) for [node](nodejs.org) to write an app that says `Hi`,
+clearly a step down from "Hello World".
+
+This is a simple `hi.js`:
 
 ~~~js
+// Initialize your express app
 const express = require('express');
 const app = express();
 
+// Tell your app that any GET should be resulting in a `Hi` returned to the user
 app.get('/', (request, result) => result.send('Hi'));
 
+// Your app will be listening on port 8111 and it 
+// will announce this on the console when you start it
 app.listen(8111, () => console.log('hi: listening on port 8111'));
 ~~~
 
-As I'm using `express`, I'll have a `package.json` file, that looks like this:
+As I'm using `express`, I'll have a `package.json`[^packagejson] file, that looks like this:
 
 ~~~
 {
@@ -38,7 +62,7 @@ As I'm using `express`, I'll have a `package.json` file, that looks like this:
 }
 ~~~
 
-You're probably used to this, so just note that I indicated that my app will need `express` in this line:
+Note that I indicated that my app will need `express` in this line:
 
 ~~~
     "express": "^4.17.1"
@@ -64,7 +88,7 @@ You can navigate to http://localhost:8111 to be said Hi to.
 
 Here's roughly what assumptions we made to run this app on your laptop/computer:
 
-- Your laptop allows for running software such as `npm`, `node`.  For example, it's a Linux or Mac Os X based machine.
+- Your laptop allows for running software such as `npm` and `node`.  For example, it's a Linux or Mac Os X based machine.
 - You had `npm` installed to install the required dependencies of your app (`express`); if you did not have it installed, you had to go and install it.
 - You then ran `npm install` from the command-line
 - You had `node` installed to actually run the application
@@ -76,7 +100,7 @@ that's how you roll), you'd repeat those steps.
 
 _"Well, of course, I would not repeat these steps, I'd put them all in a little
 script so I just have to run the script"_. Of course you would. But you'd be
-forgetten that a laptop and an EC2 instance are very different things. You'd
+forgetting that a laptop and an EC2 instance are very different things. You'd
 probably want scripts per different Operation System at the minimumn.
 
 What if you could package your app while specifying:
@@ -557,6 +581,12 @@ you scratch it a tiny bit more than the dev sitting next to you and that you
 now have the elements to dig deeper. Things I know I left out: discussions on tags, docker
 swarm, docker networking, `docker-compose`. Things I don't know I left out: $\infty$.
 
+# Footnotes
+
+[^packagejson] A `package.json` is used to describe your application (the
+metadata for your example) so that `npm` (which can be used to build your
+application) knows _how_ to build it. You can read some more about it
+[here](https://nodejs.org/en/knowledge/getting-started/npm/what-is-the-file-package-json/).
 
 <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-12447521-1"></script>
