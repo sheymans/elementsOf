@@ -120,14 +120,12 @@ Next up, let's see how that containerization works.
 
 # Containerizing the App
 
-To containerize your app, we'll use [docker](docker.com). In this article, I'll
-mostly focus on what `docker` _does_ rather than _how_ it does it. If you want
-to learn more about how docker does what it does, please refer to [Docker Deep
-Dive]() or for more on for example `containerd` and `runc`, check out this
-[blog
-series](https://www.ianlewis.org/en/container-runtimes-part-1-introduction-container-r).
-
-Central to containerizing an app is the concept of an `image`. While there's a certain mysticism around an image, fundamentally it's just an abstraction that can be understood by `docker` when it needs to actually run your application. In that sense, we can compare to several other abstractions in computer science:
+To containerize your app, we'll use [docker](docker.com). Central to
+containerizing an app is the concept of an `image`. There's a certain mysticism
+around what an image is, but fundamentally it's an abstract specification that
+can be understood by `docker` when it needs to actually run your application.
+In that sense, we can compare to several other abstractions in computer
+science:
 
 - a _Java class_ specifies the behavior of a particular instance of that class
 - a _`jar` file_ packages up your Java application and can then be run by the Java runtime.
@@ -135,30 +133,32 @@ Central to containerizing an app is the concept of an `image`. While there's a c
 - a Python script specifies which instructions to run for the Python interpreter
 
 All of these comparisons are imperfect, but have in common that there is the
-aspect of a specification (the `image`) that can then be run/executed on a
-machine.
+aspect of a specification with all its resources (the `image`) that can then be
+run/executed on a machine.
 
 Let's recap the aspects that we'd like to specify for our demo app:
 
 - a small Operating System to start from, for example [alpine](https://alpinelinux.org/)
-- an installation of `npm` and `node` layered on that
+- an installation of `npm` and `node` layered on that so we can install our app (`npm`) and run our app (`node`)
 - instructions to install your application (`npm install`)
 - instructions to run your application (`node hi.js`)
 
-Now let's write up that specification more formally (i.e., such that `docker`
-can use to build an `image`) in a file named `Dockerfile` -- specifications to
-build docker images will always be in a file named `Dockerfile` so similarly as
-a `package.json` can teach you a lot of how the application is structured, have
-a look at `Dockerfile`s in apps you meet in the wild.
+Let's write up that specification in a format that `docker` understands and can
+build an `image`.  Specifications to build docker images will always be in a
+file named `Dockerfile`. Conceptually, they are similar to `package.json`
+files: such `package.json` files specify your application's dependencies, a
+`Dockerfile` specifies the dependencies your app has from an OS perspective
+(what OS does the app assume, what should be installed on the app).
 
-We want our app to be layered on the Linux alpine OS system, so the first line of our `Dockerfile` is:
-
+We want our app to be layered on the [Linux alpine OS
+system](https://alpinelinux.org/), so the first line of our `Dockerfile` is:
 
 ~~~
 FROM alpine
 ~~~
 
-Next, up we need an installation of `npm` and `node` layered over that, so let's specify that in the `Dockerfile`:
+Next, we need an installation of `npm` and `node` layered over that, so let's
+specify that in the `Dockerfile`:
 
 ~~~
 RUN apk add --update nodejs nodejs-npm
@@ -181,10 +181,15 @@ case, it will copy over `hi.js` and `package.json`) into a root directory
 COPY . /src
 ~~~
 
-The `.` is the current directory (i.e., where the `Dockerfile` lives). This
-`COPY` command will create a new layer in the resulting image.
+The `.` is the current directory (i.e., where the `Dockerfile` lives, the
+_build-context_). This `COPY` command will create a new layer in the resulting
+image.
 
-Alright, so we have an image consisting of a Linux (`alpine`), we've installed `node` and `npm` into that image and copied our app's source code into the directory `/src` on the image. Next up, let's use `npm` to install the `app`. For this, we'll make the `/src` directory our _current_ working directory and execute `npm install`:
+At this point, we have an image consisting of a Linux (`alpine`), we've
+installed `node` and `npm` into that image and copied our app's source code
+into the directory `/src` on the image. Continuing, we use `npm` to install the
+`app`.  For this, we'll make the `/src` directory our _current_ working
+directory and execute `npm install`:
 
 ~~~
 WORKDIR /src
@@ -202,20 +207,24 @@ Almost there. Let's run our application:
 ENTRYPOINT ["node", "./hi.js"]
 ~~~
 
-This command sets the application to run when we `run` the container. Note that
+This command determines which application to run when we `run` the container. Note that
 we did not use `RUN` for this; `RUN` adds a new image layer, whereas
 `ENTRYPOINT` just adds metadata and appears only once in the `Dockerfile` to
 indicate _this is what you run once the container is ready to be run_.
 
 We forgot one thing, which is that our app will be listening on port `8111`.
 Our app would run entirely in the container so we'd not be able to access it
-via `localhost` on our laptop unless we expose the container's port:
+via `localhost` on our laptop publish the container's port. The `EXPOSE`
+statement is a _soft_ indication that this app will be listening on port `8111`
+(it does not actually yet allow you to access that port from your laptop, see
+later, as such this is merely a _heads-up_ for the engineer reading the
+`Dockerfile`).
 
 ~~~
 EXPOSE 8111
 ~~~
 
-To round it of, we add some more metadata to the image:
+To round it off, we add some more metadata to the image:
 
 ~~~
 LABEL maintainer="ben@ny.com"
@@ -234,7 +243,7 @@ EXPOSE 8111
 LABEL maintainer="ben@ny.com"
 ~~~
 
-Let's build an image:
+We can then use this `Dockerfile` to build an image:
 
 ~~~
  docker image build -t hi:latest .
@@ -245,8 +254,8 @@ Dissected:
 - `docker`: the `docker` program that we use to build images, run images, etc
 - `image`: tell `docker` that we're doing involves images (you'd also have `docker container` to indicate that you're working with containers)
 - `build`: build an image
-- `-t hi:latest`: we're *t*argetting an image with name `hi` and with tag `latest`. A tag can be used to identified different versions of your software (`v1`, etc).
-- `.`: don't forget the `.`. The `.` stands for _look into your current directory for the Dockerfile_. 
+- `-t hi:latest`: we're *t*agging an image with name `hi` and with tag `latest`. A tag can be used to identified different versions of your software (`v1`, etc) 
+- `.`: don't forget the `.`. The `.` stands for _look into your current directory for the Dockerfile_. Note that `-t` indeed stands for _tag_ and not _target_ (there's a `--target` option)
 
 Let's have a look at whether we now indeed have an image available:
 
