@@ -263,7 +263,7 @@ Let's have a look at whether we now indeed have an image available:
 docker image ls
 ~~~
 
-Dissecting that again:
+Dissecting that command:
 
 - `docker`: the `docker` program (no, really?)
 - `image`: we're dealing with images (what's the images around?)
@@ -272,14 +272,17 @@ Dissecting that again:
 This should give as output something like:
 
 ~~~
-REPOSITORY                                                                     TAG                             IMAGE ID            CREATED             SIZE
-hi                                                                             latest                          5d3095b79194        5 minutes ago       57.2MB
+REPOSITORY     TAG       IMAGE ID            CREATED             SIZE
+hi             latest    5d3095b79194        5 minutes ago       57.2MB
 ~~~
 
-So we're seeing a created image with repository name `hi`, tag `latest`, and
-image id `5d3095b79194` (this will be different when you do it). 
+This shows our created image with repository name `hi`, tag `latest`, and
+image id `5d3095b79194` -- the image id will be different on your machine.
 
-Often it's nice to be able to just get the `IMAGE ID`s (for example to pipe them to another command), you can use `--format` for that which uses [Go templates](https://golang.org/pkg/text/template/) to extract the data you like to see formatted. For example, let's say we want to see the size:
+Sometimes you'd just want the `IMAGE ID`s,for example, to pipe
+them to another command. For that situation, you can use `--format`. That option uses [Go
+templates](https://golang.org/pkg/text/template/) to extract the data you like
+to see formatted. For example, let's say we want to see the size:
 
 ~~~
 docker image ls --format "{{.Size}}"
@@ -297,13 +300,16 @@ More useful is often getting the Image Ids, so you try:
 docker image ls --format "{{.ImageId}}"
 ~~~
 
-and you get:
+This unfortunately gives you the error:
 
 ~~~
 Template parsing error: template: :1:2: executing "" at <.ImageId>: can't evaluate field ImageId in type formatter.imageContext
 ~~~
 
-So while `docker image ls` shows `IMAGE ID` as a column name, that's not how you can access this. There's a nice [hint](https://docs.docker.com/config/formatting/) on how you can see the attributes that you can actually use in `--format`:
+So while `docker image ls` shows `IMAGE ID` as a column name, that's not how
+you can access this. There's a nice
+[hint](https://docs.docker.com/config/formatting/) on how you can see the
+attributes that you can actually use in `--format`:
 
 ~~~
 docker image ls --format "{{json .}}"
@@ -323,34 +329,35 @@ docker image ls --format "{{.ID}}"
 
 will give you `5d3095b79194`.
 
-Finally, let's have a look at our created image:
+Finally, have a closer look at our created image:
 
 ~~~
 docker image inspect 5d3095b79194
 ~~~
 
-You'll see your label `maintainer` added, you'll see the entrypoint `node
-./hi.js`, and you'll see the different layers with different ids that were
-created as part of this image (recall that each `RUN` created a different
-layer). Grab a cup of coffee and spend some time quality time with that `docker
-image inspect` output, cause you're worth it.
+You see your label `maintainer` added, the entrypoint `node ./hi.js`, and the
+different layers with different ids that were created as part of this image
+(recall that each `RUN` created a different layer). Grab a cup of coffee and
+spend some time quality time with that `docker image inspect` output, cause
+you're worth it.
 
-# Publishing the Container
+# Publishing the Image
 
-In this elemental example, we'll keep working with the local image we just
-created. However, if you want other users to be able to use your image, you'd
-upload it, for example to the [Docker Hub](https://hub.docker.com/). After you
-uploaded your image to a Docker Hub repository, other developers could then
-pull it down. Have a look at this
+In this article, I'll keep working with the local image just created. However,
+if you want other users to be able to use your image, you'd upload it, for
+example to the [Docker Hub](https://hub.docker.com/). After you uploaded your
+image to a Docker Hub repository, other developers can then _pull_ it. Have a
+look at this
 [tutorial](https://ropenscilabs.github.io/r-docker-tutorial/04-Dockerhub.html)
-if you'd like to see some of the steps involved.
+if you'd like to see some of the steps involved, cause that's all I'll say
+about publishing your image.
 
 # Running the Container
 
-Now that we have an image `hi:latest`, let's try to create a running instance
-of that image. Where before we used `docker image` to do image manipulation,
-we'll now use `docker container` indicating that we're running containers based
-off an image:
+Now that I have an image `hi:latest`, I can create a running instance of that
+image. Where before we used `docker image` to do image manipulation, we'll now
+use `docker container` indicating that we're running containers based off an
+image:
 
 ~~~
 docker container run -d hi:latest
