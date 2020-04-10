@@ -369,7 +369,8 @@ we specified that this container should be running `node ./hi.js` using its
 `ENTRYPOINT` statement in the `Dockerfile`, we expect to see this app running
 when we _jump into_ the container.
 
-Let's first check what the ID or name of this freshly started container is:
+Before getting into detail of the prosaic _jumping into_ containers, I need to
+know what the ID or name of the freshly started container is:
 
 ~~~
 docker container ls
@@ -378,27 +379,33 @@ docker container ls
 We'd see something like this as output:
 
 ~~~
-CONTAINER ID        IMAGE                COMMAND                  CREATED             STATUS              PORTS                    NAMES
-885288159d28        hi:latest            "node ./hi.js"           2 minutes ago       Up 2 minutes        8111/tcp                 boring_dijkstra
+CONTAINER ID      IMAGE      COMMAND         CREATED        STATUS        PORTS     NAMES
+885288159d28      hi:latest  "node ./hi.js"  2 minutes ago  Up 2 minutes  8111/tcp  boring_dijkstra
 ~~~
 
-You'll see that a name was created for your running container
-`boring_dijkstra`. We could have decided on that name ourselves by using
-`docker container run --name your_own_name -d hi:latest`.
+The running container has ID `885288159d28` and name `boring_dijkstra`.  We did
+not specify a name when running the container, so we got a random
+`boring_dijkstra`. However, you can define your own container name using:
+`docker container run --name exciting_dijkstra -d hi:latest`.
 
 We see from that `docker container ls` that there's a container running with id
 `885288159d28` and it's executing the command `node ./hi.js` which is exactly
 what we expected from the `Dockerfile`.
 
-We can quickly jump into the container to see that in action:
+With a name for our runnning container, we can do some _jumping
+into_:
 
 ~~~
 docker container exec -it boring_dijkstra sh
 ~~~
 
-Note that I used the name of the container `boring_dijkstra`, but I could as well have used its ID `885288159d28`.
+!!! Tip
+    I used the the container's name, `boring_dijkstra`, but I can also use its ID `885288159d28`
 
-You'll see a shell prompt appear and if you see what processes are running in this container, you'll indeed see our `node` app:
+After executing that command, you see a shell prompt appear ( maybe you'll even
+see a  &#128026;[^shell] ) and if you check what processes are running in this
+container using <a href="https://en.wikipedia.org/wiki/Ps_(Unix)">`ps`</a>, you'll indeed
+see our `node` app running as expected/hoped for:
 
 ~~~
 /src # ps
@@ -412,28 +419,28 @@ You'll also see `sh` which is the command we executed as part of `docker contain
 exec -it boring_dijkstra sh` and of course `ps` which is the command we just
 ran in that shell.
 
-Let's analyze `docker container exec -it boring_dijkstra sh` in detail:
+Let's analyze the command `docker container exec -it boring_dijkstra sh`:
 
 - `docker container`: you're executing docker and it involves containers (in contrast to `image` or `volume` see later)
 - `exec`: you're going to execute a command in the container, which command? `sh`.
 - `boring_dijkstra`: the container you're executing the command `sh` in
-- `-it`: `-t` is short for `--tty` and attaches you to a terminal in the container. `-i` is to make input and output from the container flow to your terminal on your docker host (your laptop). You almost always see `-it` being used together: try out `-t` on its own in the previous command press `return`; you'll see nothing happen as the output of the container is not flowing to the output of your laptop terminal. I find it most useful to thin of `-it` as `interactive mode` and `-d` as detached mode (the container runs but you're not _in it_).
+- `-it`: `-t` is short for `--tty` and attaches you to a terminal in the container. `-i` is to make input and output from the container flow to your terminal on your docker host (your laptop). You almost always see `-it` being used together: try out `-t` on its own in the previous command and try pressing `return`; you'll see nothing happen as the output of the container is not flowing to the output of your laptop terminal. I find it most useful to think of `-it` as `interactive mode` and `-d` as detached mode (the container runs but you're not _in it_).
 - `sh`: the command you're executing on your container.
 
-The page explaining
+The documentation on
 [exec](https://docs.docker.com/engine/reference/commandline/exec/) as well as
 this [stackoverflow
 article](https://stackoverflow.com/questions/22272401/what-does-it-mean-to-attach-a-tty-std-in-out-to-dockers-or-lxc)
-have more details that are worth skimming through.
+have more details that are worth reading through.
 
-
-So we know our app is running in the container. We also know that we wrote it so it runs on port `8111`. Indeed in `hi.js`:
+By _jumping into_ the container, I confirmed the app is running. As I wrote
+this app, I know that it runs on port `8111`.  Indeed in `hi.js`:
 
 ~~~
 app.listen(8111, () => console.log('hi: listening on port 8111'));
 ~~~
 
-In the `Dockerfile` we also exposed that port:
+In the `Dockerfile`, I also exposed that port:
 
 ~~~
 EXPOSE 8111
@@ -603,6 +610,8 @@ swarm, docker networking, `docker-compose`. Things I don't know I left out: $\in
 metadata for your example) so that `npm` (which can be used to build your
 application) knows _how_ to build it. You can read some more about it
 [here](https://nodejs.org/en/knowledge/getting-started/npm/what-is-the-file-package-json/).
+
+[^shell] Of course [not](https://en.wikipedia.org/wiki/Unix_shell), but I admire your outlook on life.
 
 <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-12447521-1"></script>
