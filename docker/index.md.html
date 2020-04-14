@@ -4,27 +4,19 @@
 
 # Introduction
 
-Docker and containers in particular are presented as magic ("don't you dare
-persisting anything in a container, it will be lost forever!"). As that's a
-non-argument to start with (we all be lost forever!), I was interested in
-figuring out some basics around containers. This article does not go terribly
-deep. Staying elemental, I'll use the simplest of simple demo apps, I'll show
-you how to _containerize_ it: build an image from it, publish the image, run
-the image in a container. On that containerization road, I'll show you the
-basic commands of manipulating container images, running containers, as well as
-_volumes_ (_oh no, persistence, so difficult, don't even mention it_).
+Docker containers are often presented as magic -- _"don't you dare persisting
+anything in a container, it will be lost forever!"_. In this article, I will
+try to show that containers are not magic by going through the lifecycle of an
+app running on your laptop to an app running in a container on your laptop (the
+so-called _containerizing_ of an app).  I will build an image from the app,
+publish the image, and run that image in a container. I'll show you the basic
+commands of manipulating images, containers, and volumes. 
 
-While writing these elements I mostly used [Docker Deep
-Dive](https://www.goodreads.com/book/show/39933970-docker-deep-dive) by Nigel
-Poulton as a reference which seems fairly complete to my layman eye but also
-includes a lot of details that are not immediately relevant if you want to get
-just the basics. 
+Some final introductory messages for your general well-being before getting to
+the main show:
 
-You can download the demo code on
-[github](https://github.com/sheymans/elementsOf/tree/master/docker/demo) and
-follow along which is for this article probably the best approach for learning.
-The demo is a Javascript app, but there's so little code it should not cause
-too many side effects when consuming.
+- I used the book [Docker Deep Dive](https://www.goodreads.com/book/show/39933970-docker-deep-dive) by Nigel Poulton as a reference.
+- You can download the demo code I wrote for this article on [github](https://github.com/sheymans/elementsOf/tree/master/docker/demo) to follow along.  The demo is a Javascript app, but there's so little code it should not cause too many side effects when consuming in moderation.  
 
 # The Demo App
 
@@ -32,9 +24,9 @@ There's nothing quite like a toy example that is absolutely nothing like you
 will ever encounter in the real world, and I did my utter best to not
 disappoint.  I'm going to use the simple web framework
 [Express](expressjs.com) for [node](nodejs.org) to write an app that says `Hi`,
-clearly a step down from "Hello World".
+clearly a step down from `Hello World`.
 
-This is a simple `hi.js`:
+This is a simple Javascript file `hi.js`:
 
 ~~~js
 // Initialize your express app
@@ -49,9 +41,9 @@ app.get('/', (request, result) => result.send('Hi'));
 app.listen(8111, () => console.log('hi: listening on port 8111'));
 ~~~
 
-As I'm using `express`, I'll have a `package.json`[^packagejson] file, that looks like this:
+As I'm using `express`, I'll have a `package.json`[^packagejson] file, that contains `express` as a dependency:
 
-~~~
+~~~json
 {
   "name": "hi",
   "version": "1.0.0",
@@ -62,12 +54,6 @@ As I'm using `express`, I'll have a `package.json`[^packagejson] file, that look
 }
 ~~~
 
-Note that I indicated that my app will need `express` in this line:
-
-~~~
-    "express": "^4.17.1"
-~~~
-
 To make sure we can run this app, we'll install that `express` dependency as follows:
 
 ~~~bash
@@ -75,8 +61,8 @@ npm install
 ~~~
 
 We use the node package manager [npm](https://www.npmjs.com/) to do that. `npm`
-will look at the `package.json` file, will see that there's a `dependency`
-`express` and will then install `express` into the directory `node_modules`.
+will look at the `package.json` file, it will see that there's a `dependency`
+`express` and will then install `express` into the directory `node_modules/`.
 
 To start your app, then type:
 
@@ -84,19 +70,19 @@ To start your app, then type:
 node hi.js
 ~~~
 
-You can navigate to http://localhost:8111 to be said Hi to.
+You can navigate to http://localhost:8111 to be said `Hi` to. It's a glorious day.
 
-Here's roughly what assumptions we made to run this app on your laptop/computer:
+I made these assumptions to be able to run this app on a laptop[^laptop]:
 
-- Your laptop allows for running software such as `npm` and `node`.  For example, it's a Linux or Mac Os X based machine.
-- You had `npm` installed to install the required dependencies of your app (`express`); if you did not have it installed, you had to go and install it.
-- You then ran `npm install` from the command-line
-- You had `node` installed to actually run the application
-- You then ran `node hi.js` from the command-line
+- the laptop allows for installing and running software such as `npm` and `node`.  For example, it's Operating System (OS) is Linux or Mac OS X,
+- `npm` was installed, to, in turn, install the required dependencies of your app (`express`); if you did not have it installed, you had to install it
+- `npm install` was run from the command-line to install dependencies such as `express`
+- `node` was installed to actually run the application; if you did not have it installed, you had to install it
+- `node hi.js` was run from the command-line
 
 If you want to install and run your app on another laptop (or, on an [EC2
 instance](https://en.wikipedia.org/wiki/Amazon_Elastic_Compute_Cloud) cause
-that's how you roll), you'd repeat those steps. 
+that's how you roll), similar assumptions hold.
 
 _"Well, of course, I would not repeat these steps, I'd put them all in a little
 script so I just have to run the script"_. Of course you would. But you'd be
@@ -608,6 +594,8 @@ to delve further. Things I know I left out: discussions on tags, docker swarm,
 docker networking, `docker-compose`. Things I don't know I left out: $\infty$.
 
 # Endnotes
+
+[^laptop] I will mostly refer to your _laptop_ but you could be working on a desktop computer, or be logged in to an EC2 instance.
 
 [^packagejson] A `package.json` is used to describe your application (the
 metadata for your example) so that `npm` (which can be used to build your
