@@ -97,72 +97,74 @@ What if instead you could package your app while specifying:
 - instructions to install your application (`npm install`)
 - instructions to run your application (`node hi.js`)
 
-In other words, what if you could define a small container that specifies the
-above and that you run anywhere where such containers can run? (I'll make the
-obligatory _container on a ship_ reference: a container is a standard packaging
-solution that you can fill with any stuff, you can put it on a ship and send it
-off anywhere in the world).
-
-Next up, let's see how that containerization works.
+In other words, what if you could define a small container based on the above
+specification and that you run anywhere where such containers can run? (I'll
+make the obligatory _container on a ship_ reference: a container is a standard
+packaging solution that you can fill with any stuff, you can put it on a ship
+and send it off anywhere in the world).
 
 # Containerizing the App
 
-To containerize your app, we'll use [docker](docker.com). Central to
-containerizing an app is the concept of an `image`. There's a certain mysticism
-around what an image is, but fundamentally it's an abstract specification that
-can be understood by `docker` when it needs to actually run your application.
-In that sense, we can compare to several other abstractions in computer
-science:
+To containerize your app, I use [docker](docker.com). In this article, _Docker
+container_ is a synomym of _container_. Before I can run your app in a
+container, I need an _image_.  Explaining what an _image_ is in precise terms
+is beyond my abilities, but my working definition is that an image is an
+abstract specification of your OS as well as anything needed to run your app.
+The image can be _understood_ by `docker` when it needs to run your
+application.  Compare this to other abstractions in Computer Science:
 
-- a _Java class_ specifies the behavior of a particular instance of that class
+- a _Java class_ specifies the behavior of an instance of that class
 - a _`jar` file_ packages up your Java application and can then be run by the Java runtime.
-- an ISO image for Linux packages up the Operation System so you can download the image, install the image, and run the Operating System
+- an ISO image for Linux packages up the Linux OS: you can download the image, install the image, and run the Linux OS on your laptop once it's installed
 - a Python script specifies which instructions to run for the Python interpreter
 
-All of these comparisons are imperfect, but have in common that there is the
-aspect of a specification with all its resources (the `image`) that can then be
-run/executed on a machine.
+These comparisons are imperfect, but all have the aspect of a specification of
+all its resources (the `image`) that can then be run/executed on a machine.
 
-Let's recap the aspects that we'd like to specify for our demo app:
+From the previous section, we summarized the aspects that we'd like to specify for our demo app:
 
-- a small Operating System to start from, for example [alpine](https://alpinelinux.org/)
+- a small OS to start from, for example [alpine](https://alpinelinux.org/)
 - an installation of `npm` and `node` layered on that so we can install our app (`npm`) and run our app (`node`)
 - instructions to install your application (`npm install`)
 - instructions to run your application (`node hi.js`)
 
-Let's write up that specification in a format that `docker` understands and can
-build an `image`.  Specifications to build docker images will always be in a
-file named `Dockerfile`. Conceptually, they are similar to `package.json`
-files: such `package.json` files specify your application's dependencies, a
-`Dockerfile` specifies the dependencies your app has from an OS perspective
-(what OS does the app assume, what should be installed on the app).
+I can take that specification and write it up in a format that `docker`
+understands so it can build an `image` based on it.  Specifications to build
+docker images are in a file named `Dockerfile`. Conceptually, they are similar
+to `package.json` files: such `package.json` files specify your application's
+dependencies, and a `Dockerfile` specifies the dependencies your app has from
+an OS perspective (what OS does the app assume, what should be installed on the
+OS to be able to run the app).
 
-We want our app to be layered on the [Linux alpine OS
-system](https://alpinelinux.org/), so the first line of our `Dockerfile` is:
+I want the app to be layered on the [Linux alpine OS
+system](https://alpinelinux.org/) -- it's a very small Linux, about 4MB,
+compared Ubuntu which would more than 100MB -- so the first line of the
+`Dockerfile` is:
 
 ~~~
 FROM alpine
 ~~~
 
-Next, we need an installation of `npm` and `node` layered over that, so let's
-specify that in the `Dockerfile`:
+Next, I need an installation of `npm` and `node` layered over that:
 
 ~~~
 RUN apk add --update nodejs nodejs-npm
 ~~~
 
-`apk add --update nodejs nodejs-npm` is just the command you'd run on alpine to
+`apk add --update nodejs nodejs-npm` is the command you'd run on alpine to
 install `node` and `npm` (see
 [apk](https://wiki.alpinelinux.org/wiki/Alpine_Linux_package_management). If
 you picked a different image to start from, you'd might need a different
 install command. The important part is `RUN` which runs whatever comes after it
-and the installation of `node` and `npm` will constitute a new layer on top of
-`alpine`.
+and that the installation of `node` and `npm` will constitute a new layer on
+top of `alpine`.
 
-Note that the directory where your `Dockerfile` exists is usually called the
-_build-context_. We'll then copy all the files from this directory (in our
-case, it will copy over `hi.js` and `package.json`) into a root directory
-`/src` of the new image we're creating:
+Note that the directory on your laptop where your `Dockerfile` exists is
+usually called the _build-context_. I'll then specify that I want to copy all
+the files from this directory (in our case, it will copy over `hi.js` and
+`package.json`) into a root directory `/src` of the new image we're creating.
+Intuitively, our image of course needs the source files for our demo app in
+order to be able to run it.
 
 ~~~
 COPY . /src
@@ -172,11 +174,11 @@ The `.` is the current directory (i.e., where the `Dockerfile` lives, the
 _build-context_). This `COPY` command will create a new layer in the resulting
 image.
 
-At this point, we have an image consisting of a Linux (`alpine`), we've
-installed `node` and `npm` into that image and copied our app's source code
+To summarize, at this point I have specified that I will need an image consisting of a Linux OS (`alpine`), that I need to install 
+`node` and `npm` into that image, and that I want to copy the app's source code
 into the directory `/src` on the image. Continuing, we use `npm` to install the
-`app`.  For this, we'll make the `/src` directory our _current_ working
-directory and execute `npm install`:
+app.  For this, I'll specify that the `/src` directory needs to be the _current_ working
+directory and that I want to execute `npm install`:
 
 ~~~
 WORKDIR /src
@@ -188,7 +190,7 @@ RUN npm install
 just like it did on your laptop, look for `package.json`, find your
 dependencies in there (`express`) and install those.
 
-Almost there. Let's run our application:
+Almost there. Indicate how to run the application:
 
 ~~~
 ENTRYPOINT ["node", "./hi.js"]
@@ -199,13 +201,7 @@ we did not use `RUN` for this; `RUN` adds a new image layer, whereas
 `ENTRYPOINT` just adds metadata and appears only once in the `Dockerfile` to
 indicate _this is what you run once the container is ready to be run_.
 
-We forgot one thing, which is that our app will be listening on port `8111`.
-Our app would run entirely in the container so we'd not be able to access it
-via `localhost` on our laptop publish the container's port. The `EXPOSE`
-statement is a _soft_ indication that this app will be listening on port `8111`
-(it does not actually yet allow you to access that port from your laptop, see
-later, as such this is merely a _heads-up_ for the engineer reading the
-`Dockerfile`).
+We indicate with `EXPOSE` that our app is running on port `8111`:
 
 ~~~
 EXPOSE 8111
@@ -230,21 +226,21 @@ EXPOSE 8111
 LABEL maintainer="ben@ny.com"
 ~~~
 
-We can then use this `Dockerfile` to build an image:
+I can then use this `Dockerfile` to build an image:
 
-~~~
+~~~bash
  docker image build -t hi:latest .
 ~~~
 
-Dissected:
+Dissecting this command:
 
 - `docker`: the `docker` program that we use to build images, run images, etc
-- `image`: tell `docker` that we're doing involves images (you'd also have `docker container` to indicate that you're working with containers)
+- `image`: tell `docker` that what we're doing involves images (there's also `docker container` to indicate that you're working with containers)
 - `build`: build an image
 - `-t hi:latest`: we're *t*agging an image with name `hi` and with tag `latest`. A tag can be used to identified different versions of your software (`v1`, etc) 
 - `.`: don't forget the `.`. The `.` stands for _look into your current directory for the Dockerfile_. Note that `-t` indeed stands for _tag_ and not _target_ (there's a `--target` option)
 
-Let's have a look at whether we now indeed have an image available:
+After running that command, I can check whether there's now an image available using `ls`:
 
 ~~~
 docker image ls
@@ -252,9 +248,9 @@ docker image ls
 
 Dissecting that command:
 
-- `docker`: the `docker` program (no, really?)
-- `image`: we're dealing with images (what's the images around?)
-- `ls`: the usual listing command
+- `docker`: the `docker` program 
+- `image`: we're dealing with images
+- `ls`: the usual listing command 
 
 This should give as output something like:
 
