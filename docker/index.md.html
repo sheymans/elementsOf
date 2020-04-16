@@ -250,9 +250,9 @@ Dissecting that command:
 
 - `docker`: the `docker` program 
 - `image`: we're dealing with images
-- `ls`: the usual listing command 
+- `ls`: the listing command
 
-This should give as output something like:
+This will give as output something like:
 
 ~~~
 REPOSITORY     TAG       IMAGE ID            CREATED             SIZE
@@ -263,7 +263,7 @@ This shows our created image with repository name `hi`, tag `latest`, and
 image id `5d3095b79194` -- the image id will be different on your machine.
 
 Sometimes you'd just want the `IMAGE ID`s,for example, to pipe
-them to another command. For that situation, you can use `--format`. That option uses [Go
+them to another command. For that situation, you can use `--format`. The `--format` option uses [Go
 templates](https://golang.org/pkg/text/template/) to extract the data you like
 to see formatted. For example, let's say we want to see the size:
 
@@ -277,7 +277,7 @@ This will show:
 57.2MB
 ~~~
 
-More useful is often getting the Image Ids, so you try:
+To see the image ids, you might try:
 
 ~~~
 docker image ls --format "{{.ImageId}}"
@@ -290,7 +290,7 @@ Template parsing error: template: :1:2: executing "" at <.ImageId>: can't evalua
 ~~~
 
 So while `docker image ls` shows `IMAGE ID` as a column name, that's not how
-you can access this. There's a nice
+you can access this field. There's a 
 [hint](https://docs.docker.com/config/formatting/) on how you can see the
 attributes that you can actually use in `--format`:
 
@@ -304,7 +304,7 @@ This will make a json out of _everything_ and will show:
 {"Containers":"N/A","CreatedAt":"2020-03-25 08:11:44 -0700 PDT","CreatedSince":"2 days ago","Digest":"\u003cnone\u003e","ID":"5d3095b79194","Repository":"hi","SharedSize":"N/A","Size":"57.2MB","Tag":"latest","UniqueSize":"N/A","VirtualSize":"57.23MB"}
 ~~~
 
-From which you can see that the `IMAGE ID` is actually under attribute `ID`:
+From that you can see that the `IMAGE ID` is actually under attribute `ID`:
 
 ~~~
 docker image ls --format "{{.ID}}"
@@ -337,10 +337,9 @@ about publishing your image.
 
 # Running the Container
 
-Now that I have an image `hi:latest`, I can create a running instance of that
-image. Where before we used `docker image` to do image manipulation, we'll now
-use `docker container` indicating that we're running containers based off an
-image:
+With that image `hi:latest`, I can create a running instance (aka container).
+Where before we used `docker image` to do image manipulation, we'll now use
+`docker container` indicating that we're doing container manipulation:
 
 ~~~
 docker container run -d hi:latest
@@ -348,7 +347,7 @@ docker container run -d hi:latest
 
 This basic command starts the container in detached/background mode (hence the
 `-d`) and uses the image `hi:latest` to instantiate the container with. Since
-we specified that this container should be running `node ./hi.js` using its
+I specified that this container should be running `node ./hi.js` using its
 `ENTRYPOINT` statement in the `Dockerfile`, we expect to see this app running
 when we _jump into_ the container.
 
@@ -359,7 +358,7 @@ know what the ID or name of the freshly started container is:
 docker container ls
 ~~~
 
-We'd see something like this as output:
+I'd see something like this as output:
 
 ~~~
 CONTAINER ID      IMAGE      COMMAND         CREATED        STATUS        PORTS     NAMES
@@ -368,10 +367,10 @@ CONTAINER ID      IMAGE      COMMAND         CREATED        STATUS        PORTS 
 
 The running container has ID `885288159d28` and name `boring_dijkstra`.  We did
 not specify a name when running the container, so we got a random
-`boring_dijkstra`. However, you can define your own container name using:
+`boring_dijkstra`. You can define your own container name using:
 `docker container run --name exciting_dijkstra -d hi:latest`.
 
-We see from that `docker container ls` that there's a container running with id
+From that `docker container ls` we see that there's a container running with id
 `885288159d28` and it's executing the command `node ./hi.js` which is exactly
 what we expected from the `Dockerfile`.
 
@@ -404,20 +403,20 @@ ran in that shell.
 
 Let's analyze the command `docker container exec -it boring_dijkstra sh`:
 
-- `docker container`: you're executing docker and it involves containers (in contrast to `image` or `volume` see later)
+- `docker container`: you're executing docker and it involves containers (in contrast to `image` or `volume`, see later for `volume`)
 - `exec`: you're going to execute a command in the container, which command? `sh`.
 - `boring_dijkstra`: the container you're executing the command `sh` in
-- `-it`: `-t` is short for `--tty` and attaches you to a terminal in the container. `-i` is to make input and output from the container flow to your terminal on your docker host (your laptop). You almost always see `-it` being used together: try out `-t` on its own in the previous command and try pressing `return`; you'll see nothing happen as the output of the container is not flowing to the output of your laptop terminal. I find it most useful to think of `-it` as `interactive mode` and `-d` as detached mode (the container runs but you're not _in it_).
+- `-it`: `-t` is short for `--tty` and attaches you to a terminal in the container. `-i` is to make input and output from the container flow to your terminal on your docker host (your laptop). You almost always see `-it` being used together: try out `-t` on its own in the previous command and try pressing `return`; you'll see nothing happen as the output of the container is not flowing to the output of your laptop terminal. I find it most useful to think of `-it` as _interactive_ mode versus `-d` for _detached_ mode (the container runs but you're not _in it_).
 - `sh`: the command you're executing on your container.
 
 The documentation on
 [exec](https://docs.docker.com/engine/reference/commandline/exec/) as well as
 this [stackoverflow
 article](https://stackoverflow.com/questions/22272401/what-does-it-mean-to-attach-a-tty-std-in-out-to-dockers-or-lxc)
-have more details that are worth reading through.
+on interactive mode have more details that are worth reading through
 
 By _jumping into_ the container, I confirmed the app is running. As I wrote
-this app, I know that it runs on port `8111`.  Indeed in `hi.js`:
+this app, I know that it runs on port `8111`.  Indeed in `hi.js` I wrote:
 
 ~~~
 app.listen(8111, () => console.log('hi: listening on port 8111'));
@@ -429,22 +428,20 @@ In the `Dockerfile`, I also exposed that port:
 EXPOSE 8111
 ~~~
 
-In contrast to what the big `EXPOSE` hints at, this does not actually make the
-port `8111` _reachable_; you can see this more as documentation for other
-engineers reading your `Dockerfile` that your service listens to this port
-(`8111`).
+In contrast to what the all-caps-look-at-me `EXPOSE` hints at, this does not
+actually make the port `8111` _reachable_. Consider it as documentation for
+other engineers reading your `Dockerfile` that your service listens to this
+port (`8111`).  To make the port `8111` reachable from outside your container,
+say from your laptop, you publish it with the `-p` option.
 
-To actually make the port `8111` that the app listens to reachable from outside
-your container, say from your laptop, you publish it with the `-p` option.
-
-Before using that `-p` option, let's first `stop` and `rm` our currenty running container:
+Before using that `-p` option, `stop` and `rm` our running container:
 
 ~~~
 docker container stop boring_dijkstra
 docker container rm boring_dijkstra
 ~~~
 
-And let's now start a container from the `hi:latest` image where we map the
+Then start a container based on the `hi:latest` image but this time map the
 Docker host's port `8000` (your laptop) to `8111` port. For
 reading-left-to-right oriented cultures, this is roughly from outward to inward
 (left to right).
@@ -468,7 +465,7 @@ wrote (for example, to `/tmp`, any logs, anything) is gone. It's gone.
 If you `stop` a container, you merely suspend it. After stopping a container,
 you can restart it with `docker container start your_container_name`. After
 starting it again, whatever you wrote to `/tmp` before stopping it is still
-there. Your ap will not be running if the container is stopped. For example, if
+there. Your app will not be running if the container is stopped. For example, if
 you stop your container with `docker container stop your_container_name`,
 navigating to `localhost:8000` will give an error.  Restarting the container on
 the other hand, brings `localhost:8000` back to life.
@@ -477,21 +474,19 @@ the other hand, brings `localhost:8000` back to life.
 
 Mention _persistence_ in the context of docker or
 [kubernetes](https://kubernetes.io/) and everyone gets upset: _there's no
-persistence in containers! you dumb?!_. While there's enjoyment in upset
-people, overall it's to be avoided due to the negative impact on one's own
-well-being.
+persistence in containers! omg you wicked dumb?!_. While there's enjoyment in
+upset people, overall it's to be avoided due to the negative impact on one's
+own well-being.
 
-Of course you can persist stuff from a container. What do I mean with persist?
+You can persist stuff from a container. What do I mean with persist?
 A typical example would be logs. You can write logs and not lose them
 after the container is removed. There are other types of persistence like
 writing to a database table (and yes, of course, your data and table would
 still exist outside of your container, presuming that it lives _outside_ your
 container, or in other words, has a lifecycle that is independent of your
 container). Your pet rat is not going to die when your container dies. Their
-lifes are not tied together (unless you keep your pet rat in a container; you
-should really not be keeping pet rats in general cause pet rats are really just
-rats and keeping anything alive in a container that is not your lunch is a
-no-no).
+lifes are not tied together (unless you keep your pet rat in a container).
+Bottom line, don't keep your rat in a container.
 
 _But I'm talking about writing to the file-system man!! you can't do that man!! you're not
 listening!!_. Your skills of observation are something I will write home about
@@ -504,9 +499,9 @@ Before explaining volumes, I want to keep insisting on persisting. What type of
 persistance to a file-system do we already have without volumes?  I can have my
 app that runs in a container write to `/tmp` without issues while the container
 is running. I can even `stop` the container (suspending it, as we saw above)
-and when I come back to this container, the data I wrote to `/tmp` would still
-be there. It's only when I `rm` the container that data in `/tmp` would be gone
-as `rm` is literally wiping away the file-system of the container.
+and when I come back to this container, the data I wrote to `/tmp` is still there.
+Only when I `rm` the container that data in `/tmp` would be gone
+as `rm` is wiping away the file-system of the container.
 
 That's less drama than you were hoping for. Let's bring that disappointment in
 life up another notch.  The key to volumes is that they live and die outside of
@@ -514,41 +509,42 @@ your container's life cycle. They're an abstraction of storage: I can write to
 a volume, I can read from a volume, so my logs, yes, they can go there. So if I
 have these 2 independent entities: a volume that I can write to/read from and a
 container that potentially could be doing that writing and reading, how do I
-connect those? Well, you mount the volume to a directory on your container. So
-if your container has a directory `/logs`, you can then mount your volume to
+connect those? You mount the volume to a directory on your container. 
+If your container has a directory `/logs`, you can mount your volume to
 the directory `/logs`. After that mounting, anything written to the `/logs`
-directory will be written to mounted volume, everything read from `/logs` will
-actually be read from the mounted volume.
+directory will be written to the volume, everything read from `/logs` will
+actually be read from the volume.
 
-Let's create a volume:
+This is how you create a volume:
 
 ~~~
 docker volume create dramatic_vol
 ~~~
 
-Similar to the above, where we had `docker image` for image manipulation,
+Similar to the above, where we had `docker image` for image manipulation and
 `docker container` for container manipulation, we have `docker volume` for
-volume manipulation. Check whether your freshly created volume is indeed there with `ls`:
+volume manipulation. Check whether your freshly created volume is indeed there
+with `ls`:
 
 ~~~
 docker volume ls
 ~~~
 
-Let's now attach `dramatic_vol` to a container running based on the image `hi:latest`:
+You can attach `dramatic_vol` to a container (based on the image `hi:latest` as before):
 
 ~~~
 docker container run -d --mount target=/src,source=dramatic_vol hi:latest
 ~~~
 
-Let's find out the name of that container:
+The name of that container can be found as usual with `ls`:
 
 ~~~
 $ docker container ls
-CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
-0abd6c82cee2        hi:latest           "node ./hi.js"      54 seconds ago      Up 52 seconds       8111/tcp            laughing_pike
+CONTAINER ID    IMAGE       COMMAND          CREATED          STATUS           PORTS      NAMES
+0abd6c82cee2    hi:latest   "node ./hi.js"   54 seconds ago   Up 52 seconds    8111/tcp   laughing_pike
 ~~~
 
-And let's then check out the container `laughing_pike`:
+Inspect that `laughing_pike` container:
 
 ~~~
 docker container inspect laughing_pike
@@ -571,7 +567,7 @@ You'll see lots of output, among which this snippet:
         ],
 ~~~
 
-So there you go: our volume `dramatic_vol` is part of the mounts, it indicates
+The volume `dramatic_vol` is part of the mounts, it indicates
 where the data for that volume actually lives on my laptop
 (`/var/lib/docker/volumes/dramatic_vol/_data`) and it indicates to what
 directory _in the container_ it was  tied: `/src`.  Recall that anything
@@ -592,7 +588,8 @@ docker networking, `docker-compose`. Things I don't know I left out: $\infty$.
 
 # Endnotes
 
-[^laptop] I will mostly refer to your _laptop_ but you could be working on a desktop computer, or be logged in to an EC2 instance.
+[^laptop] I will mostly refer to your _laptop_ but you could be working on a
+desktop computer, or be logged in to an EC2 instance.
 
 [^packagejson] A `package.json` is used to describe your application (the
 metadata for your example) so that `npm` (which can be used to build your
