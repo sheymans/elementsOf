@@ -72,7 +72,7 @@ node hi.js
 
 You can navigate to http://localhost:8111 to be said `Hi` to. It's a glorious day.
 
-I made these assumptions to be able to run this app on a laptop[^laptop]:
+I made these assumptions to be able to run this app on a laptop[^laptop] :
 
 - the laptop allows for installing and running software such as `npm` and `node`.  For example, it's Operating System (OS) is Linux or Mac OS X,
 - `npm` was installed, to, in turn, install the required dependencies of your app (`express`); if you did not have it installed, you had to install it
@@ -473,20 +473,22 @@ the other hand, brings `localhost:8000` back to life.
 # Persistence
 
 Mention _persistence_ in the context of docker or
-[kubernetes](https://kubernetes.io/) and everyone gets upset: _there's no
-persistence in containers! omg you wicked dumb?!_. While there's enjoyment in
-upset people, overall it's to be avoided due to the negative impact on one's
-own well-being.
+[kubernetes](https://kubernetes.io/) and everyone gets upset.
 
-You can persist stuff from a container. What do I mean with persist?
-A typical example would be logs. You can write logs and not lose them
-after the container is removed. There are other types of persistence like
-writing to a database table (and yes, of course, your data and table would
-still exist outside of your container, presuming that it lives _outside_ your
-container, or in other words, has a lifecycle that is independent of your
-container). Your pet rat is not going to die when your container dies. Their
-lifes are not tied together (unless you keep your pet rat in a container).
-Bottom line, don't keep your rat in a container.
+In simple terms, persistence is the _ability for data to stay around_:
+
+- if your app writes data to a database table, your data is persisted in the database even when your app is no longer running
+- if you open a text editor and write text in a file, your data is persisted in the file even when you close the tex editor
+
+The database example is usually uncontroverial: your app you can write data to
+a database table from within the container as long as the database table exists
+outside of your container.  More controversial is writing to the container's
+file system, for example when your app writes logs to a file.  The key idea to
+remember is that if your data is written to a location (database table, disk
+location) that has a _lifecyle_ independent of your container, you're good:
+your data will persist as long as that location exists.  Your pet rat is not
+going to die when your container dies. Their lifes are not tied together
+(unless you keep your pet rat in a container).  
 
 _But I'm talking about writing to the file-system man!! you can't do that man!! you're not
 listening!!_. Your skills of observation are something I will write home about
@@ -579,24 +581,25 @@ affected. It is persistent.
 
 # Conclusion
 
-I showed you how to build an image out of your app (_containerize_ it) , how to
-run a container based on that image, and how to use volumes to persist the data
-that you write in the container beyond the life cycle of that container.
-There's a lot I didn't talk about as I think this is enough basics to allow you
-to delve further. Things I know I left out: discussions on tags, docker swarm,
-docker networking, `docker-compose`. Things I don't know I left out: $\infty$.
+I showed you how to build an image out of your app (how to _containerize_ it),
+how to run a container based on that image, and how to use volumes to persist
+the data that your app writes beyond the life cycle of the container.  I
+limited this article to what I consider the elements and I left out discussions
+on tags, docker swarm, docker networking, `docker-compose`, and much, much
+more. 
 
 # Endnotes
 
-[^laptop] I will mostly refer to your _laptop_ but you could be working on a
-desktop computer, or be logged in to an EC2 instance.
-
-[^packagejson] A `package.json` is used to describe your application (the
-metadata for your example) so that `npm` (which can be used to build your
-application) knows _how_ to build it. You can read some more about it
+[^packagejson]: A `package.json` file is used to describe your application (for
+example, any package dependencies) so that `npm` (which can be used to build
+your application) knows _how_ to build it. You can read about it
 [here](https://nodejs.org/en/knowledge/getting-started/npm/what-is-the-file-package-json/).
 
-[^shell] Of course [not](https://en.wikipedia.org/wiki/Unix_shell), but I admire your outlook on life.
+[^laptop]: In this article, I will mostly refer to your _laptop_ but you could be working on a
+desktop computer, or be logged in into an EC2 instance.
+
+[^shell]: Of course [not](https://en.wikipedia.org/wiki/Unix_shell), but I admire your outlook on life.
+
 
 <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-12447521-1"></script>
