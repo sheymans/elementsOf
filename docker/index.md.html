@@ -338,18 +338,18 @@ about publishing your image.
 # Running the Container
 
 With that image `hi:latest`, I can create a running instance (aka container).
-Where before we used `docker image` to do image manipulation, we'll now use
-`docker container` indicating that we're doing container manipulation:
+Where before my commands started with `docker image` to do image manipulation,
+I'll in this section mostly use `docker container` to manipulate containers:
 
 ~~~
 docker container run -d hi:latest
 ~~~
 
-This basic command starts the container in detached/background mode (hence the
-`-d`) and uses the image `hi:latest` to instantiate the container with. Since
-I specified that this container should be running `node ./hi.js` using its
-`ENTRYPOINT` statement in the `Dockerfile`, we expect to see this app running
-when we _jump into_ the container.
+This command starts the container in detached/background mode (hence the `-d`)
+and uses the image `hi:latest` to instantiate the container with. Since I
+specified that this container should be running `node ./hi.js` using its
+`ENTRYPOINT` statement in the `Dockerfile`, I expect to see this app running
+when I _jump into_ the container.
 
 Before getting into detail of the prosaic _jumping into_ containers, I need to
 know what the ID or name of the freshly started container is:
@@ -365,16 +365,14 @@ CONTAINER ID      IMAGE      COMMAND         CREATED        STATUS        PORTS 
 885288159d28      hi:latest  "node ./hi.js"  2 minutes ago  Up 2 minutes  8111/tcp  boring_dijkstra
 ~~~
 
-The running container has ID `885288159d28` and name `boring_dijkstra`.  We did
-not specify a name when running the container, so we got a random
-`boring_dijkstra`. You can define your own container name using:
-`docker container run --name exciting_dijkstra -d hi:latest`.
+The running container has ID `885288159d28` and name `boring_dijkstra`.  I did
+not specify a name when running the container, so I got a random
+`boring_dijkstra`. You can define your own container name using the `--name`
+option: `docker container run --name exciting_dijkstra -d hi:latest`.  I
+further see that my container is executing the command `node ./hi.js` which is
+exactly what I specified in `Dockerfile`.
 
-From that `docker container ls` we see that there's a container running with id
-`885288159d28` and it's executing the command `node ./hi.js` which is exactly
-what we expected from the `Dockerfile`.
-
-With a name for our running container, we can do some _jumping
+Now that I have the name of the running container, I can do some _jumping
 into_:
 
 ~~~
@@ -387,7 +385,7 @@ docker container exec -it boring_dijkstra sh
 After executing that command, you see a shell prompt appear ( maybe you'll even
 see a  &#128026;[^shell] ) and if you check what processes are running in this
 container using <a href="https://en.wikipedia.org/wiki/Ps_(Unix)">`ps`</a>, you'll indeed
-see our `node` app running as expected/hoped for:
+see our `node` app:
 
 ~~~
 /src # ps
@@ -397,23 +395,23 @@ PID   USER     TIME  COMMAND
  37   root     0:00  ps
 ~~~
 
-You'll also see `sh` which is the command we executed as part of `docker container
+You'll also see the shell `sh` running which is the command we executed as part of `docker container
 exec -it boring_dijkstra sh` and of course `ps` which is the command we just
 ran in that shell.
 
 Let's analyze the command `docker container exec -it boring_dijkstra sh`:
 
 - `docker container`: you're executing docker and it involves containers (in contrast to `image` or `volume`, see later for `volume`)
-- `exec`: you're going to execute a command in the container, which command? `sh`.
+- `exec`: you're going to execute a command in the container. What command? `sh`.
 - `boring_dijkstra`: the container you're executing the command `sh` in
-- `-it`: `-t` is short for `--tty` and attaches you to a terminal in the container. `-i` is to make input and output from the container flow to your terminal on your docker host (your laptop). You almost always see `-it` being used together: try out `-t` on its own in the previous command and try pressing `return`; you'll see nothing happen as the output of the container is not flowing to the output of your laptop terminal. I find it most useful to think of `-it` as _interactive_ mode versus `-d` for _detached_ mode (the container runs but you're not _in it_).
-- `sh`: the command you're executing on your container.
+- `-it`: `-t` is short for `--tty` and attaches you to a terminal in the container. `-i` is to make input and output from the container flow to your terminal on your docker host (your laptop). You almost always see `-i` and `-t` used together as `-it`. Try out `-t` on its own in the previous command and try pressing `return`. Nothing happens as the output of the container is not flowing to the output of your laptop terminal. I find it most useful to think of `-it` as _interactive_ mode versus `-d` for _detached_ mode (the container runs but you're not _in it_).
+- `sh`: the command you're executing on your container
 
 The documentation on
 [exec](https://docs.docker.com/engine/reference/commandline/exec/) as well as
 this [stackoverflow
 article](https://stackoverflow.com/questions/22272401/what-does-it-mean-to-attach-a-tty-std-in-out-to-dockers-or-lxc)
-on interactive mode have more details that are worth reading through
+on interactive mode have more details.
 
 By _jumping into_ the container, I confirmed the app is running. As I wrote
 this app, I know that it runs on port `8111`.  Indeed in `hi.js` I wrote:
@@ -429,12 +427,13 @@ EXPOSE 8111
 ~~~
 
 In contrast to what the all-caps-look-at-me `EXPOSE` hints at, this does not
-actually make the port `8111` _reachable_. Consider it as documentation for
-other engineers reading your `Dockerfile` that your service listens to this
-port (`8111`).  To make the port `8111` reachable from outside your container,
-say from your laptop, you publish it with the `-p` option.
+make the port `8111` _reachable_. It is _documentation_ for other engineers
+reading your `Dockerfile` indicating that your service listens to this port
+(`8111`).  To make the port `8111` reachable from outside your container, say
+from your laptop, you have to publish it with the `-p` option.
 
-Before using that `-p` option, `stop` and `rm` our running container:
+Before using the `-p` option, `stop` and `rm` the running container (which was
+not started with `-p`):
 
 ~~~
 docker container stop boring_dijkstra
@@ -452,10 +451,10 @@ docker container run -d -p 8000:8111 hi:latest
 
 After this you can navigate to `localhost:8000` on your browser and see `Hi`.
 Note that going to `localhost:8111` in your browser will give an error as
-`8111` is exposed in your container, not your `localhost` (laptop).
+`8111` is exposed in your container, but not your `localhost` (your laptop).
 
-Before diving into persistence, let's look into these `stop` and `rm`
-commands we executed before starting a new container.
+Before diving into persistence, let's look into these `stop` and `rm` commands
+we executed before starting a new container.
 
 What's the difference between `stop` and `rm`? If you remove (`rm`) a
 container, you can no longer start it or refer to it using its name. Neither
