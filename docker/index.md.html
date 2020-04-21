@@ -105,40 +105,44 @@ and send it off anywhere in the world).
 
 # Containerizing the App
 
-To containerize your app, I use [docker](docker.com). In this article, _Docker
-container_ is a synonym of _container_. Before I can run your app in a
-container, I need an _image_.  Explaining what an _image_ is in precise terms
-is beyond my abilities, but my working definition is that an image is an
-abstract specification of your OS as well as anything needed to run your app.
+To containerize the app, I use [docker](docker.com). In this article, I'll refer to a _Docker
+container_ as a synonym of _container_. Before I can run the app in a
+container, I need an _image_.  Explaining in precise terms what an _image_ is,
+is beyond my abilities. My mental definition is that an image is an
+abstract specification of the OS as well as anything needed to run the app.
 The image can be _understood_ by `docker` when it needs to run your
 application.  Compare this to other abstractions in Computer Science:
 
 - a _Java class_ specifies the behavior of an instance of that class
-- a _`jar` file_ packages up your Java application and can then be run by the Java run-time.
-- an ISO image for Linux packages up the Linux OS: you can download the image, install the image, and run the Linux OS on your laptop once it's installed
+- a _`jar` file_ packages up your Java application and can then be run by the Java runtime.
+- a Linux ISO image packages up the Linux OS: you can download the image, install the image, and run the Linux OS on your laptop once it's installed
 - a Python script specifies which instructions to run for the Python interpreter
 
 These comparisons are imperfect, but all have the aspect of a specification of
 all its resources (the `image`) that can then be run/executed on a machine.
 
-From the previous section, we summarized the aspects that we'd like to specify for our demo app:
+In the previous section, I summarized the aspects that I want to specify for the demo app:
 
 - a small OS to start from, for example [alpine](https://alpinelinux.org/)
 - an installation of `npm` and `node` layered on that so we can install our app (`npm`) and run our app (`node`)
-- instructions to install your application (`npm install`)
-- instructions to run your application (`node hi.js`)
+- instructions to install the application (`npm install`)
+- instructions to run the application (`node hi.js`)
 
-I can take that specification and write it up in a format that `docker`
+I can write that informal spefification up in a format that `docker`
 understands so it can build an `image` based on it.  Specifications to build
 docker images are in a file named `Dockerfile`. Conceptually, they are similar
 to `package.json` files: such `package.json` files specify your application's
-dependencies, and a `Dockerfile` specifies the dependencies your app has from
-an OS perspective (what OS does the app assume, what should be installed on the
-OS to be able to run the app).
+dependencies, and a `Dockerfile` specifies the dependencies the app has from an
+OS perspective (what OS does the app assume, what should be installed on the OS
+to be able to run the app).
+
+!!! Tip
+   The directory on your laptop where your `Dockerfile` exists is
+   called the _build-context_. 
 
 I want the app to be layered on the [Linux alpine OS
 system](https://alpinelinux.org/) -- it's a very small Linux, about 4MB,
-compared Ubuntu which would more than 100MB -- so the first line of the
+compared to Ubuntu which is more than 100MB -- so the first line of the
 `Dockerfile` is:
 
 ~~~
@@ -151,20 +155,19 @@ Next, I need an installation of `npm` and `node` layered over that:
 RUN apk add --update nodejs nodejs-npm
 ~~~
 
-`apk add --update nodejs nodejs-npm` is the command you'd run on alpine to
+`apk add --update nodejs nodejs-npm` is the command you run on alpine to
 install `node` and `npm` (see
-[apk](https://wiki.alpinelinux.org/wiki/Alpine_Linux_package_management). If
-you picked a different image to start from, you'd might need a different
-install command. The important part is `RUN` which runs whatever comes after it
-and that the installation of `node` and `npm` will constitute a new layer on
-top of `alpine`.
+[apk](https://wiki.alpinelinux.org/wiki/Alpine_Linux_package_management). If I
+would have picked a different image to start from, I might have needed a
+different install command. The important part of this line is `RUN`. `RUN` runs
+whatever comes after it and will build a new layer in the image. In this case,
+the new layer will have an installation of `node` and `npm`.
 
-Note that the directory on your laptop where your `Dockerfile` exists is
-usually called the _build-context_. I'll then specify that I want to copy all
-the files from this directory (in our case, it will copy over `hi.js` and
-`package.json`) into a root directory `/src` of the new image we're creating.
-Intuitively, our image of course needs the source files for our demo app in
-order to be able to run it.
+I then specify that I want to copy all the files from the build-content (the
+directory on your laptop that has your `Dockerfile`) into a root directory
+`/src` of the new image I'm creating. Thus, it will copy over `hi.js` and
+`package.json` into a root directory `/src`.  Intuitively, our image of course
+needs the source files for our demo app in order to be able to run it.
 
 ~~~
 COPY . /src
@@ -174,11 +177,12 @@ The `.` is the current directory (i.e., where the `Dockerfile` lives, the
 _build-context_). This `COPY` command will create a new layer in the resulting
 image.
 
-To summarize, at this point I have specified that I will need an image consisting of a Linux OS (`alpine`), that I need to install 
-`node` and `npm` into that image, and that I want to copy the app's source code
-into the directory `/src` on the image. Continuing, we use `npm` to install the
-app.  For this, I'll specify that the `/src` directory needs to be the _current_ working
-directory and that I want to execute `npm install`:
+To summarize, at this point I have specified that I need an image
+consisting of a Linux OS (`alpine`), that I need to install `node` and `npm`
+into that image, and that I want to copy the app's source code into the
+directory `/src` on the image. Next, I want to use `npm` to install the app.
+For this, I'll specify that the `/src` directory needs to be the _current_
+working directory and that I want to execute `npm install`:
 
 ~~~
 WORKDIR /src
@@ -265,7 +269,7 @@ image id `5d3095b79194` -- the image id will be different on your machine.
 Sometimes you'd just want the `IMAGE ID`s,for example, to pipe
 them to another command. For that situation, you can use `--format`. The `--format` option uses [Go
 templates](https://golang.org/pkg/text/template/) to extract the data you like
-to see formatted. For example, let's say we want to see the size:
+to see formatted. For example, let's say I want to see the size:
 
 ~~~
 docker image ls --format "{{.Size}}"
@@ -289,7 +293,7 @@ This unfortunately gives you the error:
 Template parsing error: template: :1:2: executing "" at <.ImageId>: can't evaluate field ImageId in type formatter.imageContext
 ~~~
 
-So while `docker image ls` shows `IMAGE ID` as a column name, that's not how
+While `docker image ls` shows `IMAGE ID` as a column name, that's not how
 you can access this field. There's a 
 [hint](https://docs.docker.com/config/formatting/) on how you can see the
 attributes that you can actually use in `--format`:
@@ -304,7 +308,7 @@ This will make a json out of _everything_ and will show:
 {"Containers":"N/A","CreatedAt":"2020-03-25 08:11:44 -0700 PDT","CreatedSince":"2 days ago","Digest":"\u003cnone\u003e","ID":"5d3095b79194","Repository":"hi","SharedSize":"N/A","Size":"57.2MB","Tag":"latest","UniqueSize":"N/A","VirtualSize":"57.23MB"}
 ~~~
 
-From that you can see that the `IMAGE ID` is actually under attribute `ID`:
+From that you can see that the `IMAGE ID` is actually the value of an attribute `ID`. Trying that,
 
 ~~~
 docker image ls --format "{{.ID}}"
@@ -312,27 +316,27 @@ docker image ls --format "{{.ID}}"
 
 will give you `5d3095b79194`.
 
-Finally, have a closer look at our created image:
+Finally, have a closer look at the created image:
 
 ~~~
 docker image inspect 5d3095b79194
 ~~~
 
-You see your label `maintainer` added, the entrypoint `node ./hi.js`, and the
+You'll see the label `maintainer`, the entrypoint `node ./hi.js`, and the
 different layers with different ids that were created as part of this image
-(recall that each `RUN` created a different layer). Grab a cup of coffee and
-spend some time quality time with that `docker image inspect` output, cause
-you're worth it.
+(recall that each `RUN` created a different layer).  I encourage you to spend
+some quality time with that `docker image inspect` output. I did not spend time
+explaining layers in an image, but you can [dig in more here if you'd
+like](https://medium.com/@jessgreb01/digging-into-docker-layers-c22f948ed612).
 
 # Publishing the Image
 
-In this article, I'll keep working with the local image just created. However,
-if you want other users to be able to use your image, you'd upload it, for
-example to the [Docker Hub](https://hub.docker.com/). After you uploaded your
-image to a Docker Hub repository, other developers can then _pull_ it. Have a
-look at this
+I created an image locally on my laptop. Usually, if you want other users to be
+able to use your image, you can now upload it, for example to the [Docker
+Hub](https://hub.docker.com/). After you uploaded your image to a Docker Hub
+repository, other developers can then _pull_ it. Have a look at this
 [tutorial](https://ropenscilabs.github.io/r-docker-tutorial/04-Dockerhub.html)
-if you'd like to see some of the steps involved, cause that's all I'll say
+if you'd like to see some of the steps involved, because that's all I'll say
 about publishing your image.
 
 # Running the Container
@@ -581,7 +585,7 @@ I showed you how to build an image out of your app (how to _containerize_ it),
 how to run a container based on that image, and how to use volumes to persist
 the data that your app writes beyond the life cycle of the container.  I
 limited this article to what I consider the elements and I left out discussions
-on tags, docker swarm, docker networking, `docker-compose`, and much, much
+on [storage drivers](https://docs.docker.com/storage/storagedriver/select-storage-driver/), [tags](https://docs.docker.com/engine/reference/commandline/tag/), [docker swarm](https://docs.docker.com/engine/swarm/), [docker networking](https://docs.docker.com/network/), [`docker-compose`](https://docs.docker.com/compose/), and much, much
 more. 
 
 # Endnotes
