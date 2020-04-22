@@ -10,14 +10,15 @@ anything in a container, it will be lost forever!"_. In this article, I will
 show that containers are not magic by going through the lifecycle of an app
 running on your laptop to an app running in a container on your laptop (the
 so-called _containerizing_ of an app).  I will build an image from the app,
-publish the image, and run that image in a container. I'll show you the basic
-commands of manipulating images, containers, and volumes. 
+publish the image, and run that image in a container, all the while showing you
+the basic commands of manipulating images, containers, and volumes. 
 
-Some final introductory messages for your general well-being before getting to
-the main show:
+You can download the demo code I wrote for this article on
+[github](https://github.com/sheymans/elementsOf/tree/master/docker/demo).  The
+demo is a Javascript app, but there's so little code it should not cause too
+many side effects when consumed in moderation.  
 
-- I used the book [Docker Deep Dive](https://www.goodreads.com/book/show/39933970-docker-deep-dive) by Nigel Poulton as a reference.
-- You can download the demo code I wrote for this article on [github](https://github.com/sheymans/elementsOf/tree/master/docker/demo).  The demo is a Javascript app, but there's so little code it should not cause too many side effects when consumed in moderation.  
+Finally, I used the book [Docker Deep Dive](https://www.goodreads.com/book/show/39933970-docker-deep-dive) by Nigel Poulton as a reference.
 
 # The Demo App
 
@@ -63,7 +64,7 @@ npm install
 
 I use the node package manager [npm](https://www.npmjs.com/) to do that. `npm`
 looks at the `package.json` file, it sees that there's a dependency
-`express` and then installs `express` into the directory `node_modules/`.
+`express` and installs `express` into the directory `node_modules/`.
 
 To start the app, type:
 
@@ -71,14 +72,14 @@ To start the app, type:
 node hi.js
 ~~~
 
-You can navigate to http://localhost:8111 to be said `Hi` to. It's a glorious day to be alive.
+You can navigate to http://localhost:8111 to be said `Hi` to. Isn't it wonderful to have friends like that?
 
-I made these assumptions to be able to run this app on a laptop[^laptop] :
+These were some of the assumptions I made and the steps I took to run this app on a laptop[^laptop] :
 
-- the laptop allows for installing and running software such as `npm` and `node`.  For example, it's Operating System (OS) is Linux or Mac OS X,
-- `npm` was installed, to, in turn, install the required dependencies of your app (`express`); if you did not have it installed, you had to install it
+- the laptop allows for installing and running software such as `npm` and `node`.  For example, its Operating System (OS) is Linux or Mac OS X
+- `npm` is installed, to, in turn, install the required dependencies of your app (`express`)
 - `npm install` was run from the command-line to install dependencies such as `express`
-- `node` was installed to actually run the application; if you did not have it installed, you had to install it
+- `node` was installed to actually run the application
 - `node hi.js` was run from the command-line
 
 If you want to install and run your app on another laptop (or, on an [EC2
@@ -87,28 +88,29 @@ assumptions hold and you need to install the same packages as well as execute
 similar commands.  _"Well, of course, I would not repeat these steps, I'd put
 them all in a little script so I just have to run the script"_. You would. But
 you'd be forgetting that a laptop and an EC2 instance are very different
-things. You'd probably want scripts per different Operation System at the
-minimum, for example installing `npm` and `node` requires different steps,
+things. You'd probably want scripts per different OS at the
+minimum. For example, installing `npm` and `node` requires different steps,
 depending on the OS you're installing them on.
 
 What if instead of doing these steps manually (and the steps being different
 depending on your OS), you could package your app while specifying:
 
-- a small Operating System to install the app on, for example [alpine](https://alpinelinux.org/)
+- a small OS System to install the app on, for example [alpine](https://alpinelinux.org/)
 - an installation of `npm` and `node` layered on that
 - instructions to install your application (`npm install`)
 - instructions to run your application (`node hi.js`)
 
 In other words, what if you could define a small container based on the above
-specification that you can run anywhere where such containers can run? (I'll
-make the obligatory _container on a ship_ reference: a container is a standard
-packaging solution that you can fill with any stuff, you can put it on a ship
-and send it off anywhere in the world).
+specification that you can run anywhere where such containers can run?
+
+!!! WARNING: Obligatory Container on a Ship Reference
+    A container is a standard packaging solution that you can fill with any stuff,
+    you can put it on a ship and send it off anywhere in the world.
 
 # Containerizing the App
 
 To containerize the app, I use [docker](docker.com). In this article, I'll refer to a _Docker
-container_ as a synonym of _container_. Before I can run the app in a
+container_ as a synonym of a _container_. Before I can run the app in a
 container, I need an _image_.  Explaining in precise terms what an _image_ is,
 is beyond my abilities. My mental definition is that an image is an
 abstract specification of the OS as well as anything needed to run the app.
@@ -130,10 +132,10 @@ In the previous section, I summarized the aspects that I want to specify for the
 - instructions to install the application (`npm install`)
 - instructions to run the application (`node hi.js`)
 
-I can write that informal specification up in a format that `docker`
+I can write up that informal specification in a format that `docker`
 understands so it can build an `image` based on it.  Specifications to build
 docker images are in a file named `Dockerfile`. Conceptually, they are similar
-to `package.json` files: such `package.json` files specify your application's
+to `package.json` files: `package.json` files specify your application's
 dependencies, and a `Dockerfile` specifies the dependencies the app has from an
 OS perspective (what OS does the app assume, what should be installed on the OS
 to be able to run the app).
@@ -143,7 +145,7 @@ to be able to run the app).
    called the _build-context_. 
 
 I want the app to be layered on the [Linux alpine OS
-system](https://alpinelinux.org/) -- it's a very small Linux, about 4MB,
+system](https://alpinelinux.org/) -- a small Linux, about 4MB,
 compared to Ubuntu which is more than 100MB -- so the first line of the
 `Dockerfile` is:
 
@@ -159,15 +161,15 @@ RUN apk add --update nodejs nodejs-npm
 
 `apk add --update nodejs nodejs-npm` is the command you run on alpine to
 install `node` and `npm` (see
-[apk](https://wiki.alpinelinux.org/wiki/Alpine_Linux_package_management). If I
+[apk](https://wiki.alpinelinux.org/wiki/Alpine_Linux_package_management)). If I
 would have picked a different image to start from, I might have needed a
 different install command. The important part of this line is `RUN`. `RUN` runs
 whatever comes after it and will build a new layer in the image. In this case,
 the new layer will have an installation of `node` and `npm`.
 
-I then specify that I want to copy all the files from the build-content (the
+I then specify that I want to copy all the files from the build-context (the
 directory on your laptop that has your `Dockerfile`) into a root directory
-`/src` of the new image I'm creating. Thus, it will copy over `hi.js` and
+`/src` of the new image I'm creating. Thus, `docker` will copy over `hi.js` and
 `package.json` into a root directory `/src`.  Intuitively, our image of course
 needs the source files for our demo app in order to be able to run it.
 
@@ -192,9 +194,9 @@ RUN npm install
 ~~~
 
 `WORKDIR` changes the working directory to `/src` and you already know the
-`RUN` command, it just executes `npm install` in this case. The latter will
-just like it did on your laptop, look for `package.json`, find your
-dependencies in there (`express`) and install those.
+`RUN` command: it just executes `npm install` . The latter will
+like it did on your laptop, look for `package.json`, find your
+dependencies (`express`) and install those.
 
 Almost there. Indicate how to run the application:
 
@@ -203,7 +205,7 @@ ENTRYPOINT ["node", "./hi.js"]
 ~~~
 
 This command determines which application to run when we `run` the container. Note that
-we did not use `RUN` for this; `RUN` adds a new image layer, whereas
+I did not use `RUN` for this; `RUN` adds a new image layer, whereas
 `ENTRYPOINT` just adds metadata and appears only once in the `Dockerfile` to
 indicate _this is what you run once the container is ready to be run_.
 
@@ -243,8 +245,11 @@ Dissecting this command:
 - `docker`: the `docker` program that we use to build images, run images, etc
 - `image`: tell `docker` that what we're doing involves images (there's also `docker container` to indicate that you're working with containers)
 - `build`: build an image
-- `-t hi:latest`: we're *t*agging an image with name `hi` and with tag `latest`. A tag can be used to identified different versions of your software (`v1`, etc) 
-- `.`: don't forget the `.`. The `.` stands for _look into your current directory for the Dockerfile_. Note that `-t` indeed stands for _tag_ and not _target_ (there's a `--target` option)
+- `-t hi:latest`: we're *t*agging an image with name `hi` and with tag `latest`. A tag can be used to identify different versions of your software (tag `v1` for example) 
+- `.`: don't forget the `.`. The `.` stands for _look into your current directory for the Dockerfile_. 
+
+!!! Tip
+   `-t` indeed stands for _tag_ and not _target_ (there's a `--target` option as well)
 
 After running that command, I can check whether there's now an image available using `ls`:
 
@@ -268,9 +273,9 @@ hi             latest    5d3095b79194        5 minutes ago       57.2MB
 This shows our created image with repository name `hi`, tag `latest`, and
 image id `5d3095b79194` -- the image id will be different on your machine.
 
-Sometimes you'd just want the `IMAGE ID`s,for example, to pipe
+Sometimes you'd just want the `IMAGE ID`s, for example, to pipe
 them to another command. For that situation, you can use `--format`. The `--format` option uses [Go
-templates](https://golang.org/pkg/text/template/) to extract the data you like
+templates](https://golang.org/pkg/text/template/) to extract the data you want
 to see formatted. For example, let's say I want to see the size:
 
 ~~~
@@ -334,7 +339,7 @@ like](https://medium.com/@jessgreb01/digging-into-docker-layers-c22f948ed612).
 # Publishing the Image
 
 I created an image locally on my laptop. Usually, if you want other users to be
-able to use your image, you can now upload it, for example to the [Docker
+able to use your image, you can upload it to the [Docker
 Hub](https://hub.docker.com/). After you uploaded your image to a Docker Hub
 repository, other developers can then _pull_ it. Have a look at this
 [tutorial](https://ropenscilabs.github.io/r-docker-tutorial/04-Dockerhub.html)
@@ -592,7 +597,7 @@ more.
 
 # Endnotes
 
-[^packagejson]: A `package.json` file is used to describe your application (for
+[^packagejson]: A `package.json` file describes your application (for
 example, any package dependencies) so that `npm` (which can be used to build
 your application) knows _how_ to build it. You can read about it
 [here](https://nodejs.org/en/knowledge/getting-started/npm/what-is-the-file-package-json/).
