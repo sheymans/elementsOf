@@ -1,7 +1,7 @@
 <meta charset="utf-8">
                             **Elements of Docker Containers**
                             Stijn Heymans
-                            published: 24 April 2020
+                            published: 23 April 2020
 
 # Introduction
 
@@ -349,7 +349,7 @@ about publishing your image.
 # Running the Container
 
 With that image `hi:latest`, I can create a running instance (aka container).
-Where before my commands started with `docker image` to do image manipulation,
+Where before my commands started with `docker image` for image manipulation,
 I'll in this section mostly use `docker container` to manipulate containers:
 
 ~~~
@@ -357,8 +357,8 @@ docker container run -d hi:latest
 ~~~
 
 This command starts the container in detached/background mode (hence the `-d`)
-and uses the image `hi:latest` to instantiate the container with. Since I
-specified that this container should be running `node ./hi.js` using its
+and uses the image `hi:latest` to instantiate the container. Since I
+specified that this container should be running `node ./hi.js` using the
 `ENTRYPOINT` statement in the `Dockerfile`, I expect to see this app running
 when I _jump into_ the container.
 
@@ -369,7 +369,7 @@ know what the ID or name of the freshly started container is:
 docker container ls
 ~~~
 
-I'd see something like this as output:
+This is the output of that command:
 
 ~~~
 CONTAINER ID      IMAGE      COMMAND         CREATED        STATUS        PORTS     NAMES
@@ -379,8 +379,8 @@ CONTAINER ID      IMAGE      COMMAND         CREATED        STATUS        PORTS 
 The running container has ID `885288159d28` and name `boring_dijkstra`.  I did
 not specify a name when running the container, so I got a random
 `boring_dijkstra`. You can define your own container name using the `--name`
-option: `docker container run --name exciting_dijkstra -d hi:latest`.  I
-further see that my container is executing the command `node ./hi.js` which is
+option: `docker container run --name exciting_dijkstra -d hi:latest`. The output
+further shows that my container is executing the command `node ./hi.js` which is
 exactly what I specified in `Dockerfile`.
 
 Now that I have the name of the running container, I can do some _jumping
@@ -393,10 +393,10 @@ docker container exec -it boring_dijkstra sh
 !!! Tip
     I used the the container's name, `boring_dijkstra`, but I can also use its ID `885288159d28`
 
-After executing that command, you see a shell prompt appear ( maybe you'll even
-see a  &#128026;[^shell] ) and if you check what processes are running in this
-container using <a href="https://en.wikipedia.org/wiki/Ps_(Unix)">`ps`</a>, you'll indeed
-see our `node` app:
+After executing that command, I see a shell prompt appear ( on a blue Monday, maybe even
+a  &#128026;[^shell] ) and if I check what processes are running in this
+container using <a href="https://en.wikipedia.org/wiki/Ps_(Unix)">`ps`</a>, I indeed
+see the `node` app:
 
 ~~~
 /src # ps
@@ -406,7 +406,7 @@ PID   USER     TIME  COMMAND
  37   root     0:00  ps
 ~~~
 
-You'll also see the shell `sh` running which is the command we executed as part of `docker container
+I also see the shell `sh` running which is the command we executed as part of `docker container
 exec -it boring_dijkstra sh` and of course `ps` which is the command we just
 ran in that shell.
 
@@ -446,7 +446,7 @@ from your laptop, you have to publish it with the `-p` option.
 Before using the `-p` option, `stop` and `rm` the running container (which was
 not started with `-p`):
 
-~~~
+~~~bash
 docker container stop boring_dijkstra
 docker container rm boring_dijkstra
 ~~~
@@ -474,7 +474,7 @@ wrote (for example, to `/tmp`, any logs, anything) is gone. It's gone.
 
 If you `stop` a container, you merely suspend it. After stopping a container,
 you can restart it with `docker container start your_container_name`. After
-starting it again, whatever you wrote to `/tmp` before stopping it is still
+starting it again, whatever you wrote to `/tmp` before stopping it, is still
 there. Your app will not be running if the container is stopped. For example, if
 you stop your container with `docker container stop your_container_name`,
 navigating to `localhost:8000` will give an error.  Restarting the container on
@@ -491,7 +491,7 @@ What is persistence? Persistence is the _ability for data to stay around_:
 - if you open a text editor write text in a file and save the file, your data is persisted in the file
 
 The database example is usually uncontroversial in the context of containers:
-your app you can write data to a database table from within the container as
+your app can write data to a database table from within the container as
 long as the database table exists outside of your container.  More
 controversial is writing to the container's file system, for example when your
 app writes logs to a file.  The key idea to remember is that if your data is
@@ -510,7 +510,7 @@ a file-system we already have without using volumes.  I can have my app that
 runs in a container write to `/tmp` without issues while the container is
 running. I can even `stop` the container (suspending it, as we saw above) and
 when I come back to this container, the data I wrote to `/tmp` is still there.
-Only when I `rm` the container that data in `/tmp` would be gone as `rm` is
+Only when I `rm` the container, that data in `/tmp` would be gone as `rm` is
 wiping away the file-system of the container.
 
 The key to volumes is that they live and die outside of your container's life
@@ -518,13 +518,13 @@ cycle. They're an abstraction of storage: I can write to a volume, I can read
 from a volume, so the app can write its logs to a volume. If I have these 2
 independent entities: a volume that I can write to/read from and a container
 that potentially could be doing that writing and reading, how do I connect
-those? You mount the volume to a directory on your container.  If your
-container has a directory `/logs`, you can mount your volume to the directory
+those? I'd mount the volume to a directory on the container.  If the
+container has a directory `/logs`, I can mount the volume to the directory
 `/logs`. After that mounting, anything written to the `/logs` directory will be
 written to the volume, everything read from `/logs` will actually be read from
 the volume.
 
-This is how you create a volume:
+This is how to create a volume:
 
 ~~~
 docker volume create dramatic_vol
@@ -532,14 +532,14 @@ docker volume create dramatic_vol
 
 Similar to the above, where we had `docker image` for image manipulation and
 `docker container` for container manipulation, we have `docker volume` for
-volume manipulation. Check whether your freshly created volume is indeed there
+volume manipulation. I can check whether the freshly created volume is indeed there
 with `ls`:
 
 ~~~
 docker volume ls
 ~~~
 
-You can attach `dramatic_vol` to a container (based on the image `hi:latest` as before):
+I attach `dramatic_vol` to a container (based on the image `hi:latest` as before):
 
 ~~~
 docker container run -d --mount target=/src,source=dramatic_vol hi:latest
@@ -559,7 +559,7 @@ Inspect that `laughing_pike` container:
 docker container inspect laughing_pike
 ~~~
 
-You'll see lots of output, among which this snippet:
+The output of that command contains this snippet:
 
 ~~~
  "Mounts": [
@@ -576,11 +576,11 @@ You'll see lots of output, among which this snippet:
         ],
 ~~~
 
-The volume `dramatic_vol` is part of the mounts, it indicates
+The volume `dramatic_vol` is part of the mounts. It indicates
 where the data for that volume actually lives on my laptop
 (`/var/lib/docker/volumes/dramatic_vol/_data`) and it indicates to what
-directory _in the container_ it was  tied: `/src`.  Recall that anything
-written to `/src` by my app in the container would be written to the volume
+directory _in the container_ it is tied: `/src`.  Recall that anything
+written to `/src` by my app in the container is written to the volume
 (and you could check that out at `/var/lib/docker/volumes/dramatic_vol/_data`).
 
 If you `stop` and `rm` the container, none of the data on the volume is
