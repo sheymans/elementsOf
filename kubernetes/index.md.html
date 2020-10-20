@@ -5,7 +5,42 @@
 
 # Introduction
 
-We'll introduce.
+I'll go over what I think are the elements of a kubernetes _from an application
+developer's perspective_. A certain familiarity with deploying applications in
+a production environment is expected (if you can imagine what things like
+_downtime_, _rollback_, _production_ mean, you should be OK).  I'll do this by
+assuming you have an application and there are a couple of requirements you
+have on this application before you will be able to put it in production:
+
+- You need to run many instances of your application to be able to serve traffic you have, which runs into the 1000s of request per second,
+- Clients of your application will want to connect to one address, requests will be guided to different instances of your application automatically
+- You need to be able to push changes to your application without downtime
+- You need to be able to rollback changes to your application
+- There is basic warm-up that needs to happen with your application before it can start serving up requests (for example, it needs to sync its data with data other instances of the application have available)
+- Sometimes an instance of your application will die and stop serving requests, you have not figured out why, but you want that instance of the application to become invisible to clients of your application. Traffic should be guided to still functioning instances of your application
+- To save costs during the night when you need less capability on your application, you'll want to reuse some of your machines that the instances of application normally run on to run batch jobs for maintenance
+- You will have regular events (oh, say shopping events) during which the amount of machines to serve your traffic will not be enough, so you'll want to scale up the amount of machines you have available for your cluster. After the event, you'll want to get back to normal and scale down,
+
+In comes Kubernetes (we will refer to _Kubernetes_ by its common abbreviation
+of _k8s_ -- pronounced _kates_). While Kubernetes is massive hammer, it does
+hammer the above problems squarely away. I dispariginaly say _hammer_ as it
+indeed is able to do more than what you'd need. Its historic origin play a role
+in that as used by a Cloud Provider in which many different applications run on
+the same host of machines and they'd want to optimize usage of infrastructure.
+In the use case we laid out, we are not _that_ interested in running different
+applications on the same infrastructure, although the particular requirement to
+save cost during the night and run some batch jobs on the same machine that
+your machine runs on during the day, is designed to hint at that use.
+
+The requirements as laid out above come from my personal experience, and the
+most knowledge I have on k8s comes from [Kubernetes in
+Action](https://www.goodreads.com/book/show/34013922-kubernetes-in-action) by
+Marko Lukša. The book goes in tremendous depth and is useful for infrastructure
+administrators (which is a whole world on itself that I will barely touch on
+here). I'll stick to what I know which is application development and what I
+need to run an application in production satisfying the above requirements.
+
+# Your Application and Running it on many Physical Instances
 
 # Conclusion
 
