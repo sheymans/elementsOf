@@ -1,0 +1,14 @@
+{
+  "name": "hi_app",
+  "version": "1.0.0",
+  "description": "App says Hi with hostname",
+  "main": "hi.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Stijn Heymans",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}

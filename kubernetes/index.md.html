@@ -42,10 +42,47 @@ need to run an application in production satisfying the above requirements.
 
 # Your Application and Running it on many Physical Instances
 
+For the application, I'll be running a simple web server that serves up the
+sentence `Hi from HOST` where `HOST` will be the host it is running from. We're
+in a brave new world, so this application has been packed up such that it can
+run as a Docker container.
+
+I've posted the source of this application on
+[github](https://github.com/sheymans/elementsOf/tree/master/kubernetes/demo/hi_app)
+and I've pushed the container image to the [Docker
+Hub](https://hub.docker.com/) with name
+[stijnh/hi_app](https://hub.docker.com/repository/docker/stijnh/hi_app).
+
+If at this point, you feel slightly lost and it's related to this article, this
+may be a good time to take a break from this article and read up on the
+[Elements of Docker
+Containers](http://www.stijnheymans.net/elements_of_docker_containers.html).
+
+The container image is public so you can try out the app on your laptop right now with:
+
+```
+docker container run -d -p 8111:8111 -t stijnh/hi_app
+```
+
+Recall that `docker container run` indicates you're asking to run a container
+image; `-d` indicates you're going to do that in the background as a daemon
+(rather than interactive), `-p 8111:8111` means you're mapping your `localhost`
+port 8111 (on your laptop) to port `8111` on your docker container behind which
+your app is running, `-t sitjnh/hi_app` indicates the image you're using to get
+the container from.
+
+At this point you can open your browser, and navigating to `localhost:8111`
+should show you `Hi from fbd698569ec5` where `fbd698569ec5` will be different
+of course for you as this the container's hostname.
+
+Alright, at this point, I'll refer to this state as "you have 1 app
+instance running". It's running as a container on your laptop. Your laptop in
+this sense is the _machine_ (or if you feel like a rockstar, you're _bare metal
+machine_).
+
 # Conclusion
 
-We'll conclude.
-
+We did not cover a whole bunch, such as volumes, secrets, jobs, cron jobs, etc etc
 
 <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-12447521-1"></script>
