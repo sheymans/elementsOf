@@ -40,7 +40,9 @@ administrators (which is a whole world on itself that I will barely touch on
 here). I'll stick to what I know which is application development and what I
 need to run an application in production satisfying the above requirements.
 
-# Your Application and Running it on many Physical Instances
+# Your Application and Running Many Instances of It
+
+## A Containerized Application
 
 For the application, I'll be running a simple web server that serves up the
 sentence `Hi from HOST` where `HOST` will be the host it is running from. We're
@@ -68,7 +70,7 @@ Recall that `docker container run` indicates you're asking to run a container
 image; `-d` indicates you're going to do that in the background as a daemon
 (rather than interactive), `-p 8111:8111` means you're mapping your `localhost`
 port 8111 (on your laptop) to port `8111` on your docker container behind which
-your app is running, `-t sitjnh/hi_app` indicates the image you're using to get
+your app is running, `-t stijnh/hi_app` indicates the image you're using to get
 the container from.
 
 At this point you can open your browser, and navigating to `localhost:8111`
@@ -80,9 +82,40 @@ instance running". It's running as a container on your laptop. Your laptop in
 this sense is the _machine_ (or if you feel like a rockstar, you're _bare metal
 machine_).
 
+## Running Many Instances of It
+
+### Pod
+
+We have 1 instance of our app running, but now you'll have thousands of users
+saying hi, so you can't have only 1 instance -- that will not fit your
+megalomanic dreams!  We need more! We need at least 3!
+
+But first we need to define a bit better of what we need 3. We clearly need 3
+containers (each container runs our app). As this is example is illustrating a
+couple of elements of kubernetes, we've not mentioned real-world things like
+logging. Typically, your application will be writing logs, and you'll need
+something to _rotate_ these logs away to more permanent storage (to [AWS's S3](https://aws.amazon.com/s3/)
+for example, where you could query it using
+[Athena](https://aws.amazon.com/athena/)). We'd want this log writing in a
+separate container (other apps could use it as well so it's not typical for
+this app alone). You'd want these 2 containers always running
+together[^sidecar], so if I say I want 3 instances of my app, I actually want 3
+instances of my app with the logging container. Hence, the first level of
+abstraction -- the base unit it deals with -- is _not_ a container, it's
+something called a _pod_ in kubernetes. So let's do some more wrapping, and
+wrap that container into a _Pod_ manifest[^manifest] that describes what the pod should look like. If you recall `Dockerfile`s, then this is similar in philosophy: in a `Dockerfile` you describe your app so that `docker` knows how to build an image, in a _Pod_ manifest you describe what all goes in your _Pod_, most importantly what container image to use such k8s knows how to create a Pod.
+
+TOD: a pod definition
+
+### Deployment
+
 # Conclusion
 
 We did not cover a whole bunch, such as volumes, secrets, jobs, cron jobs, etc etc
+
+# Endnotes
+
+[^sidecar]: We often refer to containers that always run alongside your _main_ container as _sidecars_ for obvious non-inspired reasons.
 
 <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-12447521-1"></script>
