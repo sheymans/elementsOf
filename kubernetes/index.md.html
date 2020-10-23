@@ -53,7 +53,7 @@ I've posted the source of this application on
 [github](https://github.com/sheymans/elementsOf/tree/master/kubernetes/demo/hi_app)
 and I've pushed the container image to the [Docker
 Hub](https://hub.docker.com/) with name
-[stijnh/hi_app](https://hub.docker.com/repository/docker/stijnh/hi_app).
+[stijnh/hi_app](https://hub.docker.com/repository/docker/stijnh/hi).
 
 If at this point, you feel slightly lost and it's related to this article, this
 may be a good time to take a break from this article and read up on the
@@ -63,14 +63,14 @@ Containers](http://www.stijnheymans.net/elements_of_docker_containers.html).
 The container image is public so you can try out the app on your laptop right now with:
 
 ```
-docker container run -d -p 8111:8111 -t stijnh/hi_app
+docker container run -d -p 8111:8111 -t stijnh/hi
 ```
 
 Recall that `docker container run` indicates you're asking to run a container
 image; `-d` indicates you're going to do that in the background as a daemon
 (rather than interactive), `-p 8111:8111` means you're mapping your `localhost`
 port 8111 (on your laptop) to port `8111` on your docker container behind which
-your app is running, `-t stijnh/hi_app` indicates the image you're using to get
+your app is running, `-t stijnh/hi` indicates the image you're using to get
 the container from.
 
 At this point you can open your browser, and navigating to `localhost:8111`
@@ -103,9 +103,83 @@ together[^sidecar], so if I say I want 3 instances of my app, I actually want 3
 instances of my app with the logging container. Hence, the first level of
 abstraction -- the base unit it deals with -- is _not_ a container, it's
 something called a _pod_ in kubernetes. So let's do some more wrapping, and
-wrap that container into a _Pod_ manifest[^manifest] that describes what the pod should look like. If you recall `Dockerfile`s, then this is similar in philosophy: in a `Dockerfile` you describe your app so that `docker` knows how to build an image, in a _Pod_ manifest you describe what all goes in your _Pod_, most importantly what container image to use such k8s knows how to create a Pod.
+wrap that container into a _Pod_ manifest[^manifest] that describes what the
+pod should look like. If you recall `Dockerfile`s, then this is similar in
+philosophy: in a `Dockerfile` you describe your app so that `docker` knows how
+to build an image, in a _Pod_ manifest you describe what all goes in your
+_Pod_, most importantly what container image to use such k8s knows how to
+create a Pod.
 
-TOD: a pod definition
+Pods are usually defined in [YAML](https://en.wikipedia.org/wiki/YAML) files,
+so let's do this. I have a file `hi-pod.yaml`:
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: hi-pod
+spec:
+  containers:
+    - image: stijnh/hi
+      name: hi
+      ports:
+        - containerPort: 8111
+```
+
+which is really doing nothing more than naming my pod `hi-pod` and indicating
+that it's running the container
+[`stijnh/hi`](https://hub.docker.com/repository/docker/stijnh/hi).
+
+Let's go over the pod definition, line by line:
+
+```
+apiVersion: v1
+```
+
+Indicates what API version of kubernetes this kubernetes _resource_ is defined
+in (_Pods_, together with a whole lot of other things, are named _resources_ in
+k8s), in this case `v1`. I have no memory, nor patience for remembering API
+versions, but there are [explanations of what version to use when out
+there](https://matthewpalmer.net/kubernetes-app-developer/articles/kubernetes-apiversion-definition-guide.html).
+
+
+
+```
+kind: Pod
+```
+
+The type of resource you're defining, a `Pod`.
+
+```
+metadata:
+  name: hi-pod
+```
+
+Some metadata about the pod, in this case its name `hi-pod`.
+
+```
+spec:
+  containers:
+    - image: stijnh/hi
+      name: hi
+      ports:
+        - containerPort: 8111
+```
+
+The pod's specification, in this case a list of 1 container, where the container is described by it's image tag `stijnh/hi`, given a name `hi`, and indicating that the container exposes the port `8111`.
+
+If you only remember one thing from the above, may it be that you'll see 4
+parts of such a resource description which you'll see with other types of
+resources as well: the `apiVersion`, the `kind`, the `metadata`, and the
+`spec`.
+
+With that said, can we deploy this pod now please? Yes. I'm going to assume
+you're on your laptop and have something like
+[minikube](https://github.com/kubernetes/minikube) installed.
+
+TODO: short explanation of a local cluster, nodes, cluster admin by sysadminds, some `kubectl` commands to show the nodes, the cluster.
+
+TODO: create a pod `create`, show the pod, describe the pod
 
 ### Deployment
 

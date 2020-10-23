@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: hi-pod
+spec:
+  containers:
+    - image: stijnh/hi
+      name: hi
+      ports:
+        - containerPort: 8111
