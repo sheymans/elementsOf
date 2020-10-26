@@ -166,7 +166,9 @@ spec:
         - containerPort: 8111
 ```
 
-The pod's specification, in this case a list of 1 container, where the container is described by it's image tag `stijnh/hi`, given a name `hi`, and indicating that the container exposes the port `8111`.
+The pod's specification, in this case a list of 1 container, where the
+container is described by it's image tag `stijnh/hi`, given a name `hi`, and
+indicating that the container exposes the port `8111`.
 
 If you only remember one thing from the above, may it be that you'll see 4
 parts of such a resource description which you'll see with other types of
@@ -175,13 +177,82 @@ resources as well: the `apiVersion`, the `kind`, the `metadata`, and the
 
 With that said, can we deploy this pod now please? Yes. I'm going to assume
 you're on your laptop and have something like
-[minikube](https://github.com/kubernetes/minikube) installed.
+[minikube](https://github.com/kubernetes/minikube) installed. As I'm tackling
+k8s from the perspective of an application developer, I'll not get into the
+details of setting up a cluster that serves production traffic. 
 
-TODO: short explanation of a local cluster, nodes, cluster admin by sysadminds, some `kubectl` commands to show the nodes, the cluster.
+This _is_ a good time to to talk about some general k8s concepts. But first, go
+check out [minikube](https://github.com/kubernetes/minikube) and install it so
+you can try out some stuff on your laptop.
 
-TODO: create a pod `create`, show the pod, describe the pod
+Once you're back (you were never gone though, were you), you might have read
+that minikube will give you a _single-node cluster_. You'll hear _cluster_ a
+lot, so what is a cluster? My working definition is that it's a set of nodes.
+What's a _node_ then? Again, my working definition is _that's a machine, an EC2
+instance, a laptop, some kind of computor with a CPU and memory, an old Pentium
+tower in a dusty basement, ..._ you get the idea. A typical mapping in my head
+would be _if I have 40 EC2 instances in the EU region to serve traffic_, that's
+a _cluster_ of _40_ nodes. 
+
+
+Now that you have `minikube` installed, this command should show something:
+
+```shell
+$ kubectl get nodes
+NAME       STATUS   ROLES    AGE   VERSION
+minikube   Ready    master   0d   v1.18.3
+```
+
+Your first use of `kubectl`, but not your last. `kubectl` is the command-line
+tool that will allow you to interact with your cluster asking it about its
+nodes, its pods, ...In this case, we know that we 1 node running, called
+`minikube`. This is good to keep in mind, all example we'll show later will
+involve 1 node. In reality, you'll be working with clusters that have many many
+more nodes of course.
+
+Alright, we have a cluster with 1 node. We have our `hi` app, tucked away in a
+container, and we defined a pod that is supposed to run that container. Let's
+deploy that pod using `kubectl`:
+
+```shell
+$ kubectl create -f hi_pod.yaml
+pod/hi-pod created
+```
+
+Verify that your pod is created:
+
+```shell
+$ kubectl get pods
+NAME     READY   STATUS    RESTARTS   AGE
+hi-pod   1/1     Running   0          54s
+```
+
+This shows us that the pod is `Running` and has been doing so for `54s`. Note the levels of indirection: 
+
+- when we ran the app `hi.js` we could just navigate to `localhost:8111` and see the `Hi from...`
+- when we ran the app in a container, we needed to forward the localhost's port `8111` _into_ the container using `docker container run -d -p 8111:8111 -t stijnh/hi`
+- when we run the app in a container in a pod, we need to do what?
+
+We could forward ports via `kubectl` as well, but that would be mostly be for
+debugging. We'll defer to answering this question to the next section where
+we'll talk about how to expose your pods to other pods. For now, I'll just show how you can check the logs of that pod:
+
+```
+$ kubectl logs hi-pod
+hi: listening on port 8111 of host hi-pod
+```
+
+That's indeed what the app logs. Note that the host is listed as `hi-pod` which
+corresponds to the name of the pod.
+
+TODO: describe the pod
+
+TODO: draw a picture with cluster, node, pod
+
 
 ### Deployment
+
+TODO: show how to get multiple pods
 
 # Conclusion
 
