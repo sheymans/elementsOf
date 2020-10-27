@@ -245,9 +245,29 @@ hi: listening on port 8111 of host hi-pod
 That's indeed what the app logs. Note that the host is listed as `hi-pod` which
 corresponds to the name of the pod.
 
-TODO: describe the pod
 
-TODO: draw a picture with cluster, node, pod
+You can more details on your pod by doing a `describe`:
+
+```shell
+$ kubectl describe pod hi-pod
+```
+
+There will be a lot of output, but interesting is for example the last section:
+
+```shell
+Events:
+  Type    Reason     Age        From               Message
+  ----    ------     ----       ----               -------
+  Normal  Scheduled  <unknown>  default-scheduler  Successfully assigned default/hi-pod to minikube
+  Normal  Pulling    23h        kubelet, minikube  Pulling image "stijnh/hi"
+  Normal  Pulled     23h        kubelet, minikube  Successfully pulled image "stijnh/hi"
+  Normal  Created    23h        kubelet, minikube  Created container hi
+  Normal  Started    23h        kubelet, minikube  Started container hi
+```
+
+You'll see the container image `stijnh/hi` being pulled and then the container being created. Summarizing this with a picture, we have our container image, deployed in a pod on 1 node:
+
+![Running 1 pod on your laptop](./diagrams/pod.svg)
 
 
 ### Deployment
