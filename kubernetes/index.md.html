@@ -272,7 +272,115 @@ You'll see the container image `stijnh/hi` being pulled and then the container b
 
 ### Deployment
 
-TODO: show how to get multiple pods
+Now that we have 1 instance of your application running (on 1 pod, in 1
+container). We indicated as a requirement that _your application to be able to
+serve traffic you have, which runs into the 1000s of request per second_ and
+turns out 1 instance of your application is not able to do that. Assume each
+application can serve 250 requests per second, and we need to be able to serve
+1000 in total. Hence, we need 4 instances of the application running.
+
+''OK, let me run 4 containers of my application'', you say. "yes, but no" I
+reply. The unit of operation when your application is managed by k8s is a pod,
+so we'll want 4 pods (each in turn running 1 container).
+
+There's a kunbernetes resource type (the first one we met was a `Pod`) that
+allows you to specify how many pods k8s should be keeping around: a
+[`Deployment`](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/). 
+
+So that will be the core functionality of a `Deployment` that I'm interested
+in at this point, specify how many of a certain pod I'd like around. As with
+pods, deployments are specified using YAML manifests and the line that will get
+me my 4 pods is:
+
+```
+spec:
+  replicas: 3
+```
+
+Glad to see you're awake Grashopper, yeah 4 of course:
+
+```
+replicas: 4
+```
+
+How will you describe of _which pod you want 4 replicas off_. Kubernetes uses
+_labels_ to match these. Essentially, you make sure your pods are labeled, and
+then you indicate in your `Deployment` what pods you're describing. An example
+of a label is `app=hi`, another could be `tier=dev`, or `color=blue`. The
+latter is obviously no good, `color=yellow` would be better. Labels are
+so-called key/value pairs, and you can have multiple different labels on a pod
+(but you could not have 2 labels with the same _key_: so `color=blue` and
+`color=yellow` would not be work.
+
+On the `Deployment` side, you'd then say I want 3 replicas of all pods matching
+_these labels_. For example, you'd indicate that you want all pods with label
+`app=hi`:
+
+```
+spec:
+  selector:
+    matchLabels:
+      app: hi
+```
+
+Easy enough. "But but, we did not give our pod this label, so there'd be
+nothing to find". Yes, The final piece of such a `Deployment` would be to see
+what kind of pods you want to create, a so-called _pod template_:
+
+```
+spec:
+  template:
+    metadata:
+      labels:
+        app: hi
+    spec:
+      containers:
+      - image: stijnh/hi
+	name: hi
+        ports:
+          - containerPort: 8111
+```
+
+The latter looks exactly like our pod definition earlier, except that it seems
+to also specify that the pod needs to have a label `app=hi` as metadata. Yes,
+indeed! In fact, now that have a deployment you can forget all about that
+initial pod definition. This `Deployment` knows all it needs to know to create
+your 3 pods.  Let's put it all together:
+
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hi-deployment
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: hi
+  template:
+    metadata:
+      labels:
+        app: hi
+    spec:
+      containers:
+        - image: stijnh/hi
+          name: hi
+          ports:
+            - containerPort: 8111
+```
+
+TODO: go over the above and then do it using a `create` and then a `get pods --show-labels` to show the pods.
+
+
+TODO: delete a pod, see it come back
+
+
+TODO: show the deployment resource and show that underlying there is a replicaset
+
+TODO: draw it
+
+TODO: note how we referred to 4 instances of the applciation. we did not talk about number of nodes.
+
 
 # Conclusion
 

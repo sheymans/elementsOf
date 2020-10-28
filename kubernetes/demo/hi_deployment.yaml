@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hi-deployment
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: hi
+  template:
+    metadata:
+      labels:
+        app: hi
+    spec:
+      containers:
+        - image: stijnh/hi
+          name: hi
+          ports:
+            - containerPort: 8111
