@@ -369,13 +369,113 @@ spec:
             - containerPort: 8111
 ```
 
-TODO: go over the above and then do it using a `create` and then a `get pods --show-labels` to show the pods.
+It describes a `Deployment` with name `hi-deployment`. It specifies that at all
+times there need to be 4 replicas of a `Pod` matching `app=hi`. The `template`
+indicates how the `Deployment` will go about creating new pods:, it will run
+the container `stijnh/hi` and it will label the pod with `app=hi`. The latter
+is important as this ensures that the just created Pod would be indeed managed
+by the `Deployment`: imagine if we would just a create a `Pod` with label
+`app=yo`, the `Deployment` would never think it reached 4 replicas of pods with
+label `app=hi` so it'd keep on creating pods.
+
+Before we try this `Deployment`, delete all resources you have so far, and check after that you have 0 pods running:
+
+```
+kubectl delete all --all
+kubectl get pods
+```
+
+Now, create a deployment using the usual `create` based on the above YAML (`hi-deployment.yaml`):
+
+```
+kubectl create -f hi-deploymnet.yaml
+```
+
+And then watch the magic:
+
+```
+$ kubectl get pods
+NAME                             READY   STATUS              RESTARTS   AGE
+hi-deployment-5f7b895fd9-5hb5h   0/1     ContainerCreating   0          3s
+hi-deployment-5f7b895fd9-dt8kf   0/1     ContainerCreating   0          3s
+hi-deployment-5f7b895fd9-r58kc   0/1     ContainerCreating   0          3s
+hi-deployment-5f7b895fd9-wgwpp   0/1     ContainerCreating   0          3s
+```
+
+Note the `STATUS`, and then a couple of seconds later:
+
+```
+$ kubectl get pods
+NAME                             READY   STATUS    RESTARTS   AGE
+hi-deployment-5f7b895fd9-5hb5h   1/1     Running   0          8s
+hi-deployment-5f7b895fd9-dt8kf   1/1     Running   0          8s
+hi-deployment-5f7b895fd9-r58kc   1/1     Running   0          8s
+hi-deployment-5f7b895fd9-wgwpp   1/1     Running   0          8s
+```
+
+You just specified in 1 lousy file to bring up 4 instances of your app and here
+we are. Let's verify that these pods have indeed the label `app=hi` so they're
+under management of the `Deployment`:
+
+```
+$ kubectl get pods --show-labels
+NAME                             READY   STATUS    RESTARTS   AGE     LABELS
+hi-deployment-5f7b895fd9-5hb5h   1/1     Running   0          2m40s   app=hi,pod-template-hash=5f7b895fd9
+hi-deployment-5f7b895fd9-dt8kf   1/1     Running   0          2m40s   app=hi,pod-template-hash=5f7b895fd9
+hi-deployment-5f7b895fd9-r58kc   1/1     Running   0          2m40s   app=hi,pod-template-hash=5f7b895fd9
+hi-deployment-5f7b895fd9-wgwpp   1/1     Running   0          2m40s   app=hi,pod-template-hash=5f7b895fd9
+```
+
+Yep, there we have it, `app=hi`. We said the Deployment specifies that at all
+times there needs to be 4 replicas. So what if we delete one?  For example,
+delete the first pod:
+
+```
+$ kubectl delete pod hi-deployment-5f7b895fd9-5hb5h
+```
+
+Then check your pods, with label `app=hi` (you can use the `-l` flag to specify to only see pods with that label):
+
+```
+$ kubectl get pods -l app=hi
+NAME                             READY   STATUS    RESTARTS   AGE
+hi-deployment-5f7b895fd9-dt8kf   1/1     Running   0          6m6s
+hi-deployment-5f7b895fd9-h7mz7   1/1     Running   0          82s
+hi-deployment-5f7b895fd9-r58kc   1/1     Running   0          6m6s
+hi-deployment-5f7b895fd9-wgwpp   1/1     Running   0          6m6s
+```
+
+Still 4 pods! But if you look at the `NAME`s you'll see that
+`hi-deployment-5f7b895fd9-5hb5h` is indeed gone, and replaced by the new pod
+`hi-deployment-5f7b895fd9-dt8kf`. The `Deployment` indeed guaranteed that 4
+replicas are running at all times. The Zombie Apocalypse is nigh.
+
+You have those 4 pods running, but you can also get more info on the `Deployment` resources running right now as well:
+
+```
+$ kubectl get deployment
+NAME            READY   UP-TO-DATE   AVAILABLE   AGE
+hi-deployment   4/4     4            4           8m48s
+```
+
+Note that it indicates that `4` out `4` pods are ready. In this article, I'll
+stay at the abstraction of `Deployment` and `Pods` but if you do the following,
+you'll see that there's something called a
+[`ReplicaSet`](https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/)
+created as well:
+
+```
+$ kubectl get replicaset
+NAME                       DESIRED   CURRENT   READY   AGE
+hi-deployment-5f7b895fd9   4         4         4       10m
+```
+
+It's actually this `ReplicaSet` that is created by the `Deployment` that makes
+sure that the replicas are kept to `4` (see the `DESIRED` column). The
+`Deployment` does not create the pods directly. I'll not go into more detail
+around `ReplicaSet`s as you'll usually not deal with them directly.
 
 
-TODO: delete a pod, see it come back
-
-
-TODO: show the deployment resource and show that underlying there is a replicaset
 
 TODO: draw it
 
