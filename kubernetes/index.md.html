@@ -475,12 +475,28 @@ sure that the replicas are kept to `4` (see the `DESIRED` column). The
 `Deployment` does not create the pods directly. I'll not go into more detail
 around `ReplicaSet`s as you'll usually not deal with them directly.
 
+![Running A Deployment on laptop](./diagrams/deployment.svg)
+
+Note how we referred explicitly to 4 instances of the application, not 4 nodes.
+The 4 pods running the containers are all running on the same node in your
+example. Of course, in reality, you'll have more than 1 node to run your
+application, and your application instances may have been scheduled on
+different nodes to accomoadate for, for example, CPU requirements your
+application needs: you may want to run 100 instances, but your node is a
+machine that could not run 100 instances, you may need 10 nodes.  
+
+# Clients for Your Application
+
+Recall the 2nd requirement we listed in the Introduction:
+
+!!!
+   Clients of your application will want to connect to one address, requests
+   will be guided to different instances of your application automatically
+
+## (Internal) Clients on the Same Cluster
 
 
-TODO: draw it
-
-TODO: note how we referred to 4 instances of the applciation. we did not talk about number of nodes.
-
+## (External) Clients
 
 # Conclusion
 
