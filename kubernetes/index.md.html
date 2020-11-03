@@ -495,6 +495,32 @@ Recall the 2nd requirement we listed in the Introduction:
 
 ## (Internal) Clients on the Same Cluster
 
+Let's first consider clients that want to connect to your application with the clients on the same cluster. Why is this tricky?
+
+- Your applications runs on several pods, each pod having their own IP. For a client to connect to a pod, it needs to know the IP, but since pods are so-called _ephemeral_ (they could be removed when a node fails etc), that IP may change
+- There are multiple instances of your application running (4 in our case), so the client would need to know all 4 IPs and select one
+
+How can we avoid that a client needs to know that list of ever-changing IPs? We
+need another kubernetes resource of course: a _Service_. 
+
+A _Service_ will provide you with 1 IP and will <a
+							href="https://en.wikipedia.org/wiki/Load_balancing_(computing)">load-balance</a>
+requests to that IP by redirecting to the pods that are able to serve the
+request. As with _Deployments_ before, question is how will the Service know
+what Pods it controls? Labels! Remember that all of the pods in our current
+deployment have label `app=hi`. We can define a _Service_ that provides the IP
+and load-balancing for exactly those pods:
+
+TODO define yaml for service for hi app
+
+TODO create it, show the service via get
+
+TODO draw this abstracton (see page 123 top)
+
+TODO now highlight that this is for internal clients. how would they hit the service?
+
+TODO draw this (bottom page 125)
+
 
 ## (External) Clients
 
