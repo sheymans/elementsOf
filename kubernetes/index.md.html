@@ -509,15 +509,76 @@ requests to that IP by redirecting to the pods that are able to serve the
 request. As with _Deployments_ before, question is how will the Service know
 what Pods it controls? Labels! Remember that all of the pods in our current
 deployment have label `app=hi`. We can define a _Service_ that provides the IP
-and load-balancing for exactly those pods:
+and load-balancing for exactly those pods, create a file `hi_service.yaml`:
 
-TODO define yaml for service for hi app
+```
+apiVersion: v1
+kind: Service
+metadata:
+  name: hi-service
+spec:
+  ports:
+    - port: 80
+      targetPort: 8111
+  selector:
+    app: hi
+```
 
-TODO create it, show the service via get
+By now you're used to seeing these. So we define a service (`kind: Service`),
+we define a name for the service (`hi-servive`) and we specify that we're
+forwarding port `80` of this service to port `8111` of the contaner (if you
+scroll up, you'll see that `8111` is indeed the port our `hi` app is listening
+on). Finally, we specify using a `selector` that this service is a service
+fronting pods with label `app=hi`. 
 
-TODO draw this abstracton (see page 123 top)
+You can create the service as usual:
 
-TODO now highlight that this is for internal clients. how would they hit the service?
+```shell
+$ kubectl create -f hi_service.yaml
+```
+
+And then verify it's there:
+
+```shell
+$ kubectl get services
+NAME         TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)   AGE
+hi-service   ClusterIP   10.105.43.171   <none>        80/TCP    7s
+```
+
+Note the `CLUSTER-IP`: the servive specifies an IP local to your cluster: all
+requests to this IP (port 80, as specified) will be routed to 1 of the pods
+with label `app=hi` on port `8111`. We nowhere specified that IPs of all the
+individual pods, so we don't keep a list. One extra thing to note is that we do
+not see an `EXTERNAL-IP`. Indeed, this IP is only available to clients within
+the cluster. I'll show in the next section how to make the service available
+outside the cluster.
+
+![A Service](./diagrams/deployment.svg)
+
+From that picture, note that the deployment serves a different function than
+the service. The deployment regulates the number of replicas of the pods,
+whereas the service's purpose is to provide 1 interfacing IP for clients that routes to the IPs of the endpoints. In fact, you can see the latter by doing:
+
+```shell
+$ kubectl describe service hi-service
+Name:              hi-service
+Namespace:         default
+Labels:            <none>
+Annotations:       <none>
+Selector:          app=hi
+Type:              ClusterIP
+IP:                10.105.43.171
+Port:              <unset>  80/TCP
+TargetPort:        8111/TCP
+Endpoints:         172.18.0.6:8111,172.18.0.7:8111,172.18.0.8:8111 + 1 more...
+Session Affinity:  None
+Events:            <none>
+```
+
+Note the `Endpoints`: those are the IPs of your pods (with the port `8111` on
+which your container runs).
+
+TODO now highlight that this is for internal clients. how would they hit the service ; let's try
 
 TODO draw this (bottom page 125)
 
