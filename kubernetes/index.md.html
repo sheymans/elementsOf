@@ -578,9 +578,47 @@ Events:            <none>
 Note the `Endpoints`: those are the IPs of your pods (with the port `8111` on
 which your container runs).
 
-TODO now highlight that this is for internal clients. how would they hit the service ; let's try
+So far we've highlighted that this allows clients _from within the cluster_ to
+hit your service at your cluster IP `10.105.43.171` and be routed to the different pods. How do we test this? How
+do we get a client _from within the cluster_?
 
-TODO draw this (bottom page 125)
+One know to get _in the cluster_ is using `exec` which executes a command of your choice on a pod of your choice. So if get into a pod, we'll be clearly _in our cluster_. What command would you want to execute to test your cluster IP?
+
+You'd probably want something like `curl 10.105.43.171`, so you'd do:
+
+```shell
+$ kubectl exec hi-deployment-5f7b895fd9-dt8kf -- curl 10.105.43.171
+```
+
+Note that you picked a pod `hi-deployment-5f7b895fd9-dt8kf` by looking at
+`kubectl get pods`. The `--` separates your `kubectl` command-line arguments
+from the command you're executing (which starts with `curl..`). If you execute
+this command, you'll get an error:
+
+```
+\"curl\": executable file not found in $PATH"
+```
+
+Stepping back you'll then noticate that you based your container image on the
+small Linux image `alpine` and `curl` does not come installed with that Linux.
+What does come installed that you could use:
+[`wget`](https://en.wikipedia.org/wiki/Wget).
+
+```shell
+$ kubectl exec hi-deployment-5f7b895fd9-dt8kf -- wget -q -O - 10.105.43.171
+```
+
+Execute that a few times and see subsequent outputs:
+
+```
+Hi from hi-deployment-5f7b895fd9-r58kc
+Hi from hi-deployment-5f7b895fd9-wgwpp
+Hi from hi-deployment-5f7b895fd9-h7mz7
+```
+
+You're hitting 1 IP `10.105.43.171` but you see that it it's indeed the
+different instances of your application (on different pods) answering the call
+with those different hostnames. Magic!
 
 
 ## (External) Clients
