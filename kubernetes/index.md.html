@@ -582,7 +582,9 @@ So far we've highlighted that this allows clients _from within the cluster_ to
 hit your service at your cluster IP `10.105.43.171` and be routed to the different pods. How do we test this? How
 do we get a client _from within the cluster_?
 
-One know to get _in the cluster_ is using `exec` which executes a command of your choice on a pod of your choice. So if get into a pod, we'll be clearly _in our cluster_. What command would you want to execute to test your cluster IP?
+One way to get _in the cluster_ is using `exec` which executes a command of
+your choice on a pod of your choice. So if get into a pod, we'll be clearly _in
+our cluster_. What command would you want to execute to test your cluster IP?
 
 You'd probably want something like `curl 10.105.43.171`, so you'd do:
 
@@ -620,12 +622,32 @@ You're hitting 1 IP `10.105.43.171` but you see that it it's indeed the
 different instances of your application (on different pods) answering the call
 with those different hostnames. Magic!
 
-
 ## (External) Clients
+
+Quite some hoop-jumping happened in the previous section to access our app
+through the service, as the service's IP is local to the Cluster. In reality,
+that won't always cut it of course: you'll want external clients to have access
+to your application (like a user's browser for example).
+
+There are several ways one can accomplish this, but we'll focus on _creating an
+[Ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/)
+resource_. If the word _ingress_ throws out, check out this human
+[definition](https://www.thefreedictionary.com/ingress). There are not a lot of
+better ways to make something seem complicated, but calling an _entrance_, an
+_ingress_ is definitely one of them.
+
+TODO: show yaml for ingress, describe it in detail, do a `kubectl get ingresses`
+
+TODO: explain that you'll edit `/etc/hosts` (in real world you'd do this with your provider)
+
+TODO: now do curl or open browser at URL `hi.stijnheymans.net`
+
+TODO: explain flow with diagram
+
 
 # Conclusion
 
-We did not cover a whole bunch, such as volumes, secrets, jobs, cron jobs, etc etc
+We did not cover a whole bunch, such as volumes, secrets, jobs, cron jobs, namespaces etc etc
 
 # Endnotes
 
