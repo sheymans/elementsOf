@@ -553,7 +553,7 @@ not see an `EXTERNAL-IP`. Indeed, this IP is only available to clients within
 the cluster. I'll show in the next section how to make the service available
 outside the cluster.
 
-![A Service](./diagrams/deployment.svg)
+![A Service](./diagrams/service.svg)
 
 From that picture, note that the deployment serves a different function than
 the service. The deployment regulates the number of replicas of the pods,
@@ -636,14 +636,83 @@ resource_. If the word _ingress_ throws out, check out this human
 better ways to make something seem complicated, but calling an _entrance_, an
 _ingress_ is definitely one of them.
 
-TODO: show yaml for ingress, describe it in detail, do a `kubectl get ingresses`
+As usual create a YAML, for example, names `hi-ingress.yaml`:
 
-TODO: explain that you'll edit `/etc/hosts` (in real world you'd do this with your provider)
+```yaml
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: hi-ingress
+spec:
+  rules:
+    - host: hi.stijnheymans.net
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: hi-service
+              servicePort: 80
+```
 
-TODO: now do curl or open browser at URL `hi.stijnheymans.net`
+Analyzing this yaml specification, line by line:
 
-TODO: explain flow with diagram
+```
+kind: Ingress
+```
 
+indicates that this describes an `Ingress` k8s resource. We have the resource a name:
+
+```
+name: hi-ingress
+```
+
+And now for the interesting part. We specify a rule that indicates that we want
+`hi.stijnheymans.net/` (the root), routed to the service `hi-service` at port
+`80`. Recall from the above that we indeed defined such a service `hi-ingress`
+(and recall that that service in itself rutes requests to any of the pods that
+it serves).
+
+Alright, let's put the `Ingress` in play:
+
+```
+$ kubectl create -f hi-ingress.yaml
+```
+
+Check that it's there:
+
+```
+$ kubectl get ingresses
+NAME         CLASS    HOSTS                 ADDRESS        PORTS   AGE
+hi-ingress   <none>   hi.stijnheymans.net   192.168.64.2   80      10s
+```
+
+It's there and it's showing you an IP address that you can hit on (on your
+laptop, so an _external_ IP -- not a cluster IP): `192.168.64.2`.
+
+As you've mostly not registered `hi.stijnheymans.net`, let's trick
+[DNS](https://en.wikipedia.org/wiki/Domain_Name_System) resolution to think
+`hi.stijnheymans.net` resolves to IP `192.168.64.2`. On your laptop, edit
+`/etc/hosts` by adding the following line:
+
+
+```
+192.168.64.2 hi.stijnheymans.net
+```
+
+Now let's see the magic at work: navigate to
+[http://hi.stijnheymans.net](http://stijnheymans.net). You should see `Hi from
+hi-deployment-5f7b895fd9-zfb4m` (or something similar). Refresh like the crazy
+flower-child you are and feel the glorious greetings from different hosts be
+extended to you. This is the smell of success.
+
+Let's draw up how things flow from your enthusiastic refreshing to seeing that `Hi` message:
+
+![External Client](./diagrams/ingress.svg)
+
+We made a simplication to this diagram and left out the [Ingress
+controller](https://kubernetes.io/docs/concepts/services-networking/ingress-controllers/):
+I don't want to know, I don't need to know, and `Ingress` as a name was worse
+enough, making it also a `Controller` is just that one step too far.
 
 # Conclusion
 
