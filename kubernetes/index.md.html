@@ -714,6 +714,124 @@ controller](https://kubernetes.io/docs/concepts/services-networking/ingress-cont
 I don't want to know, I don't need to know, and `Ingress` as a name was worse
 enough, making it also a `Controller` is just that one step too far.
 
+# Push Changes without Downtime and Rollback If things go Haywire
+
+We already know the base k8s kubernetes resource that will help us tackle the next 2 requirements:
+
+!!!
+   You need to be able to push changes to your application without downtime
+
+!!!
+   You need to be able to rollback changes to your application
+
+Recall the original deployment YAML:
+
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hi-deployment
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: hi
+  template:
+    metadata:
+      labels:
+        app: hi
+    spec:
+      containers:
+        - image: stijnh/hi
+          name: hi
+          ports:
+            - containerPort: 8111
+```
+
+Say you have a 2nd version of the image `stijnh/hi` ready: `stijnh/hi:v2`. How
+can I make sure that all instances of my application are running `stijnh/hi:v2`
+instead of `stijnh/hi`.
+
+The naive answer would be the correct one: replace `stijnh/hi` in the deployment by `stijnh/hi:v2`:
+
+
+```
+        - image: stijnh/hi:v2
+```
+
+That's it. The default strategy for roll-outs that k8s `Deployment`s use is the
+so-called `RollingUpdate` strategy. With that strategy, k8s would scale down
+your replicas (4 initially) of the pods that run the old image `stijnh/hi` and
+scale up the replicas (from 0 to 4) with the new image `stijnh/hi:v2`. This
+guarantees that there's no downtime, but it would force you to make sure that
+`v2` is compatible to with the first version of your app. Indeed, the service
+will start routing requests to new _and_ old pods while we are in the
+intermediate state. This may cause problems if you for example did database
+changes and `v2` of your app is writing data in a different format than before
+and `v1` and `v2` are both reading from that data but `v1` expects the old
+format so crashes on that newly written data. Some care is usually warranted to
+avoid situations like that (for example, but making sure `v2` does not write
+the new format yet, but is able to read both the new and old format). A `v3`
+could then subsequently start writing the new format without issues.
+
+If you see no such programmatic way out, but you would be willing to take a
+small downtime, you can use the `Recreate` strategy. Your deployment would look
+as follows:
+
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hi-deployment
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: hi
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: hi
+    spec:
+      containers:
+        - image: stijnh/hi:v2
+          name: hi
+          ports:
+            - containerPort: 8111
+```
+
+This will cause k8s to take out all of your `stijnh/hi` pods and immediately
+scale up all of the new `stijnh/hi:v2`. This of course will cause a small
+downtime, or may result in a situation where while `v2` is scaling up, you do
+not have enough pods to serve your production traffic.
+
+To finish this section, some quick commands that allow you to check the deployment while it's happening:
+
+```
+kubectl rollout status deployment hi-deployment
+```
+
+If something went wrong you can execute a rollback immediately as follows:
+
+```
+kubectl rollout undo deployment hi-deployment
+```
+
+You may be used to control the rolling update: how much percentage of the old
+pods can you take out while brining in new pods with the latest version. Can
+you do that with kubernetes? Yes, you can it's called [proportional
+scaling](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#proportional-scaling).
+
+
+# Warm-up Of Your Application
+
+!!!
+   There is basic warm-up that needs to happen with your application before it
+   can start serving up requests (for example, it needs to sync its data with
+   data other instances of the application have available)
+
 # Conclusion
 
 We did not cover a whole bunch, such as volumes, secrets, jobs, cron jobs, namespaces etc etc
