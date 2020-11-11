@@ -832,6 +832,92 @@ scaling](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#p
    can start serving up requests (for example, it needs to sync its data with
    data other instances of the application have available)
 
+ When a pod gets deployed on a cluster (as part of a `Deployment` for example), it might not immediately be ready for serving traffic. For example, a web app may need some time to initialize or your app may need to pull data from S3 into memory (configuration data for example), or in a distributed setting, your app may need to reach consensus with other instances.
+ These are all situations where your service that is routing traffic to pods,
+ should not immediately route traffic to that new pod. Only when the new pod is
+ _ready_ it gets included as one of the pods that a service routes traffic to.
+
+ The way this is accomplished is through the use of a so-called _readiness
+ probe_. There are several ways to define readiness probes, but I'll focus on
+ an `HTTP GET` readiness probe: doing a `GET` to the pod will indicate, based
+ on the returned status of that `GET`, whether the pod is ready for serving
+ traffic or not.
+
+Without going into more detail, you'll add a `readinessProbe` attribute to your
+pod specification, for example, you would change the following pod:
+
+```
+apiVersion: v1
+kind: Pod
+metadata:
+  name: hi-pod
+spec:
+  containers:
+    - image: stijnh/hi
+      name: hi
+      ports:
+        - containerPort: 8111
+```
+
+to include the `readinessProbe`:
+
+
+```
+apiVersion: v1
+kind: Pod
+metadata:
+  name: hi-pod
+spec:
+  containers:
+    - image: stijnh/hi
+      name: hi
+      ports:
+        - containerPort: 8111
+      readinessProbe:
+        httpGet:
+          path: /readiness
+          port: 8888
+        initialDelaySeconds: 300
+        periodSeconds: 30
+```
+
+Once the pod is deployed, we'd wait 300 seconds (`initialDelaySecods`), and
+then every 30 seconds (`periodSeconds`), we'd do a `GET` on port 8888 of the
+container at path `/readiness`. If you that `GET` returns `200` your pod is
+ready and will be included for, for example, routing traffic to from the
+service.
+
+This of course requires that your app, defines a path `/readiness` and that it
+only returns `200` if it is truly ready. For a web app, this will naturally
+follow when the web app is up and running. If there's more complex start-up
+going on (like reaching consensus in a distributed setting), you should
+guarantee that the `/readiness` path only returns a `200` when the application
+is indeed ready.
+
+# Are you alive?
+
+!!!
+   Sometimes an instance of your application will die and stop serving
+   requests, you have not figured out why, but you want that instance of the
+   application to become invisible to clients of your application. Traffic
+   should be guided to still functioning instances of your application.
+
+Well, that requirement sounds related to the readiness requirement, doesn't it.
+In this case, one or more instances of your application died (or starting
+spewing errors and no-one knows why, but usually we just reboot the whole fleet
+_just be sure_).
+
+If that happens, we want to take the pod with the dead application out of
+rotation (it should stop being routed to by the service for example) and we'd
+attempt a restart. Similar the above `readinessProbe`, we have a concept called
+`livenessProbe`. You'd similarly define for example (for the HTTP case) a `GET`
+to a path on your app that indicates whether your app is alive. If that `GET`
+indicates it's not alive (for example, no `200` was returned), the pod gets
+taken out of rotation and a new pod is restarted.
+
+Definition of a livenes probe is similar to how we define readiness probes (see
+above, on the pod), so I'll not spend any more words on it.
+
 # Conclusion
 
 We did not cover a whole bunch, such as volumes, secrets, jobs, cron jobs, namespaces etc etc
