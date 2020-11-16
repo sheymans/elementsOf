@@ -918,6 +918,35 @@ taken out of rotation and a new pod is restarted.
 Definition of a livenes probe is similar to how we define readiness probes (see
 above, on the pod), so I'll not spend any more words on it.
 
+# Horizontal Autoscaling
+
+!!!
+   To save costs during the night when you need less capability on your application, you'll want to reuse some of your machines that the instances of application normally run on to run batch jobs for maintenance
+
+ 
+Note that this does not talk about getting rid of actual machines/nodes: it
+just indicates there are periods that I'll want to downscale the pods I have to
+make room on my nodes for other jobs possibly.
+
+You can schedule jobs during the night using k8s resources like [CronJobs](https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/) so that's not the interesting part of this requirement. The core of what I'm interested in this requirement is actually:
+
+!!!
+   Can I minimize the amount of pods I need to be able to serve traffic that I need, but of course in a way that I actually am able to serve traffic.
+
+Simplified, during the day I may need 4 replicas of my application, but during
+the night I may only need 1. Rather than having all 4 replicas run all the time
+and incur costs, can I scale down to the amount of replicas I _need_ and scale
+back up similarly?
+
+This question leads first to another question of course: what does _I need_
+mean. When should I scale up or down? Well, you can specify that. You could
+specify that based on CPU usage (if average CPU usage goes above a threshold,
+say 80% for a certain amount of time, spin up extra pods so that that average
+will go down again), but you can have other _metrics_ as well. Here I'll talk
+about "transactions per second" (TPS). 
+
+TODO: see https://medium.com/better-programming/how-to-scale-kubernetes-applications-using-custom-metrics-6cf02571c5e4
+
 # Conclusion
 
 We did not cover a whole bunch, such as volumes, secrets, jobs, cron jobs, namespaces etc etc
