@@ -943,13 +943,160 @@ mean. When should I scale up or down? Well, you can specify that. You could
 specify that based on CPU usage (if average CPU usage goes above a threshold,
 say 80% for a certain amount of time, spin up extra pods so that that average
 will go down again), but you can have other _metrics_ as well. Here I'll talk
-about "transactions per second" (TPS). 
+about "transactions per second" (TPS).
 
-TODO: see https://medium.com/better-programming/how-to-scale-kubernetes-applications-using-custom-metrics-6cf02571c5e4
+Let's start with the snippet that would indicate that each pod can handle about
+200 requests per second:
+
+```
+metric:
+  name: transactions-per-second
+describedObject:
+  apiVersion: networking.k8s.io/v1beta1
+  kind: Ingress
+  name: hi-ingress
+target:
+  type: AverageValue
+  value: 200
+```
+
+Analyzing this line-by-line:
+
+```
+metric:
+  name: transactions-per-second
+```
+
+gives the metric the name `transactions-per-second`, could be `leonardo dicaprio` for all we care. 
+
+```
+describedObject:
+  apiVersion: networking.k8s.io/v1beta1
+  kind: Ingress
+  name: hi-ingress
+```
+
+indicates the object we're describing, in this we're describing our `Ingress`
+`hi-ingress`. Recall that the Ingress is thing that makes our service available
+externally. Indeed, rather than describing the traffic on the Pod directly, we just indicate that we'll be referring to the external facing part of our service. 
+
+```
+target:
+  type: AverageValue
+  value: 200
+```
+
+then indicates that the `Ingress` should _on average_ be sending 200 requests to each of the pods.
+
+Alright, what should happen when we go over those `200` average requests to the
+pods: we should scale up the amount of pods. Is there a limit to scaling up the
+pods? Yes, there is. It would indicated when you're defining your so-called
+[`HorizontalPodAutoscaler`](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/)
+(HPA). Write the spec up in a YAML `hi-hpa.yaml`:
+
+```
+apiVersion: autoscaling/v2beta2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: hi-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: hi-deployment
+  minReplicas: 1
+  maxReplicas: 5
+  metrics:
+    - type: Object
+      object:
+        metric:
+          name: transactions-per-second
+        describedObject:
+          apiVersion: networking.k8s.io/v1beta1
+          kind: Ingress
+          name: hi-ingress
+        target:
+          type: AverageValue
+          value: 200
+```
+
+You'll see the `metric` appear that we just appeared. In addition:
+
+```
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: hi-deployment
+```
+
+it refers to our `hi-deployment`. Recall that it is this deployment that tells
+k8s what pods look like (and by default makes sure there are 4 pods with the
+right labels). You also see 
+
+```
+  minReplicas: 1
+  maxReplicas: 5
+```
+
+Whereas the default is `4` pods, the HPA may scale you down to 1 pod or scale
+you up to 5 pods until we hit the target of `200` transactions on average on
+the `Ingress`.
+
+Wow, and that's all there is too it. Re-read the last _the HPA may scale you
+down..._ and cherish the way you've traveled since starting to read this
+article. 
+
+Try it out as usual with:
+
+```
+$ kubectl create -f hi-hpa.yaml
+```
+
+# Autoscale the cluster
+
+!!!
+   You will have regular events during which the amount of machines to serve
+   your traffic will not be enough, so you'll want to scale up the amount of
+   machines you have available for your cluster. After the event, you'll want
+   to get back to normal and scale down.
+
+The HPA we just saw will help you increase and decrease pods on your cluster,
+making up space for other applications/batch processes to run on your cluster,
+and saving costs in general. However, it will not do anything about the actual
+physical nodes in your cluster. You could be having a cluster of 100 nodes with
+1 pod running on one of them. Hardly an efficient deal.  Or vice versa, say
+your traffic is exploding: trying to scale up from 1 to 100 pods on 1 available
+node in your cluster, will lead to nothing but disaster.
+
+In both cases, you'd want to decrease or increase the actual nodes in your
+cluster. We're now solidly in the realm of someone more knowledgeable than me,
+but I'll give it a desperate attempt. Kubernetes has the concept of a [Cluster
+Autoscaler](https://github.com/kubernetes/autoscaler/tree/master/cluster-autoscaler).
+When configured for your cluster, it'll make sure nodes are spun up or down
+given the requirements of the pods running on it. For example, if the HPA
+determines, I need 1000 more pods to be able to meet this `200` average
+transpactions per second, your cluster would be spinning these up for you.
+Configuration of the cluster depends on cluster provider, so see
+[here](https://github.com/kubernetes/autoscaler/tree/master/cluster-autoscaler)
+for details.
+
+One thing to take into account and nicely explained in [this autoscaling
+article](https://www.cncf.io/blog/2019/10/29/kubernetes-autoscaling-101-cluster-autoscaler-horizontal-autoscaler-and-vertical-pod-autoscaler/)
+is that scaling up the cluster will take more time than scaling up the pods as
+scaling the cluster will require you to ask your cluster provider for actual
+physical instances/nodes.
 
 # Conclusion
 
-We did not cover a whole bunch, such as volumes, secrets, jobs, cron jobs, namespaces etc etc
+I tried to give you an elemental overview of the problems kubernetes is solving for you. As usual, I've not talked about a 1000 other topics, 
+such as [volumes](https://kubernetes.io/docs/concepts/storage/volumes/),
+[secrets](https://kubernetes.io/docs/concepts/configuration/secret/),
+[jobs](https://kubernetes.io/docs/concepts/workloads/controllers/job/), [cron
+jobs](https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/),
+[namespaces](https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/),... 
+As mentioned before, the book [Kubernetes in
+Action](https://www.goodreads.com/book/show/34013922-kubernetes-in-action) by
+Marko Lukša, or the internet itself, if it obliges, will answer all your further questions.
 
 # Endnotes
 
