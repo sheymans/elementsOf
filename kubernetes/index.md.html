@@ -23,7 +23,7 @@ have on this application before you will be able to put it in production:
 
 In comes Kubernetes (we will refer to _Kubernetes_ by its common abbreviation
 of _k8s_ -- pronounced _kates_). While Kubernetes is massive hammer, it does
-hammer the above problems squarely away. I dispariginaly say _hammer_ as it
+hammer the above problems squarely away. I disparagingly say _hammer_ as it
 indeed is able to do more than what you'd need. Its historic origin play a role
 in that as used by a Cloud Provider in which many different applications run on
 the same host of machines and they'd want to optimize usage of infrastructure.
@@ -88,7 +88,7 @@ machine_).
 
 We have 1 instance of our app running, but now you'll have thousands of users
 saying hi, so you can't have only 1 instance -- that will not fit your
-megalomanic dreams!  We need more! We need at least 3!
+megalomaniac dreams!  We need more! We need at least 3!
 
 But first we need to define a bit better of what we need 3. We clearly need 3
 containers (each container runs our app). As this is example is illustrating a
@@ -283,7 +283,7 @@ application can serve 250 requests per second, and we need to be able to serve
 reply. The unit of operation when your application is managed by k8s is a pod,
 so we'll want 4 pods (each in turn running 1 container).
 
-There's a kunbernetes resource type (the first one we met was a `Pod`) that
+There's a kubernetes resource type (the first one we met was a `Pod`) that
 allows you to specify how many pods k8s should be keeping around: a
 [`Deployment`](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/). 
 
@@ -297,7 +297,7 @@ spec:
   replicas: 3
 ```
 
-Glad to see you're awake Grashopper, yeah 4 of course:
+Glad to see you're awake Grasshopper, yeah 4 of course:
 
 ```
 replicas: 4
@@ -323,7 +323,7 @@ spec:
       app: hi
 ```
 
-Easy enough. "But but, we did not give our pod this label, so there'd be
+Easy enough. "But but, we did not give our pod this label, so there's be
 nothing to find". Yes, The final piece of such a `Deployment` would be to see
 what kind of pods you want to create, a so-called _pod template_:
 
@@ -388,7 +388,7 @@ kubectl get pods
 Now, create a deployment using the usual `create` based on the above YAML (`hi-deployment.yaml`):
 
 ```
-kubectl create -f hi-deploymnet.yaml
+kubectl create -f hi-deployment.yaml
 ```
 
 And then watch the magic:
@@ -481,7 +481,7 @@ Note how we referred explicitly to 4 instances of the application, not 4 nodes.
 The 4 pods running the containers are all running on the same node in your
 example. Of course, in reality, you'll have more than 1 node to run your
 application, and your application instances may have been scheduled on
-different nodes to accomoadate for, for example, CPU requirements your
+different nodes to accommodate for, for example, CPU requirements your
 application needs: you may want to run 100 instances, but your node is a
 machine that could not run 100 instances, you may need 10 nodes.  
 
@@ -525,8 +525,8 @@ spec:
 ```
 
 By now you're used to seeing these. So we define a service (`kind: Service`),
-we define a name for the service (`hi-servive`) and we specify that we're
-forwarding port `80` of this service to port `8111` of the contaner (if you
+we define a name for the service (`hi-service`) and we specify that we're
+forwarding port `80` of this service to port `8111` of the container (if you
 scroll up, you'll see that `8111` is indeed the port our `hi` app is listening
 on). Finally, we specify using a `selector` that this service is a service
 fronting pods with label `app=hi`. 
@@ -545,7 +545,7 @@ NAME         TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)   AGE
 hi-service   ClusterIP   10.105.43.171   <none>        80/TCP    7s
 ```
 
-Note the `CLUSTER-IP`: the servive specifies an IP local to your cluster: all
+Note the `CLUSTER-IP`: the service specifies an IP local to your cluster: all
 requests to this IP (port 80, as specified) will be routed to 1 of the pods
 with label `app=hi` on port `8111`. We nowhere specified that IPs of all the
 individual pods, so we don't keep a list. One extra thing to note is that we do
@@ -601,7 +601,7 @@ this command, you'll get an error:
 \"curl\": executable file not found in $PATH"
 ```
 
-Stepping back you'll then noticate that you based your container image on the
+Stepping back you'll then notice that you based your container image on the
 small Linux image `alpine` and `curl` does not come installed with that Linux.
 What does come installed that you could use:
 [`wget`](https://en.wikipedia.org/wiki/Wget).
@@ -669,7 +669,7 @@ name: hi-ingress
 And now for the interesting part. We specify a rule that indicates that we want
 `hi.stijnheymans.net/` (the root), routed to the service `hi-service` at port
 `80`. Recall from the above that we indeed defined such a service `hi-ingress`
-(and recall that that service in itself rutes requests to any of the pods that
+(and recall that that service in itself routes requests to any of the pods that
 it serves).
 
 Alright, let's put the `Ingress` in play:
@@ -709,7 +709,7 @@ Let's draw up how things flow from your enthusiastic refreshing to seeing that `
 
 ![External Client](./diagrams/ingress.svg)
 
-We made a simplication to this diagram and left out the [Ingress
+We made a simplification to this diagram and left out the [Ingress
 controller](https://kubernetes.io/docs/concepts/services-networking/ingress-controllers/):
 I don't want to know, I don't need to know, and `Ingress` as a name was worse
 enough, making it also a `Controller` is just that one step too far.
@@ -820,7 +820,7 @@ kubectl rollout undo deployment hi-deployment
 ```
 
 You may be used to control the rolling update: how much percentage of the old
-pods can you take out while brining in new pods with the latest version. Can
+pods can you take out while bringing in new pods with the latest version. Can
 you do that with kubernetes? Yes, you can it's called [proportional
 scaling](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#proportional-scaling).
 
@@ -915,7 +915,7 @@ to a path on your app that indicates whether your app is alive. If that `GET`
 indicates it's not alive (for example, no `200` was returned), the pod gets
 taken out of rotation and a new pod is restarted.
 
-Definition of a livenes probe is similar to how we define readiness probes (see
+Definition of a liveness probe is similar to how we define readiness probes (see
 above, on the pod), so I'll not spend any more words on it.
 
 # Horizontal Autoscaling
@@ -1075,7 +1075,7 @@ Autoscaler](https://github.com/kubernetes/autoscaler/tree/master/cluster-autosca
 When configured for your cluster, it'll make sure nodes are spun up or down
 given the requirements of the pods running on it. For example, if the HPA
 determines, I need 1000 more pods to be able to meet this `200` average
-transpactions per second, your cluster would be spinning these up for you.
+transactions per second, your cluster would be spinning these up for you.
 Configuration of the cluster depends on cluster provider, so see
 [here](https://github.com/kubernetes/autoscaler/tree/master/cluster-autoscaler)
 for details.
