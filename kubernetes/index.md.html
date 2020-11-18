@@ -5,15 +5,21 @@
 
 # Introduction
 
-I'll go over what I think are the elements of a kubernetes _from an application
-developer's perspective_. A certain familiarity with deploying applications in
-a production environment is expected (if you can imagine what things like
-_downtime_, _rollback_, _production_ mean, you should be OK).  I'll do this by
-assuming you have an application and there are a couple of requirements you
-have on this application before you will be able to put it in production:
+In this article, I will go over the elements of kubernetes _from an application
+developer's perspective_. Familiarity with deploying applications in
+a production environment is expected[^familiarity].
 
-- You need to run many instances of your application to be able to serve traffic you have, which runs into the 1000s of request per second,
-- Clients of your application will want to connect to one address, requests will be guided to different instances of your application automatically
+
+Rather than explaining kubernetes from the ground-up and building a pie in the
+sky, I'll introduce kubernetes as something that provides solutions for
+problems you are encountering in high-traffic production
+environments right now:
+
+- Your application needs to serve 1000s of requests per second so you will need many instances of the application running
+- Clients of your application need to connect to one IP address and requests will be guided to those different instances of your application automatically
+
+XXXRev1
+
 - You need to be able to push changes to your application without downtime
 - You need to be able to rollback changes to your application
 - There is basic warm-up that needs to happen with your application before it can start serving up requests (for example, it needs to sync its data with data other instances of the application have available)
@@ -41,6 +47,9 @@ here). I'll stick to what I know which is application development and what I
 need to run an application in production satisfying the above requirements.
 
 # Your Application and Running Many Instances of It
+
+!!!
+   Your application needs to serve 1000s of requests per second so you will need many instances of the application running
 
 ## A Containerized Application
 
@@ -490,8 +499,7 @@ machine that could not run 100 instances, you may need 10 nodes.
 Recall the 2nd requirement we listed in the Introduction:
 
 !!!
-   Clients of your application will want to connect to one address, requests
-   will be guided to different instances of your application automatically
+   Clients of your application need to connect to one IP address and requests will be guided to those different instances of your application automatically
 
 ## (Internal) Clients on the Same Cluster
 
@@ -1100,7 +1108,10 @@ Marko Lukša, or the internet itself, if it obliges, will answer all your furthe
 
 # Endnotes
 
+[^familiarity]: If you can imagine what things like _downtime_, _rollback_, _production_, _client_, and _IP address_ mean, you're OK.
+
 [^sidecar]: We often refer to containers that always run alongside your _main_ container as _sidecars_ for obvious non-inspired reasons.
+
 
 <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-12447521-1"></script>
