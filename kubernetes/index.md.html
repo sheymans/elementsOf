@@ -52,25 +52,26 @@ barely touch on here). In this article, I'll mostly stick to what I know which
 is application development and we'll go over every single one of the
 problems/requirements and discuss how k8s helps solving them.
 
-XXRev1
 
-# Your Application and Running Many Instances of It
+# Instances of your Application
 
 !!!
    Your application needs to serve 1000s of requests per second so you will need many instances of the application running
 
 ## A Containerized Application
 
-For the application, I'll be running a simple web server that serves up the
-sentence `Hi from HOST` where `HOST` will be the host it is running from. We're
-in a brave new world, so this application has been packed up such that it can
-run as a Docker container.
+As an example application, I'll run a web server that serves up the sentence
 
-I've posted the source of this application on
+```
+Hi from HOST
+``` 
+
+where `HOST` will be the host the application is running on.  We're in a brave
+new world, so this application is packed up so it can run as a Docker
+container.  I posted the source of this application on
 [github](https://github.com/sheymans/elementsOf/tree/master/kubernetes/demo/hi_app)
-and I've pushed the container image to the [Docker
-Hub](https://hub.docker.com/) with name
-[stijnh/hi_app](https://hub.docker.com/repository/docker/stijnh/hi).
+and I pushed the container image to the [Docker Hub](https://hub.docker.com/)
+with name [stijnh/hi_app](https://hub.docker.com/r/stijnh/hi).
 
 If at this point, you feel slightly lost and it's related to this article, this
 may be a good time to take a break from this article and read up on the
@@ -90,45 +91,51 @@ port 8111 (on your laptop) to port `8111` on your docker container behind which
 your app is running, `-t stijnh/hi` indicates the image you're using to get
 the container from.
 
-At this point you can open your browser, and navigating to `localhost:8111`
-should show you `Hi from fbd698569ec5` where `fbd698569ec5` will be different
-of course for you as this the container's hostname.
+Open your browser and navigate to `localhost:8111`. You will see 
 
-Alright, at this point, I'll refer to this state as "you have 1 app
-instance running". It's running as a container on your laptop. Your laptop in
-this sense is the _machine_ (or if you feel like a rockstar, you're _bare metal
-machine_).
+```
+Hi from fbd698569ec5
+```
 
-## Running Many Instances of It
+where `fbd698569ec5` will be different for you as this
+is the container's hostname.
+
+At this point you have _1 instance of your application running_. It does so as
+a container on your laptop, presuming you're following along on your laptop.
+Your laptop is the _machine_ (or for people that like their terms like their sunsets,  _with drama_,
+your _bare metal machine_).
+
+## Multiple Instances of your Application
 
 ### Pod
 
-We have 1 instance of our app running, but now you'll have thousands of users
-saying hi, so you can't have only 1 instance -- that will not fit your
-megalomaniac dreams!  We need more! We need at least 3!
+We have 1 instance of our app running, but you'll have thousands of users that
+you need to say hi to, so you can't have only 1 instance -- that will not fit
+your megalomaniac dreams!  We need more instances! We need at least 3!
 
-But first we need to define a bit better of what we need 3. We clearly need 3
-containers (each container runs our app). As this is example is illustrating a
-couple of elements of k8s, we've not mentioned real-world things like
-logging. Typically, your application will be writing logs, and you'll need
-something to _rotate_ these logs away to more permanent storage (to [AWS's S3](https://aws.amazon.com/s3/)
+But first we need to define a bit better what we need 3 of. If we need 3
+instances of our application, we clearly need 3 containers (each container runs
+our app). As this is example is illustrating a couple of elements of k8s, I've
+not mentioned other real-world requirements like logging. Typically, your
+application will be writing logs, and you'll need something to _rotate_ these
+logs away to more permanent storage (to [AWS's S3](https://aws.amazon.com/s3/)
 for example, where you could query it using
-[Athena](https://aws.amazon.com/athena/)). We'd want this log writing in a
-separate container (other apps could use it as well so it's not typical for
-this app alone). You'd want these 2 containers always running
+[Athena](https://aws.amazon.com/athena/)). We'd want this process of log
+rotating in a separate container (other apps could use it as well so it's not
+typical for this app alone). You'd want these 2 containers always running
 together[^sidecar], so if I say I want 3 instances of my app, I actually want 3
 instances of my app with the logging container. Hence, the first level of
-abstraction -- the base unit it deals with -- is _not_ a container, it's
-something called a _pod_ in k8s. So let's do some more wrapping, and
-wrap that container into a _Pod_ manifest[^manifest] that describes what the
-pod should look like. If you recall `Dockerfile`s, then this is similar in
-philosophy: in a `Dockerfile` you describe your app so that `docker` knows how
-to build an image, in a _Pod_ manifest you describe what all goes in your
-_Pod_, most importantly what container image to use such k8s knows how to
-create a Pod.
+abstraction -- the base unit k8s deals with -- is _not_ a container, it's
+something called a _pod_. So let's do some more wrapping, and wrap that
+container into a _Pod_ manifest[^manifest] that describes what the pod should
+look like. If you recall `Dockerfile`s, then this is similar in philosophy: in
+a `Dockerfile` you describe your app so that `docker` knows how to build an
+image, in a _Pod_ manifest you describe what all goes in your _Pod_, most
+importantly what container images to use such k8s knows how to create a Pod out
+of several containers.
 
-Pods are usually defined in [YAML](https://en.wikipedia.org/wiki/YAML) files,
-so let's do this. I have a file `hi-pod.yaml`:
+Pods can be defined in [YAML](https://en.wikipedia.org/wiki/YAML) files, so
+I'll have a file `hi-pod.yaml`:
 
 ```yaml
 apiVersion: v1
@@ -143,9 +150,8 @@ spec:
         - containerPort: 8111
 ```
 
-which is really doing nothing more than naming my pod `hi-pod` and indicating
-that it's running the container
-[`stijnh/hi`](https://hub.docker.com/repository/docker/stijnh/hi).
+which is not doing much more than naming my pod `hi-pod` and indicating that
+it's running the container [`stijnh/hi`](https://hub.docker.com/r/stijnh/hi).
 
 Let's go over the pod definition, line by line:
 
@@ -153,26 +159,26 @@ Let's go over the pod definition, line by line:
 apiVersion: v1
 ```
 
-Indicates what API version of k8s this k8s _resource_ is defined
-in (_Pods_, together with a whole lot of other things, are named _resources_ in
-k8s), in this case `v1`. I have no memory, nor patience for remembering API
-versions, but there are [explanations of what version to use when out
+indicates what API version of k8s this k8s _resource_ is defined in (_Pods_,
+together with a whole lot of other things, are named _resources_ in k8s), in
+this case `v1`. I have no memory, nor patience, for remembering API versions,
+but there are [explanations of what version to use when out
 there](https://matthewpalmer.net/kubernetes-app-developer/articles/kubernetes-apiversion-definition-guide.html).
-
-
 
 ```
 kind: Pod
 ```
 
-The type of resource you're defining, a `Pod`.
+indicates the type of resource you're defining, a `Pod`.
+
+XXRev1
 
 ```
 metadata:
   name: hi-pod
 ```
 
-Some metadata about the pod, in this case its name `hi-pod`.
+indicates metadata about the pod, in this case its name `hi-pod`.
 
 ```
 spec:
@@ -183,7 +189,7 @@ spec:
         - containerPort: 8111
 ```
 
-The pod's specification, in this case a list of 1 container, where the
+indicates the pod's specification, in this case a list of 1 container, where the
 container is described by it's image tag `stijnh/hi`, given a name `hi`, and
 indicating that the container exposes the port `8111`.
 
