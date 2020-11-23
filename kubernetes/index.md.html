@@ -171,8 +171,6 @@ kind: Pod
 
 indicates the type of resource you're defining, a `Pod`.
 
-XXRev1
-
 ```
 metadata:
   name: hi-pod
@@ -190,7 +188,7 @@ spec:
 ```
 
 indicates the pod's specification, in this case a list of 1 container, where the
-container is described by it's image tag `stijnh/hi`, given a name `hi`, and
+container is described by its image tag `stijnh/hi`, given a name `hi`, and
 indicating that the container exposes the port `8111`.
 
 If you only remember one thing from the above, may it be that you'll see 4
@@ -202,13 +200,13 @@ With that said, can we deploy this pod now please? Yes. I'm going to assume
 you're on your laptop and have something like
 [minikube](https://github.com/kubernetes/minikube) installed. As I'm tackling
 k8s from the perspective of an application developer, I'll not get into the
-details of setting up a cluster that serves production traffic. 
+details of setting up more than a toy cluster using `minikube`.
 
-This _is_ a good time to to talk about some general k8s concepts. But first, go
+This _is_ a good time to talk about some general k8s concepts. But first, go
 check out [minikube](https://github.com/kubernetes/minikube) and install it so
-you can try out some stuff on your laptop.
+you can sing along.
 
-Once you're back (you were never gone though, were you), you might have read
+While installing `minikube`, you might have read
 that minikube will give you a _single-node cluster_. You'll hear _cluster_ a
 lot, so what is a cluster? My working definition is that it's a set of nodes.
 What's a _node_ then? Again, my working definition is _that's a machine, an EC2
@@ -228,12 +226,12 @@ minikube   Ready    master   0d   v1.18.3
 
 Your first use of `kubectl`, but not your last. `kubectl` is the command-line
 tool that will allow you to interact with your cluster asking it about its
-nodes, its pods, ...In this case, we know that we 1 node running, called
-`minikube`. This is good to keep in mind, all example we'll show later will
-involve 1 node. In reality, you'll be working with clusters that have many many
-more nodes of course.
+nodes, its pods, ...The output of the command shows that we have 1 node
+running, called `minikube`. This is good to keep in mind. All examples we'll
+show later will involve 1 node. In reality, you'll be working with clusters
+that have many many more nodes of course.
 
-Alright, we have a cluster with 1 node. We have our `hi` app, tucked away in a
+We have a cluster with 1 node. We have our `hi` app, tucked away in a
 container, and we defined a pod that is supposed to run that container. Let's
 deploy that pod using `kubectl`:
 
@@ -252,13 +250,14 @@ hi-pod   1/1     Running   0          54s
 
 This shows us that the pod is `Running` and has been doing so for `54s`. Note the levels of indirection: 
 
-- when we ran the app `hi.js` we could just navigate to `localhost:8111` and see the `Hi from...`
+- when we ran the app `hi.js` on our laptop we could just navigate to `localhost:8111` and see the `Hi from...`
 - when we ran the app in a container, we needed to forward the localhost's port `8111` _into_ the container using `docker container run -d -p 8111:8111 -t stijnh/hi`
 - when we run the app in a container in a pod, we need to do what?
 
-We could forward ports via `kubectl` as well, but that would be mostly be for
-debugging. We'll defer to answering this question to the next section where
-we'll talk about how to expose your pods to other pods. For now, I'll just show how you can check the logs of that pod:
+I could forward the port via `kubectl` as well, but that would mostly be for
+debugging. I'll defer to answering this question to the next section where I'll
+talk about how to make your pod visible to other pods. For now, I'll show how
+you can check the logs of that pod:
 
 ```
 $ kubectl logs hi-pod
@@ -266,10 +265,9 @@ hi: listening on port 8111 of host hi-pod
 ```
 
 That's indeed what the app logs. Note that the host is listed as `hi-pod` which
-corresponds to the name of the pod.
+corresponds to the name we gave the pod in `hi-pod.yaml`.
 
-
-You can more details on your pod by doing a `describe`:
+You can see more details for your pod by doing a `describe`:
 
 ```shell
 $ kubectl describe pod hi-pod
@@ -288,32 +286,36 @@ Events:
   Normal  Started    23h        kubelet, minikube  Started container hi
 ```
 
-You'll see the container image `stijnh/hi` being pulled and then the container being created. Summarizing this with a picture, we have our container image, deployed in a pod on 1 node:
+You'll see the container image `stijnh/hi` being pulled and then the container
+being created. Summarizing the current state with a picture, you see the
+container image `stijnh/hi`, deployed on a pod `hi-pod` on 1 node (your laptop):
 
 ![Running 1 pod on your laptop](./diagrams/pod.svg)
 
 
 ### Deployment
 
-Now that we have 1 instance of your application running (on 1 pod, in 1
-container). We indicated as a requirement that _your application to be able to
-serve traffic you have, which runs into the 1000s of request per second_ and
-turns out 1 instance of your application is not able to do that. Assume each
-application can serve 250 requests per second, and we need to be able to serve
-1000 in total. Hence, we need 4 instances of the application running.
+We now have 1 instance of your application running (in 1 container, on 1 pod).
+Recall that I indicated as a requirement that _your application needs to serve
+1000s of requests per second_ and turns out 1 instance of your application is
+not able to do that. Assume each application can serve 250 requests per second,
+and we need to be able to serve 1000 in total. Doing that math without
+hesitation and with elegance, I calculated that we need 4 instances of the
+application running.
 
 ''OK, let me run 4 containers of my application'', you say. "yes, but no" I
 reply. The unit of operation when your application is managed by k8s is a pod,
 so we'll want 4 pods (each in turn running 1 container).
 
 There's a k8s resource type (the first one we met was a `Pod`) that
-allows you to specify how many pods k8s should be keeping around: a
+allows you to specify how many pods k8s should keep around: a
 [`Deployment`](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/). 
 
-So that will be the core functionality of a `Deployment` that I'm interested
-in at this point, specify how many of a certain pod I'd like around. As with
-pods, deployments are specified using YAML manifests and the line that will get
-me my 4 pods is:
+Specifying how many pods I'd like around is the core functionality of a
+`Deployment` that I'm interested in at this point. As with pods, deployments
+are specified using YAML manifests and the line that will get me my 4 pods is:
+
+XXRev1
 
 ```
 spec:
