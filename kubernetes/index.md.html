@@ -315,29 +315,28 @@ Specifying how many pods I'd like around is the core functionality of a
 `Deployment` that I'm interested in at this point. As with pods, deployments
 are specified using YAML manifests and the line that will get me my 4 pods is:
 
-XXRev1
-
 ```
 spec:
   replicas: 3
 ```
 
-Glad to see you're awake Grasshopper, yeah 4 of course:
+Glad to see you're awake Grasshopper. Four of course:
 
 ```
-replicas: 4
+spec:
+  replicas: 4
 ```
 
-How will you describe of _which pod you want 4 replicas off_. Kubernetes uses
-_labels_ to match these. Essentially, you make sure your pods are labeled, and
-then you indicate in your `Deployment` what pods you're describing. An example
-of a label is `app=hi`, another could be `tier=dev`, or `color=blue`. The
-latter is obviously no good, `color=yellow` would be better. Labels are
-so-called key/value pairs, and you can have multiple different labels on a pod
-(but you could not have 2 labels with the same _key_: so `color=blue` and
-`color=yellow` would not be work.
+How will you describe _which pod you want 4 replicas of_. Kubernetes uses
+_labels_ to determine which replicas you're talking about.  On the one hand,
+you make sure your pods are labeled, and then you indicate in your `Deployment`
+what labels you're describing. An example of a label is `app=hi`, another could
+be `tier=dev`, or `color=blue`. The latter is obviously no good, `color=yellow`
+would be better. Labels are so-called key/value pairs, and you can have
+multiple different labels on a pod (but you could not have 2 labels with the
+same _key_: so `color=blue` and `color=yellow` would not work.
 
-On the `Deployment` side, you'd then say I want 3 replicas of all pods matching
+On the `Deployment` side, you'd then say that you want 3 replicas of all pods matching
 _these labels_. For example, you'd indicate that you want all pods with label
 `app=hi`:
 
@@ -348,8 +347,8 @@ spec:
       app: hi
 ```
 
-Easy enough. "But but, we did not give our pod this label, so there's be
-nothing to find". Yes, The final piece of such a `Deployment` would be to see
+Easy enough. "But but, we did not give our pod this label, so there's 
+nothing to find". Yes, The final piece of such a `Deployment` would be to describe
 what kind of pods you want to create, a so-called _pod template_:
 
 ```
@@ -403,7 +402,8 @@ by the `Deployment`: imagine if we would just a create a `Pod` with label
 `app=yo`, the `Deployment` would never think it reached 4 replicas of pods with
 label `app=hi` so it'd keep on creating pods.
 
-Before we try this `Deployment`, delete all resources you have so far, and check after that you have 0 pods running:
+Before we try this `Deployment`, delete all resources you have so far, and then
+check that you have 0 pods running:
 
 ```
 kubectl delete all --all
@@ -475,7 +475,8 @@ Still 4 pods! But if you look at the `NAME`s you'll see that
 `hi-deployment-5f7b895fd9-dt8kf`. The `Deployment` indeed guaranteed that 4
 replicas are running at all times. The Zombie Apocalypse is nigh.
 
-You have those 4 pods running, but you can also get more info on the `Deployment` resources running right now as well:
+You have those 4 pods running, but you can also get more info on the
+`Deployment` resources running right now as well:
 
 ```
 $ kubectl get deployment
@@ -503,29 +504,30 @@ around `ReplicaSet`s as you'll usually not deal with them directly.
 ![Running A Deployment on laptop](./diagrams/deployment.svg)
 
 Note how we referred explicitly to 4 instances of the application, not 4 nodes.
-The 4 pods running the containers are all running on the same node in your
-example. Of course, in reality, you'll have more than 1 node to run your
+The 4 pods running the containers are all running on the same node on your
+laptop. Of course, in reality, you'll have more than 1 node to run your
 application, and your application instances may have been scheduled on
 different nodes to accommodate for, for example, CPU requirements your
 application needs: you may want to run 100 instances, but your node is a
 machine that could not run 100 instances, you may need 10 nodes.  
 
-# Clients for Your Application
+# Clients of your Application
 
-Recall the 2nd requirement we listed in the Introduction:
+Recall the 2nd requirement I listed in the <a href="#introduction">Introduction</a>:
 
 !!!
    Clients of your application need to connect to one IP address and requests will be guided to those different instances of your application automatically
 
 ## (Internal) Clients on the Same Cluster
 
-Let's first consider clients that want to connect to your application with the clients on the same cluster. Why is this tricky?
+Let's first consider clients that want to connect to your application, where
+the clients are on the same cluster. Why is this tricky?
 
 - Your applications runs on several pods, each pod having their own IP. For a client to connect to a pod, it needs to know the IP, but since pods are so-called _ephemeral_ (they could be removed when a node fails etc), that IP may change
 - There are multiple instances of your application running (4 in our case), so the client would need to know all 4 IPs and select one
 
 How can we avoid that a client needs to know that list of ever-changing IPs? We
-need another k8s resource of course: a _Service_. 
+need another k8s resource : a _Service_. 
 
 A _Service_ will provide you with 1 IP and will <a
 							href="https://en.wikipedia.org/wiki/Load_balancing_(computing)">load-balance</a>
@@ -533,7 +535,7 @@ requests to that IP by redirecting to the pods that are able to serve the
 request. As with _Deployments_ before, question is how will the Service know
 what Pods it controls? Labels! Remember that all of the pods in our current
 deployment have label `app=hi`. We can define a _Service_ that provides the IP
-and load-balancing for exactly those pods, create a file `hi_service.yaml`:
+and load-balancing for exactly those pods. Create a file `hi_service.yaml`:
 
 ```
 apiVersion: v1
@@ -571,7 +573,7 @@ hi-service   ClusterIP   10.105.43.171   <none>        80/TCP    7s
 
 Note the `CLUSTER-IP`: the service specifies an IP local to your cluster: all
 requests to this IP (port 80, as specified) will be routed to 1 of the pods
-with label `app=hi` on port `8111`. We nowhere specified that IPs of all the
+with label `app=hi` on port `8111`. We nowhere specified the IPs of all the
 individual pods, so we don't keep a list. One extra thing to note is that we do
 not see an `EXTERNAL-IP`. Indeed, this IP is only available to clients within
 the cluster. I'll show in the next section how to make the service available
@@ -605,6 +607,8 @@ which your container runs).
 So far we've highlighted that this allows clients _from within the cluster_ to
 hit your service at your cluster IP `10.105.43.171` and be routed to the different pods. How do we test this? How
 do we get a client _from within the cluster_?
+
+XXRev1
 
 One way to get _in the cluster_ is using `exec` which executes a command of
 your choice on a pod of your choice. So if get into a pod, we'll be clearly _in
