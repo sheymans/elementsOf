@@ -605,14 +605,14 @@ Note the `Endpoints`: those are the IPs of your pods (with the port `8111` on
 which your container runs).
 
 So far we've highlighted that this allows clients _from within the cluster_ to
-hit your service at your cluster IP `10.105.43.171` and be routed to the different pods. How do we test this? How
-do we get a client _from within the cluster_?
+hit your service at your cluster IP `10.105.43.171` and be routed to the
+different pods. How do we test this? How do we get a client _from within the
+cluster_?
 
-XXRev1
-
-One way to get _in the cluster_ is using `exec` which executes a command of
-your choice on a pod of your choice. So if get into a pod, we'll be clearly _in
-our cluster_. What command would you want to execute to test your cluster IP?
+One way to get _in the cluster_ is using `exec` which makes it possible to
+execute a command of your choice on a pod of your choice -- assuming the pod is
+_in the cluster_ you'd like to be _in_.  
+What command would you want to execute to test your cluster IP?
 
 You'd probably want something like `curl 10.105.43.171`, so you'd do:
 
@@ -630,8 +630,8 @@ this command, you'll get an error:
 ```
 
 Stepping back you'll then notice that you based your container image on the
-small Linux image `alpine` and `curl` does not come installed with that Linux.
-What does come installed that you could use:
+small Linux image `alpine` and `curl` does not come installed with that Linux (check out the [Dockerfile](https://github.com/sheymans/elementsOf/blob/master/kubernetes/demo/hi_app/Dockerfile#L1) for the image [stijnh/hi_app](https://hub.docker.com/r/stijnh/hi) ).
+What does come installed that you could use?
 [`wget`](https://en.wikipedia.org/wiki/Wget).
 
 ```shell
@@ -646,25 +646,25 @@ Hi from hi-deployment-5f7b895fd9-wgwpp
 Hi from hi-deployment-5f7b895fd9-h7mz7
 ```
 
-You're hitting 1 IP `10.105.43.171` but you see that it it's indeed the
-different instances of your application (on different pods) answering the call
-with those different hostnames. Magic!
+You're hitting 1 IP `10.105.43.171` but you see that different instances of
+your application (on different pods) answer the call with those different
+hostnames. Magic!
 
 ## (External) Clients
 
-Quite some hoop-jumping happened in the previous section to access our app
-through the service, as the service's IP is local to the Cluster. In reality,
-that won't always cut it of course: you'll want external clients to have access
-to your application (like a user's browser for example).
+In the previous section, we jumped through hoops to access our app via the
+service as the service's IP is local to the cluster.  In reality that won't cut
+it: you'll want external clients to have access to your application (like a
+user's browser for example).
 
-There are several ways one can accomplish this, but we'll focus on _creating an
+There are several ways one can accomplish this. I'll focus on one: _creating an
 [Ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/)
-resource_. If the word _ingress_ throws out, check out this human
-[definition](https://www.thefreedictionary.com/ingress). There are not a lot of
-better ways to make something seem complicated, but calling an _entrance_, an
-_ingress_ is definitely one of them.
+resource_. If someone vomits up the word
+_[ingress](https://www.thefreedictionary.com/ingress)_, there better be a
+reason.  There's not of course: someone started calling an _entrance_ an
+_ingress_ and should be punished for it.
 
-As usual create a YAML, for example, names `hi-ingress.yaml`:
+To specify the ingress resource, create a YAML, for example, `hi-ingress.yaml`:
 
 ```yaml
 apiVersion: extensions/v1beta1
@@ -682,13 +682,13 @@ spec:
               servicePort: 80
 ```
 
-Analyzing this yaml specification, line by line:
+As they do on Wallstreet, let's do this line by line:
 
 ```
 kind: Ingress
 ```
 
-indicates that this describes an `Ingress` k8s resource. We have the resource a name:
+indicates that this describes an `Ingress` k8s resource. Give that ugly child a name:
 
 ```
 name: hi-ingress
@@ -717,9 +717,9 @@ hi-ingress   <none>   hi.stijnheymans.net   192.168.64.2   80      10s
 It's there and it's showing you an IP address that you can hit on (on your
 laptop, so an _external_ IP -- not a cluster IP): `192.168.64.2`.
 
-As you've mostly not registered `hi.stijnheymans.net`, let's trick
+As you've most likely not registered `hi.stijnheymans.net`, let's trick
 [DNS](https://en.wikipedia.org/wiki/Domain_Name_System) resolution to think
-`hi.stijnheymans.net` resolves to IP `192.168.64.2`. On your laptop, edit
+`hi.stijnheymans.net` resolves to the IP `192.168.64.2`. On your laptop, edit
 `/etc/hosts` by adding the following line:
 
 
@@ -731,9 +731,10 @@ Now let's see the magic at work: navigate to
 [http://hi.stijnheymans.net](http://stijnheymans.net). You should see `Hi from
 hi-deployment-5f7b895fd9-zfb4m` (or something similar). Refresh like the crazy
 flower-child you are and feel the glorious greetings from different hosts be
-extended to you. This is the smell of success.
+extended to you. This is the smell of success you hoped for when you opened
+this page on <span id="datetime"></span>.
 
-Let's draw up how things flow from your enthusiastic refreshing to seeing that `Hi` message:
+Let's draw up how things flow:
 
 ![External Client](./diagrams/ingress.svg)
 
@@ -741,6 +742,8 @@ We made a simplification to this diagram and left out the [Ingress
 controller](https://kubernetes.io/docs/concepts/services-networking/ingress-controllers/):
 I don't want to know, I don't need to know, and `Ingress` as a name was worse
 enough, making it also a `Controller` is just that one step too far.
+
+XXRev1
 
 # Push Changes without Downtime and Rollback If things go Haywire
 
@@ -1144,6 +1147,13 @@ Marko Lukša, or the internet itself, if it obliges, will answer all your furthe
 
   gtag('config', 'UA-12447521-1');
 </script>
+
+<script>
+var dt = new Date();
+document.getElementById("datetime").innerHTML = dt.toLocaleString();
+</script>
+
+
 
 <link rel="stylesheet" href="https://casual-effects.com/markdeep/latest/latex.css?">
 <!-- Markdeep: --><style class="fallback">body{visibility:hidden}</style><script src="https://casual-effects.com/markdeep/latest/markdeep.min.js?" charset="utf-8"></script>
