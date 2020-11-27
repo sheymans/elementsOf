@@ -22,7 +22,7 @@ environments right now:
 - Your application needs to be _warmed up_: things need to happen before your application can start serving up requests. For example, the application instance needs to sync its data with the data of other instances
 - When an instance of your application dies (and is thus no longer able to serve requests), that instance needs to become invisible to clients of your application. Traffic should be guided to still functioning instances of your application
 - To save costs, for example, during the night when you need less capability, you'll want to reuse some of your machines that the instances of application normally run on to run batch jobs for maintenance
-- You will have regular period in the year during which the amount of machines to serve your traffic will not be enough (during a promotion, or, say, the holiday period), so you want to scale up the amount of physical machines you have available. After the busy period, you want to get back to normal and scale down
+- You will have regular periods in the year during which the amount of machines to serve your traffic will not be enough (during a promotion, or, say, the holiday period), so you want to scale up the amount of physical machines you have available. After the busy period, you want to get back to normal and scale down
 
 It will come as no suprise (if you _are_ surprised: Sinterklaas does indeed
 exist _and_ the world is a beautiful place where no-one drags themselves
@@ -743,11 +743,10 @@ controller](https://kubernetes.io/docs/concepts/services-networking/ingress-cont
 I don't want to know, I don't need to know, and `Ingress` as a name was worse
 enough, making it also a `Controller` is just that one step too far.
 
-XXRev1
 
-# Push Changes without Downtime and Rollback If things go Haywire
+# Push Changes
 
-We already know the base k8s kubernetes resource that will help us tackle the next 2 requirements:
+I listed 2 requirements around pushing changes to your app: 
 
 !!!
    You need to be able to push changes to your application without downtime
@@ -755,7 +754,7 @@ We already know the base k8s kubernetes resource that will help us tackle the ne
 !!!
    You need to be able to rollback changes to your application
 
-Recall the original deployment YAML:
+Recall the YAML describing our `Deployment`:
 
 ```
 apiVersion: apps/v1
@@ -779,11 +778,13 @@ spec:
             - containerPort: 8111
 ```
 
-Say you have a 2nd version of the image `stijnh/hi` ready: `stijnh/hi:v2`. How
-can I make sure that all instances of my application are running `stijnh/hi:v2`
-instead of `stijnh/hi`.
+You're never happy so you have a second version of your application ready. In
+practice, you'll have a new version of the original `stijnh/hi` ready:
+`stijnh/hi:v2`. How can I make sure that all instances of my application are
+running `stijnh/hi:v2` instead of `stijnh/hi`?
 
-The naive answer would be the correct one: replace `stijnh/hi` in the deployment by `stijnh/hi:v2`:
+The naive answer is the correct one: replace `stijnh/hi` in the `Deployment` by
+`stijnh/hi:v2`:
 
 
 ```
@@ -791,23 +792,23 @@ The naive answer would be the correct one: replace `stijnh/hi` in the deployment
 ```
 
 That's it. The default strategy for roll-outs that k8s `Deployment`s use is the
-so-called `RollingUpdate` strategy. With that strategy, k8s would scale down
-your replicas (4 initially) of the pods that run the old image `stijnh/hi` and
-scale up the replicas (from 0 to 4) with the new image `stijnh/hi:v2`. This
+so-called `RollingUpdate` strategy. With that strategy, k8s scales down your
+replicas (from 4 to 0) of the pods that run the old image `stijnh/hi` and
+scales up the replicas (from 0 to 4) with the new image `stijnh/hi:v2`. This
 guarantees that there's no downtime, but it would force you to make sure that
 `v2` is compatible to with the first version of your app. Indeed, the service
 will start routing requests to new _and_ old pods while we are in the
 intermediate state. This may cause problems if you for example did database
 changes and `v2` of your app is writing data in a different format than before
 and `v1` and `v2` are both reading from that data but `v1` expects the old
-format so crashes on that newly written data. Some care is usually warranted to
-avoid situations like that (for example, but making sure `v2` does not write
-the new format yet, but is able to read both the new and old format). A `v3`
-could then subsequently start writing the new format without issues.
+format so crashes on that newly written data. Some programmatic care is usually
+warranted to avoid situations like that, often leading to an intermediate `v2`
+with the end state in a `v3`. I leave this as an exercise to reader. Yeah.
+That's right.  Move on.
 
-If you see no such programmatic way out, but you would be willing to take a
-small downtime, you can use the `Recreate` strategy. Your deployment would look
-as follows:
+If you see no such programmatic way out, but you are willing to tolerate a bit
+of downtime, you can use the `Recreate` strategy. Your deployment is then as
+follows:
 
 ```
 apiVersion: apps/v1
@@ -834,11 +835,12 @@ spec:
 ```
 
 This will cause k8s to take out all of your `stijnh/hi` pods and immediately
-scale up all of the new `stijnh/hi:v2`. This of course will cause a small
+scale up all of the new `stijnh/hi:v2` pods. This of course will cause a small
 downtime, or may result in a situation where while `v2` is scaling up, you do
 not have enough pods to serve your production traffic.
 
-To finish this section, some quick commands that allow you to check the deployment while it's happening:
+To finish this section, some quick commands that allow you to check the
+deployment while it's happening:
 
 ```
 kubectl rollout status deployment hi-deployment
@@ -852,7 +854,7 @@ kubectl rollout undo deployment hi-deployment
 
 You may be used to control the rolling update: how much percentage of the old
 pods can you take out while bringing in new pods with the latest version. Can
-you do that with k8s? Yes, you can it's called [proportional
+you do that with k8s? Yes, you can. It's called [proportional
 scaling](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#proportional-scaling).
 
 
@@ -861,12 +863,16 @@ scaling](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#p
 !!!
    Your application needs to be _warmed up_: things need to happen before your application can start serving up requests. For example, the application instance needs to sync its data with the data of other instances
 
- When a pod gets deployed on a cluster (as part of a `Deployment` for example), it might not immediately be ready for serving traffic. For example, a web app may need some time to initialize or your app may need to pull data from S3 into memory (configuration data for example), or in a distributed setting, your app may need to reach consensus with other instances.
- These are all situations where your service that is routing traffic to pods,
- should not immediately route traffic to that new pod. Only when the new pod is
- _ready_ it gets included as one of the pods that a service routes traffic to.
+ When a pod gets deployed on a cluster (as part of a `Deployment` for example),
+ it might not immediately be ready for serving traffic. For example, a web app
+ may need some time to initialize or your app may need to pull data from S3
+ into memory (configuration data for example), or in a distributed setting,
+ your app may need to reach consensus with other instances.  These are
+ situations where your service should not immediately route traffic to that new
+ pod. Only when the new pod is _ready_ it gets included as one of the pods that
+ a service routes traffic to.
 
- The way this is accomplished is through the use of a so-called _readiness
+This is accomplished through the use of a _readiness
  probe_. There are several ways to define readiness probes, but I'll focus on
  an `HTTP GET` readiness probe: doing a `GET` to the pod will indicate, based
  on the returned status of that `GET`, whether the pod is ready for serving
@@ -910,13 +916,12 @@ spec:
         periodSeconds: 30
 ```
 
-Once the pod is deployed, we'd wait 300 seconds (`initialDelaySecods`), and
-then every 30 seconds (`periodSeconds`), we'd do a `GET` on port 8888 of the
-container at path `/readiness`. If you that `GET` returns `200` your pod is
-ready and will be included for, for example, routing traffic to from the
-service.
+Once the pod is deployed, we wait 300 seconds (`initialDelaySecods`), and then
+every 30 seconds (`periodSeconds`), we do a `GET` on port 8888 of the container
+at path `/readiness`. If that `GET` returns `200` your pod is ready and will be
+included for routing traffic to.
 
-This of course requires that your app, defines a path `/readiness` and that it
+This requires that your app defines a path `/readiness` and that it
 only returns `200` if it is truly ready. For a web app, this will naturally
 follow when the web app is up and running. If there's more complex start-up
 going on (like reaching consensus in a distributed setting), you should
@@ -928,16 +933,13 @@ is indeed ready.
 !!!
    When an instance of your application dies (and is thus no longer able to serve requests), that instance needs to become invisible to clients of your application. Traffic should be guided to still functioning instances of your application
 
-Well, that requirement sounds related to the readiness requirement, doesn't it.
-In this case, one or more instances of your application died (or starting
-spewing errors and no-one knows why, but usually we just reboot the whole fleet
-_just be sure_).
-
-If that happens, we want to take the pod with the dead application out of
-rotation (it should stop being routed to by the service for example) and we'd
-attempt a restart. Similar the above `readinessProbe`, we have a concept called
-`livenessProbe`. You'd similarly define for example (for the HTTP case) a `GET`
-to a path on your app that indicates whether your app is alive. If that `GET`
+Well, that requirement sounds related to the readiness requirement, doesn't it?
+In this case, one or more instances of your application died (or started
+spewing errors and no-one knows why.  If that happens, we want to take the pod
+with the dead application out of rotation (the service should stop routing
+traffic to the pod). Similar to the above `readinessProbe`, there's a concept
+called `livenessProbe`. You define (for the HTTP case) a path on your app that
+indicates whether your app is alive on a `GET` on that path. If that `GET`
 indicates it's not alive (for example, no `200` was returned), the pod gets
 taken out of rotation and a new pod is restarted.
 
@@ -953,28 +955,32 @@ above, on the pod), so I'll not spend any more words on it.
 
  
 Note that this does not talk about getting rid of actual machines/nodes: it
-just indicates there are periods that I'll want to downscale the pods I have to
-make room on my nodes for other jobs possibly.
+just indicates there are periods that I'll want to downscale the number of pods
+to make room on my nodes for other jobs.
 
-You can schedule jobs during the night using k8s resources like [CronJobs](https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/) so that's not the interesting part of this requirement. The core of what I'm interested in this requirement is actually:
+You can schedule jobs during the night using k8s resources like
+[CronJobs](https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/)
+so that's not the interesting part of this requirement. The core of what I'm
+interested in this requirement is actually:
 
 !!!
-   Can I minimize the amount of pods I need to be able to serve traffic that I need, but of course in a way that I actually am able to serve traffic.
+   Can I minimize the amount of pods I need to be able to serve traffic that I
+   need?
 
 Simplified, during the day I may need 4 replicas of my application, but during
 the night I may only need 1. Rather than having all 4 replicas run all the time
 and incur costs, can I scale down to the amount of replicas I _need_ and scale
 back up similarly?
 
-This question leads first to another question of course: what does _I need_
-mean. When should I scale up or down? Well, you can specify that. You could
-specify that based on CPU usage (if average CPU usage goes above a threshold,
-say 80% for a certain amount of time, spin up extra pods so that that average
-will go down again), but you can have other _metrics_ as well. Here I'll talk
-about "transactions per second" (TPS).
+This question leads first to another question: what does _I need_ mean? When
+should I scale up or down? Well, you can specify that. You could specify that
+based on CPU usage (if average CPU usage goes above a threshold, say 80% for a
+certain amount of time, spin up extra pods so that that average will go down
+again), but you can have other _metrics_ as well. One such commonly used
+metric is _transactions per second (TPS)_.
 
 Let's start with the snippet that would indicate that each pod can handle about
-200 requests per second:
+200 transacttions per second:
 
 ```
 metric:
@@ -995,7 +1001,7 @@ metric:
   name: transactions-per-second
 ```
 
-gives the metric the name `transactions-per-second`, could be `leonardo dicaprio` for all we care. 
+gives the metric the name `transactions-per-second`, but the name could be `leonardo dicaprio` for all we care (and we care a lot about Leo).
 
 ```
 describedObject:
@@ -1004,9 +1010,10 @@ describedObject:
   name: hi-ingress
 ```
 
-indicates the object we're describing, in this we're describing our `Ingress`
-`hi-ingress`. Recall that the Ingress is thing that makes our service available
-externally. Indeed, rather than describing the traffic on the Pod directly, we just indicate that we'll be referring to the external facing part of our service. 
+indicates the object I'm describing. I'm describing our `Ingress` `hi-ingress`.
+Recall that the Ingress is thing that makes our service available externally.
+Indeed, rather than describing the traffic on the Pod directly, we just
+indicate that we'll be referring to the external facing part of our service. 
 
 ```
 target:
@@ -1016,11 +1023,11 @@ target:
 
 then indicates that the `Ingress` should _on average_ be sending 200 requests to each of the pods.
 
-Alright, what should happen when we go over those `200` average requests to the
-pods: we should scale up the amount of pods. Is there a limit to scaling up the
-pods? Yes, there is. It would indicated when you're defining your so-called
+What should happen when we go over those `200` average requests to the
+pods? We should scale up the amount of pods. Is there a limit to scaling up the
+pods? Yes, there is. You indicate that limit when you're defining your 
 [`HorizontalPodAutoscaler`](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/)
-(HPA). Write the spec up in a YAML `hi-hpa.yaml`:
+(HPA). Now that I went over the metric specification, I can put it in context of the HPA's spec. Write the spec up in a YAML `hi-hpa.yaml`:
 
 ```
 apiVersion: autoscaling/v2beta2
@@ -1048,7 +1055,7 @@ spec:
           value: 200
 ```
 
-You'll see the `metric` appear that we just appeared. In addition:
+You'll see the `metric` appear that we just defined. In addition:
 
 ```
   scaleTargetRef:
@@ -1070,9 +1077,8 @@ Whereas the default is `4` pods, the HPA may scale you down to 1 pod or scale
 you up to 5 pods until we hit the target of `200` transactions on average on
 the `Ingress`.
 
-Wow, and that's all there is too it. Re-read the last _the HPA may scale you
-down..._ and cherish the way you've traveled since starting to read this
-article. 
+Wow, and that's all there is too it. Re-read that previous paragraph and
+cherish the road you've traveled since starting to read this article. 
 
 Try it out as usual with:
 
@@ -1083,29 +1089,30 @@ $ kubectl create -f hi-hpa.yaml
 # Autoscale the cluster
 
 !!!
-   You will have regular period in the year during which the amount of machines
+   You will have regular periods in the year during which the amount of machines
    to serve your traffic will not be enough (during a promotion, or, say, the
    holiday period), so you want to scale up the amount of physical machines you
    have available. After the busy period, you want to get back to normal and
    scale down
 
-The HPA we just saw will help you increase and decrease pods on your cluster,
-making up space for other applications/batch processes to run on your cluster,
-and saving costs in general. However, it will not do anything about the actual
-physical nodes in your cluster. You could be having a cluster of 100 nodes with
-1 pod running on one of them. Hardly an efficient deal.  Or vice versa, say
-your traffic is exploding: trying to scale up from 1 to 100 pods on 1 available
-node in your cluster, will lead to nothing but disaster.
+The HPA I just defined will help you increase and decrease pods on your
+cluster, making up space for other applications/batch processes to run on your
+cluster, and saving costs in general. However, it will not do anything about
+the actual physical nodes in your cluster. You could be having a cluster of 100
+nodes with 1 pod running on one of them. Hardly an efficient deal.  Or vice
+versa, say your traffic is exploding: trying to scale up from 1 to 100 pods on
+1 available node in your cluster, will lead to nothing but disaster.
 
-In both cases, you'd want to decrease or increase the actual nodes in your
+In both scenarios, you want to decrease or increase the actual nodes in your
 cluster. We're now solidly in the realm of someone more knowledgeable than me,
-but I'll give it a desperate attempt. Kubernetes has the concept of a [Cluster
+but I'll throw in a desperate attempt. Kubernetes has the concept of a [Cluster
 Autoscaler](https://github.com/kubernetes/autoscaler/tree/master/cluster-autoscaler).
 When configured for your cluster, it'll make sure nodes are spun up or down
 given the requirements of the pods running on it. For example, if the HPA
 determines, I need 1000 more pods to be able to meet this `200` average
-transactions per second, your cluster would be spinning these up for you.
-Configuration of the cluster depends on cluster provider, so see
+transactions per second, your cluster would be spinning the right amount of
+nodes up so you can meet that 1000 pods requirement.  Configuration of the
+cluster depends on cluster provider, so see
 [here](https://github.com/kubernetes/autoscaler/tree/master/cluster-autoscaler)
 for details.
 
