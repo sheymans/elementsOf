@@ -22,7 +22,7 @@ environments right now:
 - Your application needs to be _warmed up_: things need to happen before your application can start serving up requests. For example, the application instance needs to sync its data with the data of other instances
 - When an instance of your application dies (and is thus no longer able to serve requests), that instance needs to become invisible to clients of your application. Traffic should be guided to still functioning instances of your application
 - To save costs, for example, during the night when you need less capability, you'll want to reuse some of your machines that the instances of application normally run on to run batch jobs for maintenance
-- You will have regular periods in the year during which the amount of machines to serve your traffic will not be enough (during a promotion, or, say, the holiday period), so you want to scale up the amount of physical machines you have available. After the busy period, you want to get back to normal and scale down
+- There will be times when the machines to serve your traffic will not be enough (during a promotion, or, say, the holiday period), so you want to increase, _scale up_, the amount of physical machines you have available.  After the busy period, you want to get back to normal and scale down
 
 It will come as no suprise (if you _are_ surprised: Sinterklaas does indeed
 exist _and_ the world is a beautiful place where no-one drags themselves
@@ -1085,26 +1085,31 @@ Try it out as usual with:
 $ kubectl create -f hi-hpa.yaml
 ```
 
+XXRev2
+
 # Autoscale the cluster
 
 !!!
-   You will have regular periods in the year during which the amount of machines
-   to serve your traffic will not be enough (during a promotion, or, say, the
-   holiday period), so you want to scale up the amount of physical machines you
-   have available. After the busy period, you want to get back to normal and
-   scale down
+   There will be times when the machines to serve your traffic will not be
+   enough (during a promotion, or, say, the holiday period), so you want to
+   increase, _scale up_, the amount of physical machines you have available.
+   After the busy period, you want to get back to normal and scale down
 
-The HPA I just defined will help you increase and decrease pods on your
-cluster, making up space for other applications/batch processes to run on your
-cluster, and saving costs in general. However, it will not do anything about
-the actual physical nodes in your cluster. You could be having a cluster of 100
-nodes with 1 pod running on one of them. Hardly an efficient deal.  Or vice
-versa, say your traffic is exploding: trying to scale up from 1 to 100 pods on
-1 available node in your cluster, will lead to nothing but disaster.
+The HPA I just defined helps increase and decrease pods on your cluster, making
+up space for other applications/batch processes to run, and thus helps save
+costs. However, the HPA does nothing about the actual physical nodes in your
+cluster. You could have a cluster of 100 nodes with 1 pod running on one of
+them. Hardly efficient.  Or vice versa, say your traffic is exploding (or
+_blowing up_, if you prefer your hyperboles not originating from Latin): trying
+to scale up from 1 to 100 pods on 1 available node in your cluster, will lead
+to nothing but disaster. Speaking in relative terms of course, and not
+comparable to not having croissants Sunday morning for example.
 
-In both scenarios, you want to decrease or increase the actual nodes in your
-cluster. We're now solidly in the realm of someone more knowledgeable than me,
-but I'll throw in a desperate attempt. Kubernetes has the concept of a [Cluster
+In both scenarios (1 pod on 100 nodes, 100 pods on 1 node), you want to
+decrease or increase the actual nodes in your cluster. We're now solidly in the
+realm of someone more knowledgeable than me (we've wandered longer in this
+realm longer than you'd like, but I'm keeping the spirits high), but I'll throw
+in a desperate attempt. Kubernetes has the concept of a [Cluster
 Autoscaler](https://github.com/kubernetes/autoscaler/tree/master/cluster-autoscaler).
 When configured for your cluster, it'll make sure nodes are spun up or down
 given the requirements of the pods running on it. For example, if the HPA
@@ -1115,22 +1120,27 @@ cluster depends on cluster provider, so see
 [here](https://github.com/kubernetes/autoscaler/tree/master/cluster-autoscaler)
 for details.
 
-One thing to take into account and nicely explained in [this autoscaling
-article](https://www.cncf.io/blog/2019/10/29/kubernetes-autoscaling-101-cluster-autoscaler-horizontal-autoscaler-and-vertical-pod-autoscaler/)
-is that scaling up the cluster will take more time than scaling up the pods as
-scaling the cluster will require you to ask your cluster provider for actual
-physical instances/nodes.
+Note that [scaling up the cluster will take more
+time](https://www.cncf.io/blog/2019/10/29/kubernetes-autoscaling-101-cluster-autoscaler-horizontal-autoscaler-and-vertical-pod-autoscaler/)
+than scaling up the pods as scaling the cluster will require you to ask your
+cluster provider for actual physical instances/nodes. And everyone knows,
+cluster providers are slow and unwilling.
 
 # Conclusion
 
-I tried to give you an elemental overview of the problems k8s is solving for you. As usual, I've not talked about a 1000 other topics, 
-such as [volumes](https://kubernetes.io/docs/concepts/storage/volumes/),
+I gave an elemental overview of a subset of problems k8s is solving for you. As
+usual, I've not talked about a thousand and one other topics, such as
+[volumes](https://kubernetes.io/docs/concepts/storage/volumes/),
 [secrets](https://kubernetes.io/docs/concepts/configuration/secret/),
 [jobs](https://kubernetes.io/docs/concepts/workloads/controllers/job/), [cron
 jobs](https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/),
-[namespaces](https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/),... 
-As mentioned before, the book <a target="_blank" href="https://www.amazon.com/gp/product/1617293725/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=1617293725&linkCode=as2&tag=elementsof0d-20&linkId=0c545c38289f0bec5a3732abf7457643">Kubernetes in Action</a><img src="//ir-na.amazon-adsystem.com/e/ir?t=elementsof0d-20&l=am2&o=1&a=1617293725" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;" /> by
-Marko Lukša, or the internet itself, if it obliges, will answer all your further questions.
+[namespaces](https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/),...  As mentioned in the introduction, the book <a target="_blank"
+	href="https://www.amazon.com/gp/product/1617293725/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=1617293725&linkCode=as2&tag=elementsof0d-20&linkId=0c545c38289f0bec5a3732abf7457643">Kubernetes
+	in Action</a><img
+src="//ir-na.amazon-adsystem.com/e/ir?t=elementsof0d-20&l=am2&o=1&a=1617293725"
+width="1" height="1" border="0" alt="" style="border:none !important;
+margin:0px !important;" /> by Marko Lukša, or the internet itself, if it
+obliges, will answer all of your further questions.
 
 # Endnotes
 
@@ -1138,7 +1148,7 @@ Marko Lukša, or the internet itself, if it obliges, will answer all your furthe
 
 [^affiliate]: As an Amazon Associate I earn from qualifying purchases.
 
-[^sidecar]: We often refer to containers that always run alongside your _main_ container as _sidecars_ for obvious non-inspired reasons.
+[^sidecar]: We refer to containers that run alongside your _main_ container as _sidecars_ for obvious non-inspired reasons.
 
 
 <!-- Global site tag (gtag.js) - Google Analytics -->
