@@ -21,7 +21,7 @@ environments right now:
 - You need to be able to rollback changes to your application
 - Your application needs to be _warmed up_: things need to happen before your application can start serving up requests. For example, the application instance needs to sync its data with the data of other instances
 - When an instance of your application dies (and is thus no longer able to serve requests), that instance needs to become invisible to clients of your application. Traffic should be guided to still functioning instances of your application
-- To save costs, for example, during the night when you need less capability, you'll want to reuse some of your machines that the instances of application normally run on to run batch jobs for maintenance
+- To save costs during the night when you need less capability for your main application, you want to reuse some of your capability to run batch jobs that crunch data
 - There will be times when the machines to serve your traffic will not be enough (during a promotion, or, say, the holiday period), so you want to increase, _scale up_, the amount of physical machines you have available.  After the busy period, you want to get back to normal and scale down
 
 It will come as no suprise (if you _are_ surprised: Sinterklaas does indeed
@@ -927,56 +927,59 @@ going on (like reaching consensus in a distributed setting), you should
 guarantee that the `/readiness` path only returns a `200` when the application
 is indeed ready.
 
+XXRev2
+
 # Are you alive?
 
 !!!
-   When an instance of your application dies (and is thus no longer able to serve requests), that instance needs to become invisible to clients of your application. Traffic should be guided to still functioning instances of your application
+   When an instance of your application dies (and is thus no longer able to
+   serve requests), that instance needs to become invisible to clients of your
+   application. Traffic should be guided to still functioning instances of your
+   application
 
 Well, that requirement sounds related to the readiness requirement, doesn't it?
 In this case, one or more instances of your application died (or started
-spewing errors and no-one knows why.  If that happens, we want to take the pod
-with the dead application out of rotation (the service should stop routing
-traffic to the pod). Similar to the above `readinessProbe`, there's a concept
-called `livenessProbe`. You define (for the HTTP case) a path on your app that
-indicates whether your app is alive on a `GET` on that path. If that `GET`
-indicates it's not alive (for example, no `200` was returned), the pod gets
-taken out of rotation and a new pod is restarted.
+spewing errors and only Leondardo DiCaprio knows why but he won't tell).  If
+that happens, we want to take the pod with the dead application out of rotation
+(the service should stop routing traffic to the pod). Similar to the above
+`readinessProbe`, there's a concept called `livenessProbe`. You define (for the
+HTTP case) a path on your app that indicates whether your app is alive on a
+`GET` on that path. If that `GET` indicates it's not alive (for example, no
+`200` was returned), the pod gets taken out of rotation and a new pod is
+restarted.
 
-Definition of a liveness probe is similar to how we define readiness probes (see
-above, on the pod), so I'll not spend any more words on it.
+Liveness probe are defined similarly to how readiness probes are defined, so
+I'll not spend any more words on it.
 
 # Horizontal Autoscaling
 
 !!!
-   To save costs, for example, during the night when you need less capability,
-   you'll want to reuse some of your machines that the instances of application
-   normally run on to run batch jobs for maintenance
+   To save costs during the night when you need less capability for your main application,
+   you want to reuse some of your capability to run batch jobs that crunch data
 
- 
 Note that this does not talk about getting rid of actual machines/nodes: it
-just indicates there are periods that I'll want to downscale the number of pods
-to make room on my nodes for other jobs.
+just indicates there are periods that you want to downscale the number of pods
+of your main application to make room on my nodes for other jobs.
 
 You can schedule jobs during the night using k8s resources like
 [CronJobs](https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/)
 so that's not the interesting part of this requirement. The core of what I'm
-interested in this requirement is actually:
+interested in this requirement is:
 
 !!!
-   Can I minimize the amount of pods I need to be able to serve traffic that I
-   need?
+   Can I minimize the amount of pods while still being able to serve traffic?
 
 Simplified, during the day I may need 4 replicas of my application, but during
 the night I may only need 1. Rather than having all 4 replicas run all the time
-and incur costs, can I scale down to the amount of replicas I _need_ and scale
-back up similarly?
+and incur costs, can I scale down to the amount of replicas _I need_ during the
+night and scale back up during the day?
 
 This question leads first to another question: what does _I need_ mean? When
-should I scale up or down? Well, you can specify that. You could specify that
-based on CPU usage (if average CPU usage goes above a threshold, say 80% for a
-certain amount of time, spin up extra pods so that that average will go down
-again), but you can have other _metrics_ as well. One such commonly used
-metric is _transactions per second (TPS)_.
+should I scale up or down? Well, you can specify that based on different
+metrics. One such metric is _CPU usage_: if average CPU usage goes above a
+threshold, say 80% for a certain amount of time, spin up extra pods so that
+that average will go down again. Another commonly used metric is _transactions
+per second (TPS)_.
 
 Let's start with the snippet that would indicate that each pod can handle about
 200 transacttions per second:
@@ -1000,7 +1003,8 @@ metric:
   name: transactions-per-second
 ```
 
-gives the metric the name `transactions-per-second`, but the name could be `leonardo dicaprio` for all we care (and we care a lot about Leo).
+gives the metric the name `transactions-per-second` (the name does not do
+anything but being a name, a bit like `Brad Pitt`).
 
 ```
 describedObject:
@@ -1010,9 +1014,9 @@ describedObject:
 ```
 
 indicates the object I'm describing. I'm describing our `Ingress` `hi-ingress`.
-Recall that the Ingress is thing that makes our service available externally.
-Indeed, rather than describing the traffic on the Pod directly, we just
-indicate that we'll be referring to the external facing part of our service. 
+Recall that the Ingress is the resource that makes our service available
+externally.  Indeed, rather than describing the traffic on the Pod directly, I
+refer to the external facing part of our service. 
 
 ```
 target:
@@ -1020,13 +1024,16 @@ target:
   value: 200
 ```
 
-then indicates that the `Ingress` should _on average_ be sending 200 requests to each of the pods.
+indicates that the `Ingress` should _on average_ be sending 200 requests to each of the pods.
 
-What should happen when we go over those `200` average requests to the
-pods? We should scale up the amount of pods. Is there a limit to scaling up the
-pods? Yes, there is. You indicate that limit when you're defining your 
+Now that I went over the metric specification, I can put it in context of the
+k8s resource that will have such a metric specification: a
 [`HorizontalPodAutoscaler`](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/)
-(HPA). Now that I went over the metric specification, I can put it in context of the HPA's spec. Write the spec up in a YAML `hi-hpa.yaml`:
+(HPA). The HPA will, for example, indicate what should happen we go over those
+`200` average requests to the pods. We should scale up the amount of pods
+according to a linked `Deployment`. Is there a limit to scaling up the pods?
+Yes, there is and the HPA indicates that as well.  Let's write it all up in a
+YAML `hi-hpa.yaml`:
 
 ```
 apiVersion: autoscaling/v2beta2
@@ -1054,7 +1061,7 @@ spec:
           value: 200
 ```
 
-You'll see the `metric` appear that we just defined. In addition:
+In addition to the metric `transactions-per-second` I defined earlier, you also see:
 
 ```
   scaleTargetRef:
@@ -1063,7 +1070,7 @@ You'll see the `metric` appear that we just defined. In addition:
     name: hi-deployment
 ```
 
-it refers to our `hi-deployment`. Recall that it is this deployment that tells
+which refers to our `hi-deployment`. Recall that it is this deployment that tells
 k8s what pods look like (and by default makes sure there are 4 pods with the
 right labels). You also see 
 
@@ -1084,8 +1091,6 @@ Try it out as usual with:
 ```
 $ kubectl create -f hi-hpa.yaml
 ```
-
-XXRev2
 
 # Autoscale the cluster
 
