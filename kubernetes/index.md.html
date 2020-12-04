@@ -649,21 +649,24 @@ You're hitting 1 IP `10.105.43.171` but you see that different instances of
 your application (on different pods) answer the call with those different
 hostnames. Magic!
 
+XXRev2
+
 ## (External) Clients
 
-In the previous section, we jumped through hoops to access our app via the
-service as the service's IP is local to the cluster.  In reality that won't cut
-it: you'll want external clients to have access to your application (like a
-user's browser for example).
+In the previous section, we jumped through hoops onto the cluster just to be
+able to access the app via the service (the service's IP is local to the
+cluster, wow, you forgot already).  In reality that won't cut it: you want
+_external_ clients to have access to your application (like a user's browser for
+example).
 
 There are several ways one can accomplish this. I'll focus on one: _creating an
 [Ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/)
 resource_. If someone vomits up the word
 _[ingress](https://www.thefreedictionary.com/ingress)_, there better be a
 reason.  There's not of course: someone started calling an _entrance_ an
-_ingress_ and should be punished for it.
+_ingress_ and should be punished for it. But I digress.
 
-To specify the ingress resource, create a YAML, for example, `hi-ingress.yaml`:
+To specify the ingress resource, create a YAML `hi-ingress.yaml`:
 
 ```yaml
 apiVersion: extensions/v1beta1
@@ -681,7 +684,7 @@ spec:
               servicePort: 80
 ```
 
-As they do on Wallstreet, let's do this line by line:
+As they do on Wallstreet, let's go line by line:
 
 ```
 kind: Ingress
@@ -694,10 +697,21 @@ name: hi-ingress
 ```
 
 And now for the interesting part. We specify a rule that indicates that we want
-`hi.stijnheymans.net/` (the root), routed to the service `hi-service` at port
+`hi.stijnheymans.net/`, routed to the service `hi-service` at port
 `80`. Recall from the above that we indeed defined such a service `hi-ingress`
 (and recall that that service in itself routes requests to any of the pods that
 it serves).
+
+```
+  rules:
+    - host: hi.stijnheymans.net
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: hi-service
+              servicePort: 80
+```
 
 Alright, let's put the `Ingress` in play:
 
@@ -713,7 +727,7 @@ NAME         CLASS    HOSTS                 ADDRESS        PORTS   AGE
 hi-ingress   <none>   hi.stijnheymans.net   192.168.64.2   80      10s
 ```
 
-It's there and it's showing you an IP address that you can hit on (on your
+It's there and it's indicating an IP address that you can hit on (on your
 laptop, so an _external_ IP -- not a cluster IP): `192.168.64.2`.
 
 As you've most likely not registered `hi.stijnheymans.net`, let's trick
@@ -729,7 +743,7 @@ As you've most likely not registered `hi.stijnheymans.net`, let's trick
 Now let's see the magic at work: navigate to
 [http://hi.stijnheymans.net](http://stijnheymans.net). You should see `Hi from
 hi-deployment-5f7b895fd9-zfb4m` (or something similar). Refresh like the crazy
-flower-child you are and feel the glorious greetings from different hosts be
+Flower Child you are and feel the glorious greetings from different hosts be
 extended to you. This is the smell of success you hoped for when you opened
 this page on <span id="datetime"></span>.
 
@@ -737,11 +751,10 @@ Let's draw up how things flow:
 
 ![External Client](./diagrams/ingress.svg)
 
-We made a simplification to this diagram and left out the [Ingress
+I made a simplification to this diagram and left out the [Ingress
 controller](https://kubernetes.io/docs/concepts/services-networking/ingress-controllers/):
 I don't want to know, I don't need to know, and `Ingress` as a name was worse
 enough, making it also a `Controller` is just that one step too far.
-
 
 # Push Changes
 
@@ -777,10 +790,10 @@ spec:
             - containerPort: 8111
 ```
 
-You're never happy so you have a second version of your application ready. In
-practice, you'll have a new version of the original `stijnh/hi` ready:
-`stijnh/hi:v2`. How can I make sure that all instances of my application are
-running `stijnh/hi:v2` instead of `stijnh/hi`?
+You're eternally unhappy so you have a second version of your application
+ready: a new image `stijnh/hi:v2`, to replace the original `stijnh/hi`.  How
+can you make sure that all application instances are running `stijnh/hi:v2`
+instead of `stijnh/hi`?
 
 The naive answer is the correct one: replace `stijnh/hi` in the `Deployment` by
 `stijnh/hi:v2`:
@@ -791,12 +804,11 @@ The naive answer is the correct one: replace `stijnh/hi` in the `Deployment` by
 ```
 
 That's it. The default strategy for roll-outs that k8s `Deployment`s use is the
-so-called `RollingUpdate` strategy. With that strategy, k8s scales down your
-replicas (from 4 to 0) of the pods that run the old image `stijnh/hi` and
-scales up the replicas (from 0 to 4) with the new image `stijnh/hi:v2`. This
-guarantees that there's no downtime, but it would force you to make sure that
-`v2` is compatible to with the first version of your app. Indeed, the service
-will start routing requests to new _and_ old pods while we are in the
+`RollingUpdate` strategy. With that strategy, k8s scales down the pods that run
+the old image from 4 to 0 and scales up the pods with the new image from 0 to
+4. This guarantees that there's no downtime, but it would force you to make
+sure that `v2` is compatible to with the first version of your app. Indeed, the
+service will start routing requests to new _and_ old pods while we are in the
 intermediate state. This may cause problems if you for example did database
 changes and `v2` of your app is writing data in a different format than before
 and `v1` and `v2` are both reading from that data but `v1` expects the old
@@ -834,12 +846,12 @@ spec:
 ```
 
 This will cause k8s to take out all of your `stijnh/hi` pods and immediately
-scale up all of the new `stijnh/hi:v2` pods. This of course will cause a small
-downtime, or may result in a situation where while `v2` is scaling up, you do
-not have enough pods to serve your production traffic.
+scale up all of the new `stijnh/hi:v2` pods. This causes a small downtime, or
+may result in a situation where while `v2` is scaling up, you do not have
+enough pods to serve production traffic.
 
 To finish this section, some quick commands that allow you to check the
-deployment while it's happening:
+deployment rollouts/rollbacks.
 
 ```
 kubectl rollout status deployment hi-deployment
@@ -851,34 +863,34 @@ If something went wrong you can execute a rollback immediately as follows:
 kubectl rollout undo deployment hi-deployment
 ```
 
-You may be used to control the rolling update: how much percentage of the old
-pods can you take out while bringing in new pods with the latest version. Can
-you do that with k8s? Yes, you can. It's called [proportional
+You may of the controlling kind, and you wonder how to control the rolling
+update: how much percentage of the old pods can you take out while bringing in
+new pods with the latest version? It's called [proportional
 scaling](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#proportional-scaling).
-
 
 # Warm-up Of Your Application
 
 !!!
-   Your application needs to be _warmed up_: things need to happen before your application can start serving up requests. For example, the application instance needs to sync its data with the data of other instances
+   Your application needs to be _warmed up_: certain things need to happen
+   before your application can start serving up requests. For example, the
+   application instance needs to sync its data with the data of other instances
 
- When a pod gets deployed on a cluster (as part of a `Deployment` for example),
- it might not immediately be ready for serving traffic. For example, a web app
- may need some time to initialize or your app may need to pull data from S3
- into memory (configuration data for example), or in a distributed setting,
- your app may need to reach consensus with other instances.  These are
- situations where your service should not immediately route traffic to that new
- pod. Only when the new pod is _ready_ it gets included as one of the pods that
- a service routes traffic to.
+When a pod gets deployed on a cluster (as part of a `Deployment` for example),
+it might not immediately be ready for serving traffic. For example, your app
+may need to pull configuration data from [S3](https://aws.amazon.com/s3/) into
+memory, or in a distributed setting, your app may need to reach consensus with
+other instances.  These are situations where your service should not
+immediately route traffic to that new pod. Only when the new pod is _ready_ it
+gets included as one of the pods that a service routes traffic to.
 
-This is accomplished through the use of a _readiness
- probe_. There are several ways to define readiness probes, but I'll focus on
- an `HTTP GET` readiness probe: doing a `GET` to the pod will indicate, based
- on the returned status of that `GET`, whether the pod is ready for serving
- traffic or not.
+This is accomplished through the use of a _readiness probe_. There are several
+ways to define readiness probes, but I'll focus on a `HTTP GET` readiness
+probe: doing a `GET` to the pod will indicate, based on the returned status of
+that `GET`, whether the pod is ready for serving traffic or not -- _you probe
+the pod for readiness_.
 
-Without going into more detail, you'll add a `readinessProbe` attribute to your
-pod specification, for example, you would change the following pod:
+You can specify the `readinessProbe` in the pod specification. Let's change the
+following pod:
 
 ```
 apiVersion: v1
@@ -917,17 +929,16 @@ spec:
 
 Once the pod is deployed, we wait 300 seconds (`initialDelaySecods`), and then
 every 30 seconds (`periodSeconds`), we do a `GET` on port 8888 of the container
-at path `/readiness`. If that `GET` returns `200` your pod is ready and will be
-included for routing traffic to.
+at path `/readiness`. If that `GET` returns a
+[`200`](https://en.wikipedia.org/wiki/List_of_HTTP_status_codes#2xx_success)
+your pod is ready and will be included for routing traffic to.
 
-This requires that your app defines a path `/readiness` and that it
-only returns `200` if it is truly ready. For a web app, this will naturally
-follow when the web app is up and running. If there's more complex start-up
-going on (like reaching consensus in a distributed setting), you should
-guarantee that the `/readiness` path only returns a `200` when the application
-is indeed ready.
-
-XXRev2
+This set-up of course requires that your app defines a path `/readiness` and
+that it only returns `200` if it is truly ready. For a web app, this will
+naturally follow when the web app is up and running. If there's more complex
+start-up going on (like reaching consensus in a distributed setting), you
+should guarantee that the `/readiness` path only returns a `200` when the
+application is ready.
 
 # Are you alive?
 
@@ -1035,7 +1046,7 @@ according to a linked `Deployment`. Is there a limit to scaling up the pods?
 Yes, there is and the HPA indicates that as well.  Let's write it all up in a
 YAML `hi-hpa.yaml`:
 
-```
+```yaml
 apiVersion: autoscaling/v2beta2
 kind: HorizontalPodAutoscaler
 metadata:
