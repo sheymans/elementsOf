@@ -291,28 +291,30 @@ container image `stijnh/hi`, deployed on a pod `hi-pod` on 1 node (your laptop):
 
 ![Running 1 pod on your laptop](./diagrams/pod.svg)
 
+XXRev2
 
 ### Deployment
 
-We now have 1 instance of your application running (in 1 container, on 1 pod).
-Recall that I indicated as a requirement that _your application needs to serve
-1000s of requests per second_ and turns out 1 instance of your application is
-not able to do that. Assume each application can serve 250 requests per second,
-and we need to be able to serve 1000 in total. Doing that math without
-hesitation and with elegance, I calculated that we need 4 instances of the
-application running.
+One instance of your application is up and running, in 1 container, on 1 pod.
+I indicated that _your application needs to serve 1000s of requests per second_
+and, humor me, it turns out 1 instance of your application is not able to do
+that. For more good humor, assume that each application can serve 250 requests
+per second.  If you do that math, as I'm sure you  do without hesitation and
+with elegance, you see that we need 4 instances of the application.
 
-''OK, let me run 4 containers of my application'', you say. "yes, but no" I
-reply. The unit of operation when your application is managed by k8s is a pod,
-so we'll want 4 pods (each in turn running 1 container).
+"OK, let me run 4 containers of my application," you say.<br/> 
+"Yes, but no." I say. "The unit of operation when your application is managed by k8s is a pod,
+so we want 4 pods, each in turn running 1 container."<br/>
+"So I _was_ right", you say.<br/>
+"Stop being so pedantic and pay attention", I growl.
 
 There's a k8s resource type (the first one we met was a `Pod`) that
-allows you to specify how many pods k8s should keep around: a
-[`Deployment`](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/). 
+allows to specify how many pods k8s to keep around: a
+[`Deployment`](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/).
+Usually you should specify more than 1 pod, to ward off loneliness. 
 
-Specifying how many pods I'd like around is the core functionality of a
-`Deployment` that I'm interested in at this point. As with pods, deployments
-are specified using YAML manifests and the line that will get me my 4 pods is:
+As with pods, you specify a deployment
+using a YAML manifests. The line that gets me my 4 pods is:
 
 ```
 spec:
@@ -326,18 +328,19 @@ spec:
   replicas: 4
 ```
 
-How will you describe _which pod you want 4 replicas of_. Kubernetes uses
-_labels_ to determine which replicas you're talking about.  On the one hand,
-you make sure your pods are labeled, and then you indicate in your `Deployment`
-what labels you're describing. An example of a label is `app=hi`, another could
-be `tier=dev`, or `color=blue`. The latter is obviously no good, `color=yellow`
-would be better. Labels are so-called key/value pairs, and you can have
-multiple different labels on a pod (but you could not have 2 labels with the
-same _key_: so `color=blue` and `color=yellow` would not work.
+How will you describe _which_ pod you want 4 replicas of? Kubernetes uses
+_labels_ to determine which replicas you're talking about.
 
-On the `Deployment` side, you'd then say that you want 3 replicas of all pods matching
-_these labels_. For example, you'd indicate that you want all pods with label
-`app=hi`:
+On the one hand, the _Pod_ side, you make sure your pods are labeled, and then you indicate in
+your `Deployment` what labels you're describing. An example of a label is
+`app=hi`. Another label could be `tier=dev`, or `color=blue`. The latter is
+obviously no good, `color=yellow` is be better. Labels are _key/value pairs_,
+and you can have multiple different labels on a pod (but you could not have 2
+labels with the same _key_: so `color=blue` and `color=yellow` does not work).
+
+On the `Deployment` side, you then indicate that you want 3 replicas of all
+pods matching _these labels_. For example, you indicate that you are describing
+pods with label `app=hi`:
 
 ```
 spec:
@@ -346,9 +349,9 @@ spec:
       app: hi
 ```
 
-Easy enough. "But but, we did not give our pod this label, so there's 
-nothing to find". Yes, The final piece of such a `Deployment` would be to describe
-what kind of pods you want to create, a so-called _pod template_:
+Easy enough. <br/> "But but, we did not give our pod this label, so there's
+nothing to find." <br/> Yes, The final piece of such a `Deployment` is to
+describe what kind of pods you want to create, a so-called _pod template_:
 
 ```
 spec:
@@ -364,11 +367,11 @@ spec:
           - containerPort: 8111
 ```
 
-The latter looks exactly like our pod definition earlier, except that it seems
-to also specify that the pod needs to have a label `app=hi` as metadata. Yes,
-indeed! In fact, now that have a deployment you can forget all about that
-initial pod definition. This `Deployment` knows all it needs to know to create
-your 3 pods.  Let's put it all together:
+The latter looks like the pod definition earlier, except that it also specifies
+that the pod needs to have a label `app=hi` as metadata. In fact, now that we
+have a deployment you can forget all about that initial pod definition. This
+`Deployment` knows all it needs to know to create your 3 pods (_4! pay
+attention!_).  Put it all together:
 
 ```
 apiVersion: apps/v1
@@ -392,7 +395,7 @@ spec:
             - containerPort: 8111
 ```
 
-It describes a `Deployment` with name `hi-deployment`. It specifies that at all
+This specification describes a `Deployment` with name `hi-deployment`. It specifies that at all
 times there need to be 4 replicas of a `Pod` matching `app=hi`. The `template`
 indicates how the `Deployment` will go about creating new pods:, it will run
 the container `stijnh/hi` and it will label the pod with `app=hi`. The latter
@@ -401,7 +404,7 @@ by the `Deployment`: imagine if we would just a create a `Pod` with label
 `app=yo`, the `Deployment` would never think it reached 4 replicas of pods with
 label `app=hi` so it'd keep on creating pods.
 
-Before we try this `Deployment`, delete all resources you have so far, and then
+Before you try this `Deployment`, delete all resources you have so far, and then
 check that you have 0 pods running:
 
 ```
@@ -437,8 +440,8 @@ hi-deployment-5f7b895fd9-r58kc   1/1     Running   0          8s
 hi-deployment-5f7b895fd9-wgwpp   1/1     Running   0          8s
 ```
 
-You just specified in 1 lousy file to bring up 4 instances of your app and here
-we are. Let's verify that these pods have indeed the label `app=hi` so they're
+You just specified in 1 lousy file that 4 instances of your app should be
+brought to live. Verify that these pods have the label `app=hi` so they're
 under management of the `Deployment`:
 
 ```
@@ -450,8 +453,8 @@ hi-deployment-5f7b895fd9-r58kc   1/1     Running   0          2m40s   app=hi,pod
 hi-deployment-5f7b895fd9-wgwpp   1/1     Running   0          2m40s   app=hi,pod-template-hash=5f7b895fd9
 ```
 
-Yep, there we have it, `app=hi`. We said the Deployment specifies that at all
-times there needs to be 4 replicas. So what if we delete one?  For example,
+Yep, there we have it, `app=hi`. I promised that the Deployment specifies that at all
+times there needs to be 4 replicas. So what if you delete one?  For example,
 delete the first pod:
 
 ```
@@ -469,7 +472,7 @@ hi-deployment-5f7b895fd9-r58kc   1/1     Running   0          6m6s
 hi-deployment-5f7b895fd9-wgwpp   1/1     Running   0          6m6s
 ```
 
-Still 4 pods! But if you look at the `NAME`s you'll see that
+Still 4 pods! But if you look at the `NAME`s you see that
 `hi-deployment-5f7b895fd9-5hb5h` is indeed gone, and replaced by the new pod
 `hi-deployment-5f7b895fd9-dt8kf`. The `Deployment` indeed guaranteed that 4
 replicas are running at all times. The Zombie Apocalypse is nigh.
@@ -487,7 +490,7 @@ Note that it indicates that `4` out `4` pods are ready. In this article, I'll
 stay at the abstraction of `Deployment` and `Pods` but if you do the following,
 you'll see that there's something called a
 [`ReplicaSet`](https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/)
-created as well:
+created as well.
 
 ```
 $ kubectl get replicaset
@@ -502,15 +505,13 @@ around `ReplicaSet`s as you'll usually not deal with them directly.
 
 ![Running A Deployment on laptop](./diagrams/deployment.svg)
 
-Note how we referred explicitly to 4 instances of the application, not 4 nodes.
+Note how I referred explicitly to 4 instances of the application, not 4 nodes.
 The 4 pods running the containers are all running on the same node on your
-laptop. Of course, in reality, you'll have more than 1 node to run your
+laptop. In reality, you'll have more than 1 node to run your
 application, and your application instances may have been scheduled on
 different nodes to accommodate for, for example, CPU requirements your
 application needs: you may want to run 100 instances, but your node is a
 machine that could not run 100 instances, you may need 10 nodes.  
-
-XXRev2
 
 # Clients of your Application
 
