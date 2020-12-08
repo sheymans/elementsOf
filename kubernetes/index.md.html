@@ -133,6 +133,8 @@ image, in a _Pod_ manifest you describe what all goes in your _Pod_, most
 importantly what container images to use such k8s knows how to create a Pod out
 of several containers.
 
+XXRev2
+
 Pods can be defined in [YAML](https://en.wikipedia.org/wiki/YAML) files, so
 I'll have a file `hi-pod.yaml`:
 
@@ -158,11 +160,10 @@ Let's go over the pod definition, line by line:
 apiVersion: v1
 ```
 
-indicates what API version of k8s this k8s _resource_ is defined in (_Pods_,
+indicates what API version of k8s this k8s _resource_ is defined for (_Pods_,
 together with a whole lot of other things, are named _resources_ in k8s), in
 this case `v1`. I have no memory, nor patience, for remembering API versions,
-but there are [explanations of what version to use when out
-there](https://matthewpalmer.net/kubernetes-app-developer/articles/kubernetes-apiversion-definition-guide.html).
+but there are [explanations of what version to use](https://matthewpalmer.net/kubernetes-app-developer/articles/kubernetes-apiversion-definition-guide.html).
 
 ```
 kind: Pod
@@ -186,36 +187,27 @@ spec:
         - containerPort: 8111
 ```
 
-indicates the pod's specification, in this case a list of 1 container, where the
-container is described by its image tag `stijnh/hi`, given a name `hi`, and
-indicating that the container exposes the port `8111`.
+indicates the pod's specification, in this case a list of 1 container, where
+the container is described by its image tag `stijnh/hi`, given a name `hi`, and
+indicates that the container exposes the port `8111`.  A pattern worth
+remembering are the 4 sections that you will see with other types of resources
+as well: the `apiVersion`, the `kind`, the `metadata`, and the `spec`.
 
-If you only remember one thing from the above, may it be that you'll see 4
-parts of such a resource description which you'll see with other types of
-resources as well: the `apiVersion`, the `kind`, the `metadata`, and the
-`spec`.
-
-With that said, can we deploy this pod now please? Yes. I'm going to assume
-you're on your laptop and have something like
+To deploy this pod, I assume you're on your laptop and have something like
 [minikube](https://github.com/kubernetes/minikube) installed. As I'm tackling
-k8s from the perspective of an application developer, I'll not get into the
-details of setting up more than a toy cluster using `minikube`.
+k8s from the perspective of an application developer, I do not tackle setting
+up more than a toy cluster using `minikube`. If you want to sing-along, go
+check out [minikube](https://github.com/kubernetes/minikube) and install it.
 
-This _is_ a good time to talk about some general k8s concepts. But first, go
-check out [minikube](https://github.com/kubernetes/minikube) and install it so
-you can sing along.
+While installing `minikube`, you might have read that minikube will give you a
+_single-node cluster_. You'll hear _cluster_ a lot, so what is a cluster? My
+working definition is that it's a set of nodes.  What's a _node_? Again, my
+working definition is _that's a machine, an EC2 instance, a laptop, some kind
+of computor with a CPU and memory, an old Pentium tower in a dusty basement,
+..._ A typical mapping in my head would be _if I have 40 EC2 instances in the
+EU region to serve traffic_, that's a _cluster_ of _40_ nodes. 
 
-While installing `minikube`, you might have read
-that minikube will give you a _single-node cluster_. You'll hear _cluster_ a
-lot, so what is a cluster? My working definition is that it's a set of nodes.
-What's a _node_ then? Again, my working definition is _that's a machine, an EC2
-instance, a laptop, some kind of computor with a CPU and memory, an old Pentium
-tower in a dusty basement, ..._ you get the idea. A typical mapping in my head
-would be _if I have 40 EC2 instances in the EU region to serve traffic_, that's
-a _cluster_ of _40_ nodes. 
-
-
-Now that you have `minikube` installed, this command should show something:
+With minikube running, try this:
 
 ```shell
 $ kubectl get nodes
@@ -223,12 +215,11 @@ NAME       STATUS   ROLES    AGE   VERSION
 minikube   Ready    master   0d   v1.18.3
 ```
 
-Your first use of `kubectl`, but not your last. `kubectl` is the command-line
-tool that will allow you to interact with your cluster asking it about its
-nodes, its pods, ...The output of the command shows that we have 1 node
-running, called `minikube`. This is good to keep in mind. All examples we'll
-show later will involve 1 node. In reality, you'll be working with clusters
-that have many many more nodes of course.
+`kubectl` is the command-line tool that allows you to interact with your
+cluster, asking it about its nodes, its pods, ...The output of the command
+shows that we have 1 node running, called `minikube`. This is good to keep in
+mind. All later examples involve 1 node. In your real life, you'll work with
+clusters that have many more nodes.
 
 We have a cluster with 1 node. We have our `hi` app, tucked away in a
 container, and we defined a pod that is supposed to run that container. Let's
@@ -247,7 +238,7 @@ NAME     READY   STATUS    RESTARTS   AGE
 hi-pod   1/1     Running   0          54s
 ```
 
-This shows us that the pod is `Running` and has been doing so for `54s`. Note the levels of indirection: 
+This shows that the pod is `Running` and has been doing so for `54s`. Note the levels of indirection: 
 
 - when we ran the app `hi.js` on our laptop we could just navigate to `localhost:8111` and see the `Hi from...`
 - when we ran the app in a container, we needed to forward the localhost's port `8111` _into_ the container using `docker container run -d -p 8111:8111 -t stijnh/hi`
@@ -255,15 +246,15 @@ This shows us that the pod is `Running` and has been doing so for `54s`. Note th
 
 I could forward the port via `kubectl` as well, but that would mostly be for
 debugging. I'll defer to answering this question to the next section where I'll
-talk about how to make your pod visible to other pods. For now, I'll show how
-you can check the logs of that pod:
+talk about how to make your pod visible to other pods. For now, I'll just show
+how to check your logs on that pod:
 
-```
+```shell
 $ kubectl logs hi-pod
 hi: listening on port 8111 of host hi-pod
 ```
 
-That's indeed what the app logs. Note that the host is listed as `hi-pod` which
+That's indeed what the app logs when you start it. Note that the host is listed as `hi-pod` which
 corresponds to the name we gave the pod in `hi-pod.yaml`.
 
 You can see more details for your pod by doing a `describe`:
@@ -285,13 +276,11 @@ Events:
   Normal  Started    23h        kubelet, minikube  Started container hi
 ```
 
-You'll see the container image `stijnh/hi` being pulled and then the container
-being created. Summarizing the current state with a picture, you see the
-container image `stijnh/hi`, deployed on a pod `hi-pod` on 1 node (your laptop):
+The container image `stijnh/hi` is pulled and then the container is created.
+This picture summarizes the current state -- the container image `stijnh/hi`,
+deployed on a pod `hi-pod` on 1 node (your laptop):
 
 ![Running 1 pod on your laptop](./diagrams/pod.svg)
-
-XXRev2
 
 ### Deployment
 
@@ -407,20 +396,20 @@ label `app=hi` so it'd keep on creating pods.
 Before you try this `Deployment`, delete all resources you have so far, and then
 check that you have 0 pods running:
 
-```
-kubectl delete all --all
-kubectl get pods
+```shel
+$ kubectl delete all --all
+$ kubectl get pods
 ```
 
 Now, create a deployment using the usual `create` based on the above YAML (`hi-deployment.yaml`):
 
-```
-kubectl create -f hi-deployment.yaml
+```shell
+$ kubectl create -f hi-deployment.yaml
 ```
 
 And then watch the magic:
 
-```
+```shell
 $ kubectl get pods
 NAME                             READY   STATUS              RESTARTS   AGE
 hi-deployment-5f7b895fd9-5hb5h   0/1     ContainerCreating   0          3s
@@ -431,7 +420,7 @@ hi-deployment-5f7b895fd9-wgwpp   0/1     ContainerCreating   0          3s
 
 Note the `STATUS`, and then a couple of seconds later:
 
-```
+```shell
 $ kubectl get pods
 NAME                             READY   STATUS    RESTARTS   AGE
 hi-deployment-5f7b895fd9-5hb5h   1/1     Running   0          8s
@@ -444,7 +433,7 @@ You just specified in 1 lousy file that 4 instances of your app should be
 brought to live. Verify that these pods have the label `app=hi` so they're
 under management of the `Deployment`:
 
-```
+```shell
 $ kubectl get pods --show-labels
 NAME                             READY   STATUS    RESTARTS   AGE     LABELS
 hi-deployment-5f7b895fd9-5hb5h   1/1     Running   0          2m40s   app=hi,pod-template-hash=5f7b895fd9
@@ -457,13 +446,13 @@ Yep, there we have it, `app=hi`. I promised that the Deployment specifies that a
 times there needs to be 4 replicas. So what if you delete one?  For example,
 delete the first pod:
 
-```
+```shell
 $ kubectl delete pod hi-deployment-5f7b895fd9-5hb5h
 ```
 
 Then check your pods, with label `app=hi` (you can use the `-l` flag to specify to only see pods with that label):
 
-```
+```shell
 $ kubectl get pods -l app=hi
 NAME                             READY   STATUS    RESTARTS   AGE
 hi-deployment-5f7b895fd9-dt8kf   1/1     Running   0          6m6s
@@ -480,7 +469,7 @@ replicas are running at all times. The Zombie Apocalypse is nigh.
 You have those 4 pods running, but you can also get more info on the
 `Deployment` resources running right now as well:
 
-```
+```shell
 $ kubectl get deployment
 NAME            READY   UP-TO-DATE   AVAILABLE   AGE
 hi-deployment   4/4     4            4           8m48s
@@ -492,7 +481,7 @@ you'll see that there's something called a
 [`ReplicaSet`](https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/)
 created as well.
 
-```
+```shell
 $ kubectl get replicaset
 NAME                       DESIRED   CURRENT   READY   AGE
 hi-deployment-5f7b895fd9   4         4         4       10m
@@ -714,13 +703,13 @@ it serves).
 
 Alright, let's put the `Ingress` in play:
 
-```
+```shell
 $ kubectl create -f hi-ingress.yaml
 ```
 
 Check that it's there:
 
-```
+```shell
 $ kubectl get ingresses
 NAME         CLASS    HOSTS                 ADDRESS        PORTS   AGE
 hi-ingress   <none>   hi.stijnheymans.net   192.168.64.2   80      10s
@@ -852,14 +841,14 @@ enough pods to serve production traffic.
 To finish this section, some quick commands that allow you to check the
 deployment rollouts/rollbacks.
 
-```
-kubectl rollout status deployment hi-deployment
+```shell
+$ kubectl rollout status deployment hi-deployment
 ```
 
 If something went wrong you can execute a rollback immediately as follows:
 
-```
-kubectl rollout undo deployment hi-deployment
+```shell
+$ kubectl rollout undo deployment hi-deployment
 ```
 
 You may of the controlling kind, and you wonder how to control the rolling
@@ -1098,7 +1087,7 @@ cherish the road you've traveled since starting to read this article.
 
 Try it out as usual with:
 
-```
+```shell
 $ kubectl create -f hi-hpa.yaml
 ```
 
