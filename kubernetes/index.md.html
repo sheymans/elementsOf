@@ -5,52 +5,50 @@
 
 # Introduction
 
-In this article, I will go over the elements of Kubernetes _from an application
-developer's perspective_. Familiarity with deploying applications in
-a production environment is expected[^familiarity].
-
+In this article, I lay out the elements of Kubernetes _from an application
+developer's perspective_. Familiarity with deploying applications in a
+production environment is expected[^familiarity].
 
 Rather than explaining Kubernetes from the ground-up and building a pie in the
-sky, I'll introduce Kubernetes as something that provides solutions for
-problems you are encountering in high-traffic production
-environments right now:
+sky that no-one will eat because it has strawberries and whipped cream and who
+likes that, I introduce Kubernetes as a solution for problems you are
+encountering in high-traffic production environments right now:
 
 - Your application needs to serve 1000s of requests per second so you will need many instances of the application running
 - Clients of your application need to connect to one IP address and requests will be routed to the different application instances automatically
 - You need to be able to push changes to your application without downtime
 - You need to be able to rollback changes to your application
 - Your application needs to be _warmed up_: things need to happen before your application can start serving up requests. For example, the application instance needs to sync its data with the data of other instances
-- When an instance of your application dies (and is thus no longer able to serve requests), that instance needs to become invisible to clients of your application. Traffic should be guided to still functioning instances of your application
-- To save costs during the night when you need less capability for your main application, you want to reuse some of your capability to run batch jobs that crunch data
+- When an instance of your application dies (and is thus no longer able to serve requests), that instance needs to become invisible to clients of your application. Traffic should be guided to still-functioning instances of your application
+- To save costs during the night, when you need less capability for your main application, you want to reuse some of the available capability to run batch jobs that crunch data
 - There will be times when the machines to serve your traffic will not be enough (during a promotion, or, say, the holiday period), so you want to increase, _scale up_, the amount of physical machines you have available.  After the busy period, you want to get back to normal and scale down
 
 It will come as no suprise (if you _are_ surprised: Sinterklaas does indeed
 exist _and_ the world is a beautiful place where no-one drags themselves
 through wondering _where and when in the name it all went wrong_) that
-_Kubernetes_ is the _thing_ that will provide solutions for those problems.
-I'll refer to _Kubernetes_ by its common abbreviation of _k8s_ -- pronounced
-_kates_, because that's what all the cool kids do and I'll do the same to just
-to spite them with my lack of cool- and kidness. While Kubernetes is massive
-hammer, it does hammer the above problems squarely away.  I disparagingly say
-_hammer_ as I say almost everything disparaginly but also because k8s is able to
-do more than what you'd need to solve the above stated problems.  Blame that on
-its historic origin as used by a Cloud Provider in which many different
-applications need to run on the same cluster of machines in a desperate capitalistic attempt
-to optimize usage of infrastructure.  Given the problems we laid out, we are
-not _that_ interested in running different applications on the same
-infrastructure, although the particular requirement to save cost during the
-night and run some batch jobs on the same machine that your machine runs on
-during the day, is designed to hint at that use.
+_Kubernetes_ is _a_ solution for those problems.  I'll refer to _Kubernetes_ by
+its common abbreviation of _k8s_ -- pronounced _kates_, because that's what all
+the cool kids do and I'll do the same even though it's aeons since I was a kid.
+While Kubernetes is a large hammer, it does hammer the above problems squarely
+away.  I disparagingly say _hammer_ as I say almost everything disparaginly but
+also because k8s is able to do more than what you'd need to solve the above
+stated problems.  Blame that on its historic origin as used by a Cloud Provider
+in which many different applications need to run on the same cluster of
+machines in a desperate capitalistic attempt to optimize usage of
+infrastructure.  Given the problems I laid out, I'm not _that_ interested
+in running different applications on the same infrastructure, although the
+particular requirement to save cost during the night and run some batch jobs on
+the same machine that your machine runs on during the day, is designed to hint
+at that use.
 
 The requirements as laid out above come from my personal experience, and my
 limited knowledge I have on k8s comes from <a target="_blank" href="https://www.amazon.com/gp/product/1617293725/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=1617293725&linkCode=as2&tag=elementsof0d-20&linkId=0c545c38289f0bec5a3732abf7457643">Kubernetes in Action</a><img src="//ir-na.amazon-adsystem.com/e/ir?t=elementsof0d-20&l=am2&o=1&a=1617293725" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;" />  by
 Marko Lukša, which gave me all the misplaced confidence to play an expert on
-the Internet [^affiliate]. The book goes in tremendous depth and is useful for
-infrastructure administrators (which is a whole world on itself that I will
-barely touch on here). In this article, I'll mostly stick to what I know which
-is application development and we'll go over every single one of the
-problems/requirements and discuss how k8s helps solving them.
-
+the Internet [^affiliate]. The book goes in depth and is useful for
+infrastructure administrators (which is a whole world of joy on itself that I will
+barely touch on here). In this article, I mostly stick to what I know, 
+application development, and I'll go over every single one of the
+above problems/requirements and discuss how k8s helps solving them.
 
 # Instances of your Application
 
@@ -72,7 +70,7 @@ container.  I posted the source of this application on
 and I pushed the container image to the [Docker Hub](https://hub.docker.com/)
 with name [stijnh/hi_app](https://hub.docker.com/r/stijnh/hi).
 
-If at this point, you feel slightly lost and it's related to this article, this
+If at this point you feel slightly lost and it's related to this article, this
 may be a good time to take a break from this article and read up on the
 [Elements of Docker
 Containers](http://www.stijnheymans.net/elements_of_docker_containers.html).
@@ -101,27 +99,27 @@ is the container's hostname.
 
 At this point you have _1 instance of your application running_. It does so as
 a container on your laptop, presuming you're following along on your laptop.
-Your laptop is the _machine_ (or for people that like their terms like their sunsets,  _with drama_,
-your _bare metal machine_).
+Your laptop is the _machine_ (or for people that like their engineering terms
+like their sunsets,  _with drama_, your _bare metal machine_).
 
 ## Multiple Instances of your Application
 
 ### Pod
 
-We have 1 instance of our app running, but you'll have thousands of users that
+You have 1 instance of our app running, but you'll have thousands of users that
 you need to say hi to, so you can't have only 1 instance -- that will not fit
-your megalomaniac dreams!  We need more instances! We need at least 3!
+your megalomaniac dreams!  More instances! At least 3!
 
-But first we need to define a bit better what we need 3 of. If we need 3
-instances of our application, we clearly need 3 containers (each container runs
-our app). As this is example is illustrating a couple of elements of k8s, I've
+But first I need to define a bit better what we need 3 of. If I need 3
+instances of our application, I need 3 containers (each container runs
+the app). As this is example is illustrating a couple of elements of k8s, I've
 not mentioned other real-world requirements like logging. Typically, your
 application will be writing logs, and you'll need something to _rotate_ these
 logs away to more permanent storage (to [AWS's S3](https://aws.amazon.com/s3/)
 for example, where you could query it using
-[Athena](https://aws.amazon.com/athena/)). We'd want this process of log
+[Athena](https://aws.amazon.com/athena/)). I want this process of log
 rotating in a separate container (other apps could use it as well so it's not
-typical for this app alone). You'd want these 2 containers always running
+typical for this app alone). I want these 2 containers always running
 together[^sidecar], so if I say I want 3 instances of my app, I actually want 3
 instances of my app with the logging container. Hence, the first level of
 abstraction -- the base unit k8s deals with -- is _not_ a container, it's
@@ -132,8 +130,6 @@ a `Dockerfile` you describe your app so that `docker` knows how to build an
 image, in a _Pod_ manifest you describe what all goes in your _Pod_, most
 importantly what container images to use such k8s knows how to create a Pod out
 of several containers.
-
-XXRev2
 
 Pods can be defined in [YAML](https://en.wikipedia.org/wiki/YAML) files, so
 I'll have a file `hi-pod.yaml`:
@@ -933,7 +929,7 @@ application is ready.
 !!!
    When an instance of your application dies (and is thus no longer able to
    serve requests), that instance needs to become invisible to clients of your
-   application. Traffic should be guided to still functioning instances of your
+   application. Traffic should be guided to still-functioning instances of your
    application
 
 Well, that requirement sounds related to the readiness requirement, doesn't it?
@@ -954,7 +950,7 @@ I'll not spend any more words on it.
 
 !!!
    To save costs during the night when you need less capability for your main application,
-   you want to reuse some of your capability to run batch jobs that crunch data
+   you want to reuse some of the available capability to run batch jobs that crunch data
 
 Note that this does not talk about getting rid of actual machines/nodes: it
 just indicates there are periods that you want to downscale the number of pods
