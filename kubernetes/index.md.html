@@ -14,14 +14,14 @@ sky that no-one will eat because it has strawberries and whipped cream and who
 likes that, I introduce Kubernetes as a solution for problems you are
 encountering in high-traffic production environments right now:
 
-- Your application needs to serve 1000s of requests per second so you will need many instances of the application running
+- Your application needs to serve 1000s of requests per second so you need many instances of the application running
 - Clients of your application need to connect to one IP address and requests will be routed to the different application instances automatically
 - You need to be able to push changes to your application without downtime
 - You need to be able to rollback changes to your application
 - Your application needs to be _warmed up_: things need to happen before your application can start serving up requests. For example, the application instance needs to sync its data with the data of other instances
 - When an instance of your application dies (and is thus no longer able to serve requests), that instance needs to become invisible to clients of your application. Traffic should be guided to still-functioning instances of your application
-- To save costs during the night, when you need less capability for your main application, you want to reuse some of the available capability to run batch jobs that crunch data
-- There will be times when the machines to serve your traffic will not be enough (during a promotion, or, say, the holiday period), so you want to increase, _scale up_, the amount of physical machines you have available.  After the busy period, you want to get back to normal and scale down
+- To save costs during the night, when you need less capability for your main application, you want to reuse some of the available capability to run batch jobs
+- There will be times when there will not be enough machines to serve your traffic (during a promotion, or, say, the holiday period), so you want to increase, _scale up_, the amount of physical machines you have available.  After the busy period, you want to get back to normal and scale down
 
 It will come as no suprise (if you _are_ surprised: Sinterklaas does indeed
 exist _and_ the world is a beautiful place where no-one drags themselves
@@ -29,7 +29,7 @@ through wondering _where and when in the name it all went wrong_) that
 _Kubernetes_ is _a_ solution for those problems.  I'll refer to _Kubernetes_ by
 its common abbreviation of _k8s_ -- pronounced _kates_, because that's what all
 the cool kids do and I'll do the same even though it's aeons since I was a kid.
-While Kubernetes is a large hammer, it does hammer the above problems squarely
+Even though Kubernetes is a large hammer, it does hammer the above problems squarely
 away.  I disparagingly say _hammer_ as I say almost everything disparaginly but
 also because k8s is able to do more than what you'd need to solve the above
 stated problems.  Blame that on its historic origin as used by a Cloud Provider
@@ -43,17 +43,17 @@ at that use.
 
 The requirements as laid out above come from my personal experience, and my
 limited knowledge I have on k8s comes from <a target="_blank" href="https://www.amazon.com/gp/product/1617293725/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=1617293725&linkCode=as2&tag=elementsof0d-20&linkId=0c545c38289f0bec5a3732abf7457643">Kubernetes in Action</a><img src="//ir-na.amazon-adsystem.com/e/ir?t=elementsof0d-20&l=am2&o=1&a=1617293725" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;" />  by
-Marko Lukša, which gave me all the misplaced confidence to play an expert on
-the Internet [^affiliate]. The book goes in depth and is useful for
-infrastructure administrators (which is a whole world of joy on itself that I will
-barely touch on here). In this article, I mostly stick to what I know, 
-application development, and I'll go over every single one of the
-above problems/requirements and discuss how k8s helps solving them.
+Marko Lukša. A book that, like all good books, gave me all the misplaced
+confidence to play an expert on the Internet [^affiliate]. The book goes in
+depth and is useful for infrastructure administrators (which is a whole world
+of joy on itself that I will barely touch on here). In this article, I mostly
+stick to what I know, application development, and I'll go over every single
+one of the above problems/requirements and discuss how k8s helps solving them.
 
 # Instances of your Application
 
 !!!
-   Your application needs to serve 1000s of requests per second so you will need many instances of the application running
+   Your application needs to serve 1000s of requests per second so you need many instances of the application running
 
 ## A Containerized Application
 
@@ -71,9 +71,9 @@ and I pushed the container image to the [Docker Hub](https://hub.docker.com/)
 with name [stijnh/hi_app](https://hub.docker.com/r/stijnh/hi).
 
 If at this point you feel slightly lost and it's related to this article, this
-may be a good time to take a break from this article and read up on the
-[Elements of Docker
-Containers](http://www.stijnheymans.net/elements_of_docker_containers.html).
+may be a good time to take a break to read up on the [Elements of Docker
+Containers](http://www.stijnheymans.net/elements_of_docker_containers.html), or
+have a Snickers, what do I know.
 
 The container image is public so you can try out the app on your laptop right now with:
 
@@ -98,28 +98,28 @@ where `fbd698569ec5` will be different for you as this
 is the container's hostname.
 
 At this point you have _1 instance of your application running_. It does so as
-a container on your laptop, presuming you're following along on your laptop.
-Your laptop is the _machine_ (or for people that like their engineering terms
-like their sunsets,  _with drama_, your _bare metal machine_).
+a container on your laptop.  Your laptop is the _machine_ (or for people that
+like their engineering terms like their sunsets,  with drama, your _bare
+metal machine_).
 
 ## Multiple Instances of your Application
 
 ### Pod
 
 You have 1 instance of our app running, but you'll have thousands of users that
-you need to say hi to, so you can't have only 1 instance -- that will not fit
-your megalomaniac dreams!  More instances! At least 3!
+you need to say hi to, so you can't have only 1 instance -- you have dreams,
+megalomaniac dreams!  More instances! At least 3!
 
-But first I need to define a bit better what we need 3 of. If I need 3
-instances of our application, I need 3 containers (each container runs
-the app). As this is example is illustrating a couple of elements of k8s, I've
+But first I need to define tad more precise what we need 3 of. If I need 3
+instances of the application, I need 3 containers (each container runs
+the app). As this example is focused on a particular set of requirements that k8s solves, I've
 not mentioned other real-world requirements like logging. Typically, your
 application will be writing logs, and you'll need something to _rotate_ these
 logs away to more permanent storage (to [AWS's S3](https://aws.amazon.com/s3/)
 for example, where you could query it using
 [Athena](https://aws.amazon.com/athena/)). I want this process of log
 rotating in a separate container (other apps could use it as well so it's not
-typical for this app alone). I want these 2 containers always running
+specific to this app). I want these 2 containers always running
 together[^sidecar], so if I say I want 3 instances of my app, I actually want 3
 instances of my app with the logging container. Hence, the first level of
 abstraction -- the base unit k8s deals with -- is _not_ a container, it's
@@ -196,12 +196,17 @@ up more than a toy cluster using `minikube`. If you want to sing-along, go
 check out [minikube](https://github.com/kubernetes/minikube) and install it.
 
 While installing `minikube`, you might have read that minikube will give you a
-_single-node cluster_. You'll hear _cluster_ a lot, so what is a cluster? My
-working definition is that it's a set of nodes.  What's a _node_? Again, my
-working definition is _that's a machine, an EC2 instance, a laptop, some kind
-of computor with a CPU and memory, an old Pentium tower in a dusty basement,
-..._ A typical mapping in my head would be _if I have 40 EC2 instances in the
-EU region to serve traffic_, that's a _cluster_ of _40_ nodes. 
+_single-node cluster_. You have only ever heard cluster in the context of "What
+a cluster...! Who ate the last Oreos??!!!" Your feeling for the English
+language tells you that clusters may be related to that exclamation of frustration,
+but not exactly the same. My working definition of a _cluster_ is that it's a
+set of nodes.  What's a _node_? Again, my working definition is _that's a
+machine, an EC2 instance, a laptop, some kind of thing with a CPU and
+memory, an old Pentium tower in a dusty basement, ..._ A typical mapping in my
+head would be _if I have 40 [EC2](https://aws.amazon.com/ec2/) instances in the EU region to serve traffic_,
+that's a _cluster_ of _40_ nodes. 
+
+XXRev3
 
 With minikube running, try this:
 
@@ -950,7 +955,7 @@ I'll not spend any more words on it.
 
 !!!
    To save costs during the night when you need less capability for your main application,
-   you want to reuse some of the available capability to run batch jobs that crunch data
+   you want to reuse some of the available capability to run batch jobs
 
 Note that this does not talk about getting rid of actual machines/nodes: it
 just indicates there are periods that you want to downscale the number of pods
@@ -1090,8 +1095,8 @@ $ kubectl create -f hi-hpa.yaml
 # Autoscale the cluster
 
 !!!
-   There will be times when the machines to serve your traffic will not be
-   enough (during a promotion, or, say, the holiday period), so you want to
+   There will be times when there will not be enough machines to serve your
+   traffic (during a promotion, or, say, the holiday period), so you want to
    increase, _scale up_, the amount of physical machines you have available.
    After the busy period, you want to get back to normal and scale down
 
