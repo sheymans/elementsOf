@@ -206,9 +206,7 @@ memory, an old Pentium tower in a dusty basement, ..._ A typical mapping in my
 head would be _if I have 40 [EC2](https://aws.amazon.com/ec2/) instances in the EU region to serve traffic_,
 that's a _cluster_ of _40_ nodes. 
 
-XXRev3
-
-With minikube running, try this:
+With `minikube` running, try this:
 
 ```shell
 $ kubectl get nodes
@@ -216,11 +214,10 @@ NAME       STATUS   ROLES    AGE   VERSION
 minikube   Ready    master   0d   v1.18.3
 ```
 
-`kubectl` is the command-line tool that allows you to interact with your
-cluster, asking it about its nodes, its pods, ...The output of the command
-shows that we have 1 node running, called `minikube`. This is good to keep in
-mind. All later examples involve 1 node. In your real life, you'll work with
-clusters that have many more nodes.
+`kubectl` is the command-line tool for interacting with your cluster (asking it
+about nodes, pods, ...) The output of the command shows that 1 node, called
+`minikube`. All later examples involve that 1 node. In your real life, you'll
+work with clusters that have many more nodes.
 
 We have a cluster with 1 node. We have our `hi` app, tucked away in a
 container, and we defined a pod that is supposed to run that container. Let's
@@ -241,14 +238,14 @@ hi-pod   1/1     Running   0          54s
 
 This shows that the pod is `Running` and has been doing so for `54s`. Note the levels of indirection: 
 
-- when we ran the app `hi.js` on our laptop we could just navigate to `localhost:8111` and see the `Hi from...`
-- when we ran the app in a container, we needed to forward the localhost's port `8111` _into_ the container using `docker container run -d -p 8111:8111 -t stijnh/hi`
-- when we run the app in a container in a pod, we need to do what?
+- when you ran the app `hi.js` on our laptop, you could navigate to `localhost:8111` and see the `Hi from...`
+- when you ran the app in a container, you needed to forward the localhost's port `8111` _into_ the container using `docker container run -d -p 8111:8111 -t stijnh/hi`
+- when you run the app in a container in a pod, you need to do what?
 
-I could forward the port via `kubectl` as well, but that would mostly be for
-debugging. I'll defer to answering this question to the next section where I'll
-talk about how to make your pod visible to other pods. For now, I'll just show
-how to check your logs on that pod:
+You could forward the port via `kubectl`, but that is mostly for debugging.
+I'll answer this question in the next section where I'll talk about how to make
+your pod visible to other pods. For now, I'll just show how to check your logs
+on the pod with name `hi-pod`:
 
 ```shell
 $ kubectl logs hi-pod
@@ -258,13 +255,13 @@ hi: listening on port 8111 of host hi-pod
 That's indeed what the app logs when you start it. Note that the host is listed as `hi-pod` which
 corresponds to the name we gave the pod in `hi-pod.yaml`.
 
-You can see more details for your pod by doing a `describe`:
+See more details for your pod by doing a `describe`:
 
 ```shell
 $ kubectl describe pod hi-pod
 ```
 
-There will be a lot of output, but interesting is for example the last section:
+Scroll down to the last section:
 
 ```shell
 Events:
@@ -277,7 +274,9 @@ Events:
   Normal  Started    23h        kubelet, minikube  Started container hi
 ```
 
-The container image `stijnh/hi` is pulled and then the container is created.
+The container image `stijnh/hi` is pulled, the container is created, and
+finally, the container is started.
+
 This picture summarizes the current state -- the container image `stijnh/hi`,
 deployed on a pod `hi-pod` on 1 node (your laptop):
 
@@ -293,27 +292,27 @@ per second.  If you do that math, as I'm sure you  do without hesitation and
 with elegance, you see that we need 4 instances of the application.
 
 "OK, let me run 4 containers of my application," you say.<br/> 
-"Yes, but no." I say. "The unit of operation when your application is managed by k8s is a pod,
+"Yes, but no," I say. "The unit of operation when your application is managed by k8s is a pod,
 so we want 4 pods, each in turn running 1 container."<br/>
-"So I _was_ right", you say.<br/>
-"Stop being so pedantic and pay attention", I growl.
+"So I _was_ right," you say.<br/>
+"Stop being pedantic and pay attention."
 
 There's a k8s resource type (the first one we met was a `Pod`) that
 allows to specify how many pods k8s to keep around: a
 [`Deployment`](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/).
-Usually you should specify more than 1 pod, to ward off loneliness. 
+The word on the street is that you should specify more than 1 pod, to ward off loneliness. 
 
 As with pods, you specify a deployment
 using a YAML manifests. The line that gets me my 4 pods is:
 
-```
+```yaml
 spec:
   replicas: 3
 ```
 
 Glad to see you're awake Grasshopper. Four of course:
 
-```
+```yaml
 spec:
   replicas: 4
 ```
@@ -321,18 +320,18 @@ spec:
 How will you describe _which_ pod you want 4 replicas of? Kubernetes uses
 _labels_ to determine which replicas you're talking about.
 
-On the one hand, the _Pod_ side, you make sure your pods are labeled, and then you indicate in
+On the _Pod_ side, you have to make sure your pods are labeled, and then you indicate in
 your `Deployment` what labels you're describing. An example of a label is
 `app=hi`. Another label could be `tier=dev`, or `color=blue`. The latter is
 obviously no good, `color=yellow` is be better. Labels are _key/value pairs_,
-and you can have multiple different labels on a pod (but you could not have 2
+and you can have multiple different labels on a pod (but you cannot have 2
 labels with the same _key_: so `color=blue` and `color=yellow` does not work).
 
 On the `Deployment` side, you then indicate that you want 3 replicas of all
 pods matching _these labels_. For example, you indicate that you are describing
 pods with label `app=hi`:
 
-```
+```yaml
 spec:
   selector:
     matchLabels:
@@ -343,7 +342,7 @@ Easy enough. <br/> "But but, we did not give our pod this label, so there's
 nothing to find." <br/> Yes, The final piece of such a `Deployment` is to
 describe what kind of pods you want to create, a so-called _pod template_:
 
-```
+```yaml
 spec:
   template:
     metadata:
@@ -352,7 +351,7 @@ spec:
     spec:
       containers:
       - image: stijnh/hi
-	name: hi
+        name: hi
         ports:
           - containerPort: 8111
 ```
@@ -387,12 +386,12 @@ spec:
 
 This specification describes a `Deployment` with name `hi-deployment`. It specifies that at all
 times there need to be 4 replicas of a `Pod` matching `app=hi`. The `template`
-indicates how the `Deployment` will go about creating new pods:, it will run
+indicates how the `Deployment` will go about creating new pods: it will run
 the container `stijnh/hi` and it will label the pod with `app=hi`. The latter
-is important as this ensures that the just created Pod would be indeed managed
-by the `Deployment`: imagine if we would just a create a `Pod` with label
-`app=yo`, the `Deployment` would never think it reached 4 replicas of pods with
-label `app=hi` so it'd keep on creating pods.
+is important as this ensures that the just created Pod is managed
+by the `Deployment`. Imagine if we create a `Pod` with label
+`app=yo`. The `Deployment` would never conclude it reached 4 replicas of pods with
+label `app=hi` so pods would keep on getting created.
 
 Before you try this `Deployment`, delete all resources you have so far, and then
 check that you have 0 pods running:
@@ -419,7 +418,7 @@ hi-deployment-5f7b895fd9-r58kc   0/1     ContainerCreating   0          3s
 hi-deployment-5f7b895fd9-wgwpp   0/1     ContainerCreating   0          3s
 ```
 
-Note the `STATUS`, and then a couple of seconds later:
+Note the `STATUS` `ContainerCreating`, and then a couple of seconds later:
 
 ```shell
 $ kubectl get pods
@@ -430,9 +429,8 @@ hi-deployment-5f7b895fd9-r58kc   1/1     Running   0          8s
 hi-deployment-5f7b895fd9-wgwpp   1/1     Running   0          8s
 ```
 
-You just specified in 1 lousy file that 4 instances of your app should be
-brought to live. Verify that these pods have the label `app=hi` so they're
-under management of the `Deployment`:
+Verify that the pods have the label `app=hi` so they're under management of the
+`Deployment`:
 
 ```shell
 $ kubectl get pods --show-labels
@@ -444,14 +442,14 @@ hi-deployment-5f7b895fd9-wgwpp   1/1     Running   0          2m40s   app=hi,pod
 ```
 
 Yep, there we have it, `app=hi`. I promised that the Deployment specifies that at all
-times there needs to be 4 replicas. So what if you delete one?  For example,
+times there need to be 4 replicas. So what if you delete one?  For example,
 delete the first pod:
 
 ```shell
 $ kubectl delete pod hi-deployment-5f7b895fd9-5hb5h
 ```
 
-Then check your pods, with label `app=hi` (you can use the `-l` flag to specify to only see pods with that label):
+Then check your pods with label `app=hi` -- you can use the `-l` flag to specify to only see pods with that label:
 
 ```shell
 $ kubectl get pods -l app=hi
@@ -462,13 +460,13 @@ hi-deployment-5f7b895fd9-r58kc   1/1     Running   0          6m6s
 hi-deployment-5f7b895fd9-wgwpp   1/1     Running   0          6m6s
 ```
 
-Still 4 pods! But if you look at the `NAME`s you see that
-`hi-deployment-5f7b895fd9-5hb5h` is indeed gone, and replaced by the new pod
-`hi-deployment-5f7b895fd9-dt8kf`. The `Deployment` indeed guaranteed that 4
+Still 4 pods, shucks! But if you look at the `NAME`s you see that
+`hi-deployment-5f7b895fd9-5hb5h` is gone and replaced by the new pod
+`hi-deployment-5f7b895fd9-dt8kf`. The `Deployment` guaranteed that 4
 replicas are running at all times. The Zombie Apocalypse is nigh.
 
-You have those 4 pods running, but you can also get more info on the
-`Deployment` resources running right now as well:
+We checked the 4 pods using `kubectl get pods`. You can also get more info on the
+`Deployment` resources: 
 
 ```shell
 $ kubectl get deployment
@@ -489,19 +487,18 @@ hi-deployment-5f7b895fd9   4         4         4       10m
 ```
 
 It's actually this `ReplicaSet` that is created by the `Deployment` that makes
-sure that the replicas are kept to `4` (see the `DESIRED` column). The
+sure that the replicas are kept at `4` (see the `DESIRED` column). The
 `Deployment` does not create the pods directly. I'll not go into more detail
 around `ReplicaSet`s as you'll usually not deal with them directly.
 
-![Running A Deployment on laptop](./diagrams/deployment.svg)
+![A Deployment](./diagrams/deployment.svg)
 
-Note how I referred explicitly to 4 instances of the application, not 4 nodes.
-The 4 pods running the containers are all running on the same node on your
-laptop. In reality, you'll have more than 1 node to run your
+In the previous, I kept referring to 4 instances of the application or 4 pods,
+not 4 nodes.  The 4 pods running the containers are all running on the same
+node on your laptop. In reality, you'll have more than 1 node to run your
 application, and your application instances may have been scheduled on
-different nodes to accommodate for, for example, CPU requirements your
-application needs: you may want to run 100 instances, but your node is a
-machine that could not run 100 instances, you may need 10 nodes.  
+different nodes to accommodate for, for example, CPU requirements of your
+application.  
 
 # Clients of your Application
 
