@@ -509,13 +509,13 @@ Recall the 2nd requirement I listed in the <a href="#introduction">Introduction<
 
 ## (Internal) Clients on the Same Cluster
 
-Let's first consider clients on the same cluster. Why is it tricky for clients to connect to your application?
+First consider clients on the same cluster. Why is it tricky for clients to connect to your application?
 
 - Your application runs on several pods. Each pod has its own IP. For a client to connect to a pod, it needs to know the IP of the pod, but since pods are _ephemeral_ (they could be removed when a node fails etc), that IP may change, so even if your client has the IP of the pod, that IP may become invalid over time
 - There are multiple instances of your application running (4 in our case), so the client needs to know all 4 IPs and then select one to connect to
 
-How can we avoid that a client needs to know that list of ever-changing IPs? We
-need another k8s resource : a _Service_. 
+How to avoid that a client needs to know that list of ever-changing IPs?
+Another k8s resource to the rescue : a _Service_. 
 
 A _Service_ gives you 1 IP and <a
 	href="https://en.wikipedia.org/wiki/Load_balancing_(computing)">load-balances</a>
@@ -539,12 +539,11 @@ spec:
     app: hi
 ```
 
-By now you're used to seeing these. I defined a service (`kind: Service`), a
-name for the service (`hi-service`), and I specified that port `80` of the
-service forwards to port `8111` of the container (if you scroll up, you can see
-that `8111` is indeed the port our `hi` app is listening on). Finally, by using
-a `selector`, I specified that this service is a service fronting pods with
-label `app=hi`. 
+I defined a service (`kind: Service`), a name for the service (`hi-service`),
+and I specified that port `80` of the service forwards to port `8111` of the
+container (if you scroll up, you can see that `8111` is indeed the port our
+`hi` app is listening on). Finally, by using a `selector`, I specified that
+this service is a service fronting pods with label `app=hi`. 
 
 Create the service as usual:
 
@@ -591,10 +590,9 @@ Events:            <none>
 Note the `Endpoints`: those are the IPs of your pods (including the port `8111` on
 which your container runs).
 
-So far we've highlighted that this allows clients _from within the cluster_ to
-hit your service at your cluster IP `10.105.43.171` and be routed to the
-different pods. How do I test this? How do I get a client _from within the
-cluster_?
+I've highlighted that this allows clients _from within the cluster_ to hit your
+service at the IP `10.105.43.171` so they are routed to the different pods. How
+do I test this? How do I get a client _from within the cluster_?
 
 One way to get _in the cluster_ is using `exec` which makes it possible to
 execute a command of your choice on a pod of your choice -- assuming the pod is
@@ -617,7 +615,7 @@ this command, you'll get an error:
 ```
 
 Stepping back you then notice that you based your container image on the
-small Linux image `alpine` and `curl` does not come installed with that Linux (check out the [Dockerfile](https://github.com/sheymans/elementsOf/blob/master/kubernetes/demo/hi_app/Dockerfile#L1) for the image [stijnh/hi_app](https://hub.docker.com/r/stijnh/hi) ).
+small Linux image `alpine` and `curl` does not come installed with that Linux (check out the [Dockerfile](https://github.com/sheymans/elementsOf/blob/master/kubernetes/demo/hi_app/Dockerfile#L1) for the image [stijnh/hi_app](https://hub.docker.com/r/stijnh/hi)).
 What does come installed that you could use?
 [`wget`](https://en.wikipedia.org/wiki/Wget).
 
@@ -636,6 +634,8 @@ Hi from hi-deployment-5f7b895fd9-h7mz7
 You're hitting 1 IP `10.105.43.171` but you see that different instances of
 your application (on different pods) answer the call with those different
 hostnames. Magic!
+
+XXRev3
 
 ## (External) Clients
 
