@@ -23,14 +23,14 @@ encountering in high-traffic production environments right now:
 - To save costs during the night, when you need less capability for your main application, you want to reuse some of the available capability to run batch jobs
 - There will be times when there will not be enough machines to serve your traffic (during a promotion, or, say, the holiday period), so you want to increase, _scale up_, the amount of physical machines you have available.  After the busy period, you want to get back to normal and scale down
 
-It will come as no suprise (if you _are_ surprised: Sinterklaas does indeed
+It will come as no surprise (if you _are_ surprised: Sinterklaas does indeed
 exist _and_ the world is a beautiful place where no-one drags themselves
 through wondering _where and when in the name it all went wrong_) that
 _Kubernetes_ is _a_ solution for those problems.  I'll refer to _Kubernetes_ by
 its common abbreviation of _k8s_ -- pronounced _kates_, because that's what all
 the cool kids do and I'll do the same even though it's aeons since I was a kid.
 Even though Kubernetes is a large hammer, it does hammer the above problems squarely
-away.  I disparagingly say _hammer_ as I say almost everything disparaginly but
+away.  I disparagingly say _hammer_ as I say almost everything disparagingly but
 also because k8s is able to do more than what you'd need to solve the above
 stated problems.  Blame that on its historic origin as used by a Cloud Provider
 in which many different applications need to run on the same cluster of
@@ -396,7 +396,7 @@ label `app=hi` so pods would keep on getting created.
 Before you try this `Deployment`, delete all resources you have so far, and then
 check that you have 0 pods running:
 
-```shel
+```shell
 $ kubectl delete all --all
 $ kubectl get pods
 ```
@@ -637,7 +637,7 @@ hostnames. Magic!
 
 ## (External) Clients
 
-In the previous section, you maneuvred yourself on a pod in the cluster to
+In the previous section, you maneuvered yourself on a pod in the cluster to
 access the app via the service's cluster-local IP.  In the real world, you want
 _external_ clients, such as your user's browser, to have access to your
 application.
@@ -852,8 +852,6 @@ update: how much percentage of the old pods can you take out while bringing in
 new pods with the latest version? Go checkout out [proportional
 scaling](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#proportional-scaling).
 
-XXRev3
-
 # Warm-up Of Your Application
 
 !!!
@@ -935,7 +933,7 @@ the `/readiness` path only returns a `200` when the application has reached cons
 
 Well, that requirement sounds related to the readiness requirement, doesn't it?
 In this case, one or more instances of your application died (or started
-spewing errors and only Leondardo DiCaprio knows why but he won't tell).  If
+spewing errors and only Leonardo DiCaprio knows why but he won't tell).  If
 that happens, we want to take the pod with the dead application out of rotation
 (the service should stop routing traffic to the pod). Similar to the above
 `readinessProbe`, there's a concept called `livenessProbe`. You define (for the
