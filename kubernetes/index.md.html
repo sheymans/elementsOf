@@ -635,17 +635,14 @@ You're hitting 1 IP `10.105.43.171` but you see that different instances of
 your application (on different pods) answer the call with those different
 hostnames. Magic!
 
-XXRev3
-
 ## (External) Clients
 
-In the previous section, we jumped through hoops onto the cluster just to be
-able to access the app via the service (the service's IP is local to the
-cluster, wow, you forgot already).  In reality that won't cut it: you want
-_external_ clients to have access to your application (like a user's browser for
-example).
+In the previous section, you maneuvred yourself on a pod in the cluster to
+access the app via the service's cluster-local IP.  In the real world, you want
+_external_ clients, such as your user's browser, to have access to your
+application.
 
-There are several ways one can accomplish this. I'll focus on one: _creating an
+There are several ways you can accomplish this. I'll focus on one: _creating an
 [Ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/)
 resource_. If someone vomits up the word
 _[ingress](https://www.thefreedictionary.com/ingress)_, there better be a
@@ -670,21 +667,21 @@ spec:
               servicePort: 80
 ```
 
-As they do on Wallstreet, let's go line by line:
+As they do on Wall Street, line by line:
 
 ```
 kind: Ingress
 ```
 
-indicates that this describes an `Ingress` k8s resource. Give that ugly child a name:
+indicates that this describes an `Ingress` k8s resource. Give it a name:
 
 ```
 name: hi-ingress
 ```
 
-And now for the interesting part. We specify a rule that indicates that we want
-`hi.stijnheymans.net/`, routed to the service `hi-service` at port
-`80`. Recall from the above that we indeed defined such a service `hi-ingress`
+And now for the interesting part. I specify a rule that indicates that I want
+to route the URL `hi.stijnheymans.net/` to the service `hi-service` at port
+`80`. Recall from the above that I defined such a service `hi-ingress`
 (and recall that that service in itself routes requests to any of the pods that
 it serves).
 
@@ -699,7 +696,7 @@ it serves).
               servicePort: 80
 ```
 
-Alright, let's put the `Ingress` in play:
+Put the `Ingress` in play:
 
 ```shell
 $ kubectl create -f hi-ingress.yaml
@@ -713,7 +710,7 @@ NAME         CLASS    HOSTS                 ADDRESS        PORTS   AGE
 hi-ingress   <none>   hi.stijnheymans.net   192.168.64.2   80      10s
 ```
 
-It's there and it's indicating an IP address that you can hit on (on your
+It's there and it's indicating an IP address that you can hit (on your
 laptop, so an _external_ IP -- not a cluster IP): `192.168.64.2`.
 
 As you've most likely not registered `hi.stijnheymans.net`, let's trick
@@ -733,7 +730,7 @@ Flower Child you are and feel the glorious greetings from different hosts be
 extended to you. This is the smell of success you hoped for when you opened
 this page on <span id="datetime"></span>.
 
-Let's draw up how things flow:
+In summary, this is how things flow:
 
 ![External Client](./diagrams/ingress.svg)
 
@@ -744,7 +741,7 @@ enough, making it also a `Controller` is just that one step too far.
 
 # Push Changes
 
-I listed 2 requirements around pushing changes to your app: 
+Recall the 2 requirements around pushing changes to your app: 
 
 !!!
    You need to be able to push changes to your application without downtime
@@ -752,7 +749,7 @@ I listed 2 requirements around pushing changes to your app:
 !!!
    You need to be able to rollback changes to your application
 
-Recall the YAML describing our `Deployment`:
+This was the YAML describing our `Deployment`:
 
 ```
 apiVersion: apps/v1
@@ -776,7 +773,7 @@ spec:
             - containerPort: 8111
 ```
 
-You're eternally unhappy so you have a second version of your application
+You're eternally unsatisfied so you have a second version of your application
 ready: a new image `stijnh/hi:v2`, to replace the original `stijnh/hi`.  How
 can you make sure that all application instances are running `stijnh/hi:v2`
 instead of `stijnh/hi`?
@@ -790,12 +787,12 @@ The naive answer is the correct one: replace `stijnh/hi` in the `Deployment` by
 ```
 
 That's it. The default strategy for roll-outs that k8s `Deployment`s use is the
-`RollingUpdate` strategy. With that strategy, k8s scales down the pods that run
-the old image from 4 to 0 and scales up the pods with the new image from 0 to
+`RollingUpdate` strategy. With that strategy, k8s scales down the number of pods that run
+the old image from 4 to 0 and scales up the number of pods with the new image from 0 to
 4. This guarantees that there's no downtime, but it would force you to make
-sure that `v2` is compatible to with the first version of your app. Indeed, the
+sure that `v2` is compatible with the first version of your app. Indeed, the
 service will start routing requests to new _and_ old pods while we are in the
-intermediate state. This may cause problems if you for example did database
+intermediate state. This may cause problems if you, for example, did database
 changes and `v2` of your app is writing data in a different format than before
 and `v1` and `v2` are both reading from that data but `v1` expects the old
 format so crashes on that newly written data. Some programmatic care is usually
@@ -803,8 +800,8 @@ warranted to avoid situations like that, often leading to an intermediate `v2`
 with the end state in a `v3`. I leave this as an exercise to reader. Yeah.
 That's right.  Move on.
 
-If you see no such programmatic way out, but you are willing to tolerate a bit
-of downtime, you can use the `Recreate` strategy. Your deployment is then as
+If you see no such programmatic way out, but you are willing to tolerate 
+downtime, you can use the `Recreate` strategy. Your deployment is then as
 follows:
 
 ```
@@ -832,9 +829,10 @@ spec:
 ```
 
 This will cause k8s to take out all of your `stijnh/hi` pods and immediately
-scale up all of the new `stijnh/hi:v2` pods. This causes a small downtime, or
-may result in a situation where while `v2` is scaling up, you do not have
-enough pods to serve production traffic.
+scale up all of the new `stijnh/hi:v2` pods. This causes a small downtime when
+old the old pods are gone and none of the new ones are there yet, or may result
+in a situation where while `v2` is scaling up, you do not have enough pods to
+serve production traffic.
 
 To finish this section, some quick commands that allow you to check the
 deployment rollouts/rollbacks.
@@ -849,10 +847,12 @@ If something went wrong you can execute a rollback immediately as follows:
 $ kubectl rollout undo deployment hi-deployment
 ```
 
-You may of the controlling kind, and you wonder how to control the rolling
+You may be of the controlling kind, and you wonder how to control the rolling
 update: how much percentage of the old pods can you take out while bringing in
-new pods with the latest version? It's called [proportional
+new pods with the latest version? Go checkout out [proportional
 scaling](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#proportional-scaling).
+
+XXRev3
 
 # Warm-up Of Your Application
 
