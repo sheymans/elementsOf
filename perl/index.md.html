@@ -2,7 +2,7 @@
                             **Elements of Perl**
                             Stijn Heymans
                             published: 12 October 2019
-                            last updated: 3 November 2019 
+                            last updated: 3 November 2019
 
 # Introduction
 
@@ -15,7 +15,7 @@ able construct arbitrary data structures in the References section.
 
 After introducing the basic data structures, I'll show how to
 control flow in the Conditions section, and how to use such conditions when
-looping in the Looping section. 
+looping in the Looping section.
 Once I tackled basic data structures and control flow, I'll show how to
 encapsulate logic into functions in the Subroutines section.
 
@@ -93,22 +93,7 @@ Interpolation will usually lead to cleaner code than concatenation. Compare the 
 
 ~~~perl
 my $name = 'stijn';
-my $hello_conc = 'my name is ' . $name; 
-~~~
-
-You can extract individual characters out of a string similar to how you'd do it in
-other languages. Here I get the first character out of string:
-
-~~~perl
-my $string = 'what';
-my $first = $string[0];
-~~~
-
-You can get the last character of the string using the index `-1`, something you
-might know from `Python`:
-
-~~~perl
-my $last = $string[-1];
+my $hello_conc = 'my name is ' . $name;
 ~~~
 
 ### Built-in Functions
@@ -123,7 +108,7 @@ print "This is a printed string\n";
 
 !!!
    There's an explicit `\n` in that statement; you might be used to a `println`
-   from other languages that puts that `\n` there for you. 
+   from other languages that puts that `\n` there for you.
 
 #### [`substr`](https://perldoc.perl.org/functions/substr.html)
 
@@ -156,11 +141,11 @@ split //, 'yeah';
 ~~~
 
 This will split the string `yeah` into a list of its individual characters because the
-pattern `//` matches _everything_. 
+pattern `//` matches _everything_.
 I will introduce lists/arrays as well as regular expressions later.
 
 
-!!! 
+!!!
    Note that `split //, 'yeah'` has no parentheses. Based on
    how I wrote `substr` you expected to see `split(//,'yeah')` and you'd been
    right as well! `perl` is playing loose with parentheses, so for
@@ -225,13 +210,13 @@ if (defined $x) {
 
 which checks whether `$x` is defined (so is `$x` `undef` or not).
 
-What's with the 
+What's with the
 
 ~~~perl
 # stuff
 ~~~
 
-A `#` marks comments. Anything following it is ignored by the `perl` compiler. 
+A `#` marks comments. Anything following it is ignored by the `perl` compiler.
 
 # Array Variables
 
@@ -286,7 +271,7 @@ Note that here I use `@` for both sides of the assignment: I'm creating an
 array `@copy` and copying the array `@array` (I am not referring to the
 individual elements in `@array`: the array is used in a _list_ context).
 
-!!! 
+!!!
    `@copy` is indeed a copy: changing elements in `@copy` will _not_ change
    elements in `@array`.
 
@@ -363,7 +348,7 @@ my @array = ('hey', 'you');
 my $scalar_something = @array;
 ~~~
 
-we have that `$scalar_something` now contains `2`: the length of `@array`. 
+we have that `$scalar_something` now contains `2`: the length of `@array`.
 
 This also works the other way: what if you want to store a scalar into a list?
 For example:
@@ -399,7 +384,7 @@ my @rev = reverse @array;
 ## Basics
 
 Most programming languages have support for some key/value data structure (a
-`Map in Java`, a `dict` in Python).  `perl` calls its key/value data structure 
+`Map in Java`, a `dict` in Python).  `perl` calls its key/value data structure
 a _hash_. A hash _literal_ can be initialized as follows:
 
 ~~~perl
@@ -407,12 +392,12 @@ my %some_hash = ('name', 'john', 'age', 39);
 ~~~
 
 !!! Tip
-    I used a new symbol `%` to indicate that `some_hash` is a variable used to store a hash. 
+    I used a new symbol `%` to indicate that `some_hash` is a variable used to store a hash.
 
 I did not make a syntactical distinction between keys and values when writing
 `('name', 'john', 'age', 39)`. You expect `'name'` and `'age'` to be keys, and
 `'john'` and `39` to be values, but there is no apparent syntactical distinction
-with a literal _list_ in this example. So why is this defining a hash and not a list? 
+with a literal _list_ in this example. So why is this defining a hash and not a list?
 
 Let's get back to our _contexts_. We already saw a _list context_ and a _scalar
 context_. The `%` on the left-hand side of the assignment, indicates a _hash
@@ -493,7 +478,7 @@ my @values = values %some_hash;
 Indeed, `@values` will be the array `(39, 'john')`. Note that even though I
 defined `%some_hash` using the literal `('name', 'john', 'age', '39')` which
 hints at some _ordering_, neither `values` nor `keys` need to satisfy that
-original order. 
+original order.
 
 # References
 
@@ -515,7 +500,7 @@ scalars, hence the `$`) that points to an array `(1, 2, 3)`:
 
 ***********************************
 *                                 *
-*   .--------.       .---------.  *    
+*   .--------.       .---------.  *
 *   | $a_ref +----->| (1, 2, 3) | *
 *   '--------'       '---------'  *
 ***********************************
@@ -593,11 +578,11 @@ my $copy_ref = $a_ref;
 
 ***********************************
 *                                 *
-*   .--------.       .---------.  *    
+*   .--------.       .---------.  *
 *   | $a_ref +----->| (1, 2, 3) | *
 *   '--------'       '---------'  *
 *                         ^       *
-*   .-----------.         |       * 
+*   .-----------.         |       *
 *   | $copy_ref +--------'        *
 *   '-----------'                 *
 *                                 *
@@ -613,11 +598,11 @@ Indeed both `${$a_ref}[0]` and `${$copy_ref}[0]` are now equal to `500`:
 
 ************************************
 *                                  *
-*   .--------.       .-----------. *    
+*   .--------.       .-----------. *
 *   | $a_ref +----->| (500, 2, 3) |*
 *   '--------'       '-----------' *
 *                           ^      *
-*   .-----------.           |      * 
+*   .-----------.           |      *
 *   | $copy_ref +----------'       *
 *   '-----------'                  *
 *                                  *
@@ -660,7 +645,7 @@ $hash{age};
 ~~~
 
 We have a similar _trick_ as with arrays when you want to get that value via the `$hash_ref` rather than the `%hash`.
-We replace the name `hash` by `{$hash_ref}` -- the dereferenced reference: 
+We replace the name `hash` by `{$hash_ref}` -- the dereferenced reference:
 
 ~~~perl
 ${$hash_ref}{age};
@@ -702,7 +687,7 @@ if ( !($age == 18) ) {
 }
 ~~~
 
-Note the extra parentheses in `!($age == 18)`. This is needed as in `!$age == 18`, 
+Note the extra parentheses in `!($age == 18)`. This is needed as in `!$age == 18`,
 `!$age` is interpreted first. This is unwanted as `$age` is assumed to be a
 number and the negation `!` of a number is false for all numbers except
 `0`.
@@ -737,7 +722,7 @@ else {
 Note that it's _not_ `elseif` nor `else if`. It's `elsif`.
 
 `perl` also has the `unless` keyword for the "`if` not" situation. Do not use
-`unless` unless you feel like getting confused. 
+`unless` unless you feel like getting confused.
 
 Conditions can also be used to filter arrays. Using `grep` you can reduce an
 array to keep only the items that satisfy a certain condition.  Say I want to
@@ -827,7 +812,7 @@ use List::Util ("any", "first");
 use List::Util qw(any first);
 ~~~
 
-where `qw` signifies, _hey, these are quoted words_. 
+where `qw` signifies, _hey, these are quoted words_.
 
 I already mentioned `first`: use `first` when you'd like to find
 the first element that matches the condition:
@@ -851,7 +836,7 @@ With the above `@all_numbers`, this prints: `el: 9 el: -7 el: -6 el: 5 el: 4 `.
 
 The first line of that loop: `for my $number (@all_numbers)`, indicates that we
 are going to loop through the elements of the array `@all_numbers`. We
-initialize `my $number` with each such element from `@all_numbers`. 
+initialize `my $number` with each such element from `@all_numbers`.
 
 Why are there parentheses `( )` around `@all_numbers` in that syntax? That seems
 odd, but it seems that there are not many reasons apart from that [Larry wants
@@ -1022,12 +1007,12 @@ my $y = double_it(5);
 
 The argument list to `double_it` now gets implicitly bound to the special array
 variable `@_`. Note that we already saw special variable `$_`, well, this is
-another special one, for arrays. 
+another special one, for arrays.
 
 In this case, we'd have that `@_` is be bound to the list `(5)`. So `my
 ($x) = @_`is at that point the same as `my ($x) = (5)`. The left hand side is
 an array literal with a variable `$x` in it, the right hand side is just an
-array literal. `perl` matches those 2 for you such that `$x` is now `5`. 
+array literal. `perl` matches those 2 for you such that `$x` is now `5`.
 
 Let's take a quick detour around this mechanism of matching. It allows you to
 do:
@@ -1052,7 +1037,7 @@ my $x = shift;
 my $y = shift;
 ~~~
 
-This is an alternative for 
+This is an alternative for
 
 ~~~perl
 my ($x, $y) = @_;
@@ -1063,7 +1048,7 @@ habit of assuming defaults, in this case the `@_` is assumed and `shift` indeed
 stands for `shift @_`.
 
 This might be a cleaner way in case you want to validate `$x` for example,
-before continuing with the rest of the arguments. 
+before continuing with the rest of the arguments.
 
 To test our knowledge, let's look at this:
 
@@ -1104,7 +1089,7 @@ We cannot talk about `perl` without mentioning regular expressions. Let's look
 at some examples to explain common constructs.
 
 Assume you have a string "there is a wolf somewhere" and you'd like to check
-whether it contains the word _wolf_: 
+whether it contains the word _wolf_:
 
 ~~~perl
 my $test = "there is a wolf somewhere";
@@ -1118,7 +1103,7 @@ operator `=~` we are saying: I want to check the pattern on the right of `=~`
 in the text on the left of `=~`. What is the pattern? The pattern is between
 slashes `/`: `/wolf/`. Note that you'll sometimes see `m/wolf/`, i.e, the pattern prefixed
 with `m`. That's because there's a version with `s` as well, which stands for
-_substitute_. 
+_substitute_.
 
 That was the absolute basics. Let's advance to _capture groups_. They allow you
 to use the matched pattern later:
@@ -1223,6 +1208,10 @@ to limit the levels of that nested structure you'd like to print you can do:
 ~~~perl
 $Data::Dumper::Maxdepth=2;
 ~~~
+
+# Acknowledgements
+
+Thanks to [csbuja](https://github.com/csbuja) for corrections.
 
 # Endnotes
 
