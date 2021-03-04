@@ -11,14 +11,14 @@ show that containers are not magic by going through the lifecycle of an app
 running on your laptop to an app running in a container on your laptop (the
 so-called _containerizing_ of an app).  I will build an image from the app,
 publish the image, and run that image in a container, all the while showing you
-the basic commands of manipulating images, containers, and volumes. 
+the basic commands of manipulating images, containers, and volumes.
 
 You can download the demo code I wrote for this article on
 [github](https://github.com/sheymans/elementsOf/tree/master/docker/demo).  The
 demo is a Javascript app, but there's so little code it should not cause too
-many side effects when consumed in moderation.  
+many side effects when consumed in moderation.
 
-Finally, I used the book <a target="_blank" href="https://www.amazon.com/gp/product/1521822808/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=1521822808&linkCode=as2&tag=elementsof0d-20&linkId=97d07af68c8c3dd4da76f758a8f66b77">Docker Deep Dive</a><img src="//ir-na.amazon-adsystem.com/e/ir?t=elementsof0d-20&l=am2&o=1&a=1521822808" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;" /> by Nigel Poulton as a reference [^affiliate].
+Finally, I used the book [Docker Deep Dive](https://www.goodreads.com/book/show/39933970-docker-deep-dive)by Nigel Poulton as a reference.
 
 
 # The Demo App
@@ -39,7 +39,7 @@ const app = express();
 // Tell your app that any GET should be resulting in a `Hi` returned to the user
 app.get('/', (request, result) => result.send('Hi'));
 
-// Your app will be listening on port 8111 and it 
+// Your app will be listening on port 8111 and it
 // will announce this on the console when you start it
 app.listen(8111, () => console.log('hi: listening on port 8111'));
 ~~~
@@ -143,7 +143,7 @@ to be able to run the app).
 
 !!! Tip
    The directory on your laptop where your `Dockerfile` exists is
-   called the _build-context_. 
+   called the _build-context_.
 
 I want the app to be layered on the [Linux alpine OS
 system](https://alpinelinux.org/) -- a small Linux, about 4MB,
@@ -246,8 +246,8 @@ Dissecting this command:
 - `docker`: the `docker` program that we use to build images, run images, etc
 - `image`: tell `docker` that what we're doing involves images (there's also `docker container` to indicate that you're working with containers)
 - `build`: build an image
-- `-t hi:latest`: we're *t*agging an image with name `hi` and with tag `latest`. A tag can be used to identify different versions of your software (tag `v1` for example) 
-- `.`: don't forget the `.`. The `.` stands for _look into your current directory for the Dockerfile_. 
+- `-t hi:latest`: we're *t*agging an image with name `hi` and with tag `latest`. A tag can be used to identify different versions of your software (tag `v1` for example)
+- `.`: don't forget the `.`. The `.` stands for _look into your current directory for the Dockerfile_.
 
 !!! Tip
    `-t` indeed stands for _tag_ and not _target_ (there's a `--target` option as well)
@@ -260,7 +260,7 @@ docker image ls
 
 Dissecting that command:
 
-- `docker`: the `docker` program 
+- `docker`: the `docker` program
 - `image`: we're dealing with images
 - `ls`: the listing command
 
@@ -302,7 +302,7 @@ Template parsing error: template: :1:2: executing "" at <.ImageId>: can't evalua
 ~~~
 
 While `docker image ls` shows `IMAGE ID` as a column name, that's not how
-you can access this field. There's a 
+you can access this field. There's a
 [hint](https://docs.docker.com/config/formatting/) on how you can see the
 attributes that you can actually use in `--format`:
 
@@ -500,7 +500,7 @@ written to a location (database table, disk location) that has a _lifecyle_
 independent of your container, you're good: your data will persist as long as
 that location exists.  Your pet rat is not going to die when your container
 dies. Their lives are not tied together (unless you keep your pet rat in a
-container).  
+container).
 
 _Volumes_ are the _magic_ that allows docker to write to the file-system in a
 persistent manner: the written word will persist long after the container is
@@ -594,11 +594,9 @@ how to run a container based on that image, and how to use volumes to persist
 the data that your app writes beyond the life cycle of the container.  I
 limited this article to what I consider the elements and I left out discussions
 on [storage drivers](https://docs.docker.com/storage/storagedriver/select-storage-driver/), [tags](https://docs.docker.com/engine/reference/commandline/tag/), [docker swarm](https://docs.docker.com/engine/swarm/), [docker networking](https://docs.docker.com/network/), [`docker-compose`](https://docs.docker.com/compose/), and much, much
-more. 
+more.
 
 # Endnotes
-
-[^affiliate]: As an Amazon Associate I earn from qualifying purchases.
 
 [^packagejson]: A `package.json` file describes your application (for
 example, any package dependencies) so that `npm` (which can be used to build

@@ -42,9 +42,10 @@ the same machine that your machine runs on during the day, is designed to hint
 at that use.
 
 The requirements as laid out above come from my personal experience, and my
-limited knowledge I have on k8s comes from <a target="_blank" href="https://www.amazon.com/gp/product/1617293725/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=1617293725&linkCode=as2&tag=elementsof0d-20&linkId=0c545c38289f0bec5a3732abf7457643">Kubernetes in Action</a><img src="//ir-na.amazon-adsystem.com/e/ir?t=elementsof0d-20&l=am2&o=1&a=1617293725" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;" />  by
+limited knowledge I have on k8s comes from [Kubernetes in
+Action](https://www.goodreads.com/book/show/34013922-kubernetes-in-action)  by
 Marko Lukša. A book that, like all good books, gave me all the misplaced
-confidence to play an expert on the Internet [^affiliate]. The book goes in
+confidence to play an expert on the Internet. The book goes in
 depth and is useful for infrastructure administrators (which is a whole world
 of joy on itself that I will barely touch on here). In this article, I mostly
 stick to what I know, application development, and I'll go over every single
@@ -61,7 +62,7 @@ As an example application, I'll run a web server that serves up the sentence
 
 ```
 Hi from HOST
-``` 
+```
 
 where `HOST` will be the host the application is running on.  We're in a brave
 new world, so this application is packed up so it can run as a Docker
@@ -88,7 +89,7 @@ port 8111 (on your laptop) to port `8111` on your docker container behind which
 your app is running, `-t stijnh/hi` indicates the image you're using to get
 the container from.
 
-Open your browser and navigate to `localhost:8111`. You will see 
+Open your browser and navigate to `localhost:8111`. You will see
 
 ```
 Hi from fbd698569ec5
@@ -204,7 +205,7 @@ set of nodes.  What's a _node_? Again, my working definition is _that's a
 machine, an EC2 instance, a laptop, some kind of thing with a CPU and
 memory, an old Pentium tower in a dusty basement, ..._ A typical mapping in my
 head would be _if I have 40 [EC2](https://aws.amazon.com/ec2/) instances in the EU region to serve traffic_,
-that's a _cluster_ of _40_ nodes. 
+that's a _cluster_ of _40_ nodes.
 
 With `minikube` running, try this:
 
@@ -236,7 +237,7 @@ NAME     READY   STATUS    RESTARTS   AGE
 hi-pod   1/1     Running   0          54s
 ```
 
-This shows that the pod is `Running` and has been doing so for `54s`. Note the levels of indirection: 
+This shows that the pod is `Running` and has been doing so for `54s`. Note the levels of indirection:
 
 - when you ran the app `hi.js` on our laptop, you could navigate to `localhost:8111` and see the `Hi from...`
 - when you ran the app in a container, you needed to forward the localhost's port `8111` _into_ the container using `docker container run -d -p 8111:8111 -t stijnh/hi`
@@ -291,7 +292,7 @@ that. For more good humor, assume that each application can serve 250 requests
 per second.  If you do that math, as I'm sure you  do without hesitation and
 with elegance, you see that we need 4 instances of the application.
 
-"OK, let me run 4 containers of my application," you say.<br/> 
+"OK, let me run 4 containers of my application," you say.<br/>
 "Yes, but no," I say. "The unit of operation when your application is managed by k8s is a pod,
 so we want 4 pods, each in turn running 1 container."<br/>
 "So I _was_ right," you say.<br/>
@@ -300,7 +301,7 @@ so we want 4 pods, each in turn running 1 container."<br/>
 There's a k8s resource type (the first one we met was a `Pod`) that
 allows to specify how many pods k8s to keep around: a
 [`Deployment`](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/).
-The word on the street is that you should specify more than 1 pod, to ward off loneliness. 
+The word on the street is that you should specify more than 1 pod, to ward off loneliness.
 
 As with pods, you specify a deployment
 using a YAML manifests. The line that gets me my 4 pods is:
@@ -466,7 +467,7 @@ Still 4 pods, shucks! But if you look at the `NAME`s you see that
 replicas are running at all times. The Zombie Apocalypse is nigh.
 
 We checked the 4 pods using `kubectl get pods`. You can also get more info on the
-`Deployment` resources: 
+`Deployment` resources:
 
 ```shell
 $ kubectl get deployment
@@ -498,7 +499,7 @@ not 4 nodes.  The 4 pods running the containers are all running on the same
 node on your laptop. In reality, you'll have more than 1 node to run your
 application, and your application instances may have been scheduled on
 different nodes to accommodate for, for example, CPU requirements of your
-application.  
+application.
 
 # Clients of your Application
 
@@ -515,7 +516,7 @@ First consider clients on the same cluster. Why is it tricky for clients to conn
 - There are multiple instances of your application running (4 in our case), so the client needs to know all 4 IPs and then select one to connect to
 
 How to avoid that a client needs to know that list of ever-changing IPs?
-Another k8s resource to the rescue : a _Service_. 
+Another k8s resource to the rescue : a _Service_.
 
 A _Service_ gives you 1 IP and <a
 	href="https://en.wikipedia.org/wiki/Load_balancing_(computing)">load-balances</a>
@@ -543,7 +544,7 @@ I defined a service (`kind: Service`), a name for the service (`hi-service`),
 and I specified that port `80` of the service forwards to port `8111` of the
 container (if you scroll up, you can see that `8111` is indeed the port our
 `hi` app is listening on). Finally, by using a `selector`, I specified that
-this service is a service fronting pods with label `app=hi`. 
+this service is a service fronting pods with label `app=hi`.
 
 Create the service as usual:
 
@@ -596,7 +597,7 @@ do I test this? How do I get a client _from within the cluster_?
 
 One way to get _in the cluster_ is using `exec` which makes it possible to
 execute a command of your choice on a pod of your choice -- assuming the pod is
-_in the cluster_ you'd like to be _in_.  
+_in the cluster_ you'd like to be _in_.
 What command do you want to execute to test your cluster IP?
 
 You probably want something like `curl 10.105.43.171`, so you do:
@@ -741,7 +742,7 @@ enough, making it also a `Controller` is just that one step too far.
 
 # Push Changes
 
-Recall the 2 requirements around pushing changes to your app: 
+Recall the 2 requirements around pushing changes to your app:
 
 !!!
    You need to be able to push changes to your application without downtime
@@ -800,7 +801,7 @@ warranted to avoid situations like that, often leading to an intermediate `v2`
 with the end state in a `v3`. I leave this as an exercise to reader. Yeah.
 That's right.  Move on.
 
-If you see no such programmatic way out, but you are willing to tolerate 
+If you see no such programmatic way out, but you are willing to tolerate
 downtime, you can use the `Recreate` strategy. Your deployment is then as
 follows:
 
@@ -1010,7 +1011,7 @@ describedObject:
 indicates the object I'm describing. I'm describing our `Ingress` `hi-ingress`.
 Recall that the Ingress is the resource that makes our service available
 externally.  Indeed, rather than describing the traffic on the Pod directly, I
-refer to the externally facing part of our service. 
+refer to the externally facing part of our service.
 
 ```
 target:
@@ -1066,7 +1067,7 @@ In addition to the metric `transactions-per-second` I defined earlier, you also 
 
 which refers to our `hi-deployment`. Recall that it is this deployment that tells
 k8s what pods look like (and by default makes sure there are 4 pods with the
-right labels). You also see 
+right labels). You also see
 
 ```
   minReplicas: 1
@@ -1122,7 +1123,7 @@ for details.
 Note that [scaling up the cluster will take more
 time](https://www.cncf.io/blog/2019/10/29/kubernetes-autoscaling-101-cluster-autoscaler-horizontal-autoscaler-and-vertical-pod-autoscaler/)
 than scaling up the pods as scaling up the cluster will require k8s asking your
-cluster provider for actual physical instances/nodes. 
+cluster provider for actual physical instances/nodes.
 # Conclusion
 
 I gave an elemental overview of a subset of problems k8s is solving for you. As
@@ -1131,12 +1132,8 @@ usual, I've not talked about a thousand and one other topics, such as
 [secrets](https://kubernetes.io/docs/concepts/configuration/secret/),
 [jobs](https://kubernetes.io/docs/concepts/workloads/controllers/job/), [cron
 jobs](https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/),
-[namespaces](https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/),...  As mentioned in the introduction, the book <a target="_blank"
-	href="https://www.amazon.com/gp/product/1617293725/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=1617293725&linkCode=as2&tag=elementsof0d-20&linkId=0c545c38289f0bec5a3732abf7457643">Kubernetes
-	in Action</a><img
-src="//ir-na.amazon-adsystem.com/e/ir?t=elementsof0d-20&l=am2&o=1&a=1617293725"
-width="1" height="1" border="0" alt="" style="border:none !important;
-margin:0px !important;" /> by Marko Lukša, or the internet itself, if it
+[namespaces](https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/),...  As mentioned in the introduction, the book [Kubernetes in
+          Action](https://www.goodreads.com/book/show/34013922-kubernetes-in-action) by Marko Lukša, or the internet itself, if it
 obliges, will answer all of your further questions. One of those questions I can answer
 for you right now: if you saw a dog today, yes, you had a good day.
 
@@ -1144,8 +1141,6 @@ for you right now: if you saw a dog today, yes, you had a good day.
 # Endnotes
 
 [^familiarity]: If you can imagine what things like _downtime_, _rollback_, _production_, _client_, and _IP address_ mean, you're OK.
-
-[^affiliate]: As an Amazon Associate I earn from qualifying purchases. Given the popularity of any of this, read that as _I'll earn nothing from this_.
 
 [^sidecar]: We refer to containers that run alongside your _main_ container as _sidecars_ for obvious non-inspired reasons.
 
