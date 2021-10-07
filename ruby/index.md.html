@@ -27,6 +27,48 @@ Something I aspire to in this article. Let's try.
 
 # Getting Started
 
+I assume you have some familiarity with basic command-line usage. Check whether
+ruby is installed:
+
+~~~shell
+$ ruby --version
+~~~
+
+For me, it returns `ruby 2.6.3p62 (2019-04-16 revision 67580)
+[universal.x86_64-darwin20]`). If you don't have it installed, you can get it
+at [the ruby-lang website](https://www.ruby-lang.org/en/downloads/).
+
+If you have ruby, you will have an interactive interpreter called
+[irb](https://github.com/ruby/irb). On the command-line, type `irb`.
+
+~~~
+irb(main):001:0> puts 'Hello World!'
+Hello World!
+=> nil
+~~~
+
+Leave the interactive interpreter `irb` by typing `exit`. Now the same but
+without `irb`. Open a file (make it end on `rb`, for example
+`ruby_playground.rb`) and put the following line in it:
+
+~~~
+puts 'Hello World!'
+~~~
+
+Close the file and at the command-line, have ruby execute it:
+
+~~~
+$ ruby ruby_playground.rb
+Hello World!
+~~~
+
+Want to know more about `puts`? Get in the habit of looking that sort of info
+up in the [official docs](https://docs.ruby-lang.org/en/) -
+pick the right version of the docs corresponding to what you saw in your
+initial `ruby --version`. I picked `2.6.0` as my ruby version is `2.6.3`.
+
+This got us started.
+
 # The Basic Classes
 
 ## Numbers
