@@ -42,7 +42,7 @@ If you have ruby, you will have an interactive interpreter called
 [irb](https://github.com/ruby/irb). On the command-line, type `irb`.
 
 ~~~
-irb(main):001:0> puts 'Hello World!'
+irb> puts 'Hello World!'
 Hello World!
 => nil
 ~~~
@@ -72,6 +72,57 @@ This got us started.
 # The Basic Classes
 
 ## Numbers
+
+Unsuprisingly, integers are represented as we expect: `3`, `5, `-100`, ...
+Suprisingly, everything in ruby is an object so you can ask the class of an
+integer by doing `5.class`, which will return
+[Integer](https://docs.ruby-lang.org/en/2.6.0/Integer.html). 
+
+Since they're full-fledged objects there's more fun stuff one can do: 
+
+~~~
+irb> 123.digits
+=> [3, 2, 1]
+~~~
+
+Yep, you can get an array of all digits that make up the integer. Fans of
+coding interviews will like that, cause that's literally the only place you'll
+ever need that.
+
+You can do the usual math:
+
+~~~
+irb> 1 + 2
+=> 3
+irb> 2 * 3
+=> 6
+irb> 8 / 4
+=> 2
+~~~
+
+Besides integers, you have our favorite inexact real numbers, represented by
+[Float](https://docs.ruby-lang.org/en/2.6.0/Float.html) and in its literal form
+things containing a decimal point:`1.0`, `9.9999`, ...
+
+~~~
+irb> 1.0.class
+=> Float
+~~~
+
+First encounters are often unpleasant:
+
+~~~
+irb> 7 / 2
+=> 3
+~~~
+
+Dividing 2 integers results in integer division. Force one to be a `Float`
+using `to_f`:
+
+~~~
+irb> 7.to_f / 2
+=> 3.5
+~~~
 
 ## Strings
 
