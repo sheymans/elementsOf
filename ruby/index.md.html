@@ -126,12 +126,88 @@ irb> 7.to_f / 2
 
 ## Strings
 
+String are any characters surrounded by single quotes or double quotes:
+`'Hello'` or `"Hello"`. The double-quoted variety are a bit special. I'll show
+after talking about variables.
+
 ## Symbols
+
+Symbols consist of letters, digits, or underscores, and are preceded by a `:`.
+For example, `:a`, `:a_2`, `:an_orange`. Well, why not just use Strings? [Great
+question](https://stackoverflow.com/questions/255078/whats-the-difference-between-a-string-and-a-symbol-in-ruby).
+
+Remember that I said everything is an object? So let's look a bit at how strings are different from objects:
+
+~~~
+irb> "bar".object_id
+=> 70236502854760
+irb> "bar".object_id
+=> 70236502887440
+irb> :foo.object_id
+=> 1516508
+irb> :foo.object_id
+=> 1516508
+~~~
+
+You can learn several things from this:
+
+- every object apparently has a method `object_id` that gives some sort of id.
+- strings that look the same do not necessarily have the same `object_id`, which _probably_ has memory consequences
+- symbols that look the same have the same `object_id`, which _probably_ has memory consequences
 
 ## Booleans
 
+`true` and `false`. There.
+
 
 # Variables
+
+Like symbols they consist of letters, digits, or underscores. Unlike symbols,
+they do not start with colons. You initialize them:
+
+~~~
+irb> x = 'hello'
+=> "hello"
+irb> x = 5
+=> 5
+irb> x = true
+=> true
+~~~
+
+Note that you can assign and re-assign `x` to your heart's content and to
+different types while you're at it. And you're at it.
+
+Now is the time to start letting go of your _this is insane_ resistance.
+Embrace it. When in Stockholm do like the Stockholmers do.
+
+And as far as those single and double quotes go: 
+
+~~~
+irb> x = 2
+=> 2
+irb> "we were #{x}"
+=> "we were 2"
+irb> 'we were #{x}'
+=> "we were \#{x}"
+~~~
+
+[String interpolation](https://en.wikipedia.org/wiki/String_interpolation) yes.
+
+And sometimes variables are not so variable:
+
+~~~
+irb> X = 5
+=> 5
+irb> X = 6
+(irb):5: warning: already initialized constant X
+~~~
+
+Capitalize your variable and it becomes _constant_: initialize it once and
+never more.
+
+A word on camels and snakes when naming variables or really anything. Use snake
+case almost everywhere: `lowercase_words_separated_by_underscores`. Except
+`ClassNames`, go for camel case there. Classes will be take their turn later.
 
 # Control Structures
 
