@@ -51,7 +51,7 @@ Leave the interactive interpreter `irb` by typing `exit`. Now the same but
 without `irb`. Open a file (make it end on `rb`, for example
 `ruby_playground.rb`) and put the following line in it:
 
-~~~
+~~~ruby
 puts 'Hello World!'
 ~~~
 
@@ -211,7 +211,59 @@ case almost everywhere: `lowercase_words_separated_by_underscores`. Except
 
 # Control Structures
 
+## Conditions and `if`
+
+Here's the basic form:
+
+~~~ruby
+if condition
+  do_something
+end
+~~~
+
+So no parentheses (`(condition)`), no colon (`condition:`), no curly brackets
+(`{ do_something }`). And `end` to end it.
+
+The usual `else if` and `else` work like so:
+
+~~~ruby
+if condition
+  do_something
+elsif other_condition
+  do_something_else
+else
+  final_thing_you_can_do
+end
+~~~
+
+Conditions in `if` statements are expressions that evaluate to true or false.
+So what all evaluates to true?
+
+- all numbers (including `0`) are true
+- all strings (including `''` -- the empty string) are true
+- `nil` (yep, that's a null right there) is false
+- the boolean literal `true` is true
+- the boolean literal `false` is false
+- the boolean expression `a && b` is true if `a` and `b` are true
+- the boolean expression `a || b` is true if `a` or `b` are true
+- the boolean expression `!a` is true if a is not true
+
+Conditions can of course be the result of a function or method call which could
+be true or false as well.
+
+
+todo: comparison operators
+
+todo: unless
+
+todo: short form
+
+## Looping
+
 # Arrays and Hashes
+
+
+todo: loop through arrrays and hashes
 
 # Functions
 
