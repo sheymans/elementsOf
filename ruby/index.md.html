@@ -251,12 +251,73 @@ So what all evaluates to true?
 Conditions can of course be the result of a function or method call which could
 be true or false as well.
 
+Your conditions will often compare things (if variable `a` is equal `"dog"`,
+then do this). While you have `==`, `===`, `equal?`, and `eql?` in ruby, you
+will mostly use:
 
-todo: comparison operators
+- `==` for checking whether values are equal as far as the class designer of the objects you're comparing is concerned. 
+- `equal?` for checking object equality.
 
-todo: unless
+In fact, `equal?` and `==` as defined in the
+[`Object`](https://ruby-doc.org/core-3.0.2/Object.html#method-i-eql-3F) are
+equal. Pun intended.
 
-todo: short form
+The intent is that `==` is overridden by class designers to something that
+makes sense for your class, but that `equal?` always stands for object
+equality. Take `String`:
+
+~~~
+irb> "a" == "a"
+=> true
+irb> "a".equal?("a")
+=> false
+~~~
+
+So `"a"` is equal to `"a"` as values but as we saw before, they're not the same
+objects. Looking at symbols:
+
+~~~
+irb> :a == :a
+=> true
+irb> :a.equal?(:a)
+=> true
+~~~
+
+Back to our `if` for a bit. It's usual to instead of:
+
+~~~ruby
+if !condition
+  do_something
+end
+~~~
+
+to write:
+
+~~~ruby
+unless condition
+  do_something
+end
+~~~
+
+While this takes some getting used to, especially for my head, it's the ruby way.
+
+Furthermore, if `do_something` is just one line, ruby often prefers the one-liner:
+
+~~~ruby
+do_something if condition
+~~~
+
+or
+
+~~~ruby
+do_something unless condition
+~~~
+
+Especially when returning early from functions, this makes code readable:
+
+~~~ruby
+return if invalid_parameters
+~~~
 
 ## Looping
 
