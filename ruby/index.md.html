@@ -321,10 +321,105 @@ return if invalid_parameters
 
 ## Looping
 
+This is an area where ruby is opinionated. Say there's no collection like an
+Array or Hash in sight, and in some other language (say `go`), we'd write:
+
+~~~go
+n := 5
+for i := 0; i < n; i++ {
+  fmt.Println(i)
+}
+~~~
+
+This would print:
+
+~~~
+0
+1
+2
+3
+4
+~~~
+
+There's a variety of ways to write this in valid ruby, but the construct as
+above does not exist.
+
+Closest in spirit to the above one is to probably use a while:
+
+~~~ruby
+n = 5
+i = 0
+while i < n
+  puts i
+  i += 1
+end
+~~~
+
+which is arguably slightly more verbose than the corresponding `for` loop in `go`.
+
+A more ruby way is to probably use [`times`](https://docs.ruby-lang.org/en/2.6.0/Integer.html#method-i-times):
+
+~~~ruby
+n.times { |i| puts i }
+~~~
+
+Now this is arguably quite elegant. But what's going on?
+
+Let's analyze it's parts:
+
+- `n`. An `Integer`, so an an object that has methods
+- `times`. A [method](https://docs.ruby-lang.org/en/2.6.0/Integer.html#method-i-times) that is called on the object and _iterates_ the following block `{ |i| puts i}` from `0` to `n - 1`, passing in those values to `i` with each iteration. Wow. More on blocks later. For those familiar, the block is essentially an anonymous function or lambda with parameter `i` (or arrow function for the Javascript knowledgeables). 
+- `{ |i| puts i }`. We spoiled it, but this is a `block` that prints `i` with `i` ranging over values `0` to `n - 1`. This _feeding_ is accomplished by `times`. We'll see later how we can write functions such as `times` ourselves in the section on Blocks. For now, you can see `times` as an higher-order function that takes another function as an argument and executes. 
+
+We'll do more looping in the Arrays and Hashes section, as most of the time
+your looping will be in the context of some collection and also in that case
+ruby has opinions.
+
 # Arrays and Hashes
 
+## Arrays
 
-todo: loop through arrrays and hashes
+An array is an ordered collection of values. Let's initialize one:
+
+~~~
+irb> a = ["x", 1, :y]
+=> ["x", 1, :y]
+~~~
+
+Arrays are in other words not restricted to 1 type of objects. You can shuffle
+in there what'd you like. "Oh yeah??!!". Yes:
+
+~~~
+irb> a = ["x", [1, 2], :y]
+=> ["x", [1, 2], :y]
+~~~
+
+The usual suspects with a special mention for `-1` (the last of the elements):
+
+~~~
+irb> a = ["x", [1, 2], :y]
+=> ["x", [1, 2], :y]
+irb> a.length
+=> 3
+irb> a[1]
+=> [1, 2]
+irb> a[-1]
+=> :y
+~~~
+
+TODO:
+
+- add elements front
+- add elements back
+- add another array
+- destructive or not?
+
+
+
+## Hashes
+
+## Looping through Arrays and Hashes
+
 
 # Functions
 
