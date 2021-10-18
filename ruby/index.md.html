@@ -407,13 +407,70 @@ irb> a[-1]
 => :y
 ~~~
 
+You can add elements to the back of an array using `<<` or `push`. Both are destructive operations:
+
+~~~
+irb> a << :b
+=> ["x", [1, 2], :y, :b]
+irb> a.push(:c)
+=> ["x", [1, 2], :y, :b, :c]
+irb> a
+=> ["x", [1, 2], :y, :b, :c]
+~~~
+
+You can remove that last element again using `pop`:
+
+~~~
+irb> l = a.pop
+=> :c
+irb> a
+=> ["x", [1, 2], :y, :b]
+~~~
+
+What about adding and removing to the _front_ of an array? Use `unshift` and `shift`. As far as unsavory mnemonics go, remove the `f` to remember which does what.
+
+~~~
+irb> a
+=> ["x", [1, 2], :y, :b]
+irb> f = a.shift
+=> "x"
+irb> a
+=> [[1, 2], :y, :b]
+irb> a.unshift("x_new")
+=> ["x_new", [1, 2], :y, :b]
+~~~
+
+But `pop/push` must be more efficient than `shift/unshift` right? Seems [it
+hardly
+matters](https://stackoverflow.com/questions/8353026/what-is-the-run-time-of-shift-unshift-in-a-ruby-array).
+
+What if you have a second array `b = [:b1, :b2]` that you want to append (i.e., add each element) to `a`? Just using `push` will not do what you want:
+
+~~~
+irb(main):019:0> a = ["x", [1, 2], :y]
+=> ["x", [1, 2], :y]
+irb(main):020:0> b = [:b1, :b2]
+=> [:b1, :b2]
+irb(main):021:0> a.push(b)
+=> ["x", [1, 2], :y, [:b1, :b2]]
+~~~
+
+However, using the _splat_ operator `*` will:
+
+~~~
+irb> b = [:b1, :b2]
+=> [:b1, :b2]
+irb> a.push(*b)
+=> ["x", [1, 2], :y, :b1, :b2]
+~~~
+
+`*b` for an array `b` in the context of a function call (`push` here) will send
+each element of the array as an individual argument to the function. In other
+words, `a.push(*b)` is the same as `a.push(:b1, :b2)`.
+
 TODO:
 
-- add elements front
-- add elements back
-- add another array
-- destructive or not?
-
+- non-destructive version?
 
 
 ## Hashes
