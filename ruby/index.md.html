@@ -379,7 +379,7 @@ ruby has opinions.
 
 ## Arrays
 
-An array is an ordered collection of values. Let's initialize one:
+An array is an [ordered integer-indexed collection](https://docs.ruby-lang.org/en/2.6.0/Array.html) of objects. Let's initialize one:
 
 ~~~
 irb> a = ["x", 1, :y]
@@ -468,12 +468,22 @@ irb> a.push(*b)
 each element of the array as an individual argument to the function. In other
 words, `a.push(*b)` is the same as `a.push(:b1, :b2)`.
 
-TODO:
+So far we initialized arrays using their literal form (such as `a = [1, 2]`).
+We can also initialize them using the `new` method from the
+[Array](https://docs.ruby-lang.org/en/2.6.0/Array.html) class:
 
-- non-destructive version?
-
+~~~
+irb> a = Array.new
+=> []
+irb> a << 1
+=> [1]
+~~~
 
 ## Hashes
+
+[Hashes](https://docs.ruby-lang.org/en/2.6.0/Hash.html) are structures to store
+key-value pairs with unique keys (also called dictionaries, associate arrays,
+`HashMap`, maps in other languages). You can use any object type as a key.
 
 ## Looping through Arrays and Hashes
 
