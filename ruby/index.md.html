@@ -130,6 +130,50 @@ String are any characters surrounded by single quotes or double quotes:
 `'Hello'` or `"Hello"`. The double-quoted variety are a bit special. I'll show
 after talking about variables.
 
+Use `+` to concatenate 2 strings without changing the original strings. Use
+`<<` to concanate and destroy the string you're appending to:
+
+~~~
+irb> a = "hello"
+=> "hello"
+irb> b = "world"
+=> "world"
+irb> a + b
+=> "helloworld"
+irb> a
+=> "hello"
+irb> b
+=> "world"
+irb> a << b
+=> "helloworld"
+irb> a
+=> "helloworld"
+irb> b
+=> "world"
+~~~
+
+You can use similar operations as for arrays to get to individual parts of the String:
+
+~~~
+irb> a = "hello"
+=> "hello"
+irb> a[0]
+=> "h"
+irb> a[-1]
+=> "o"
+~~~
+
+You can get substrings by using inclusive (`..`) or exclusive (`...`) ranges:
+
+~~~
+irb> a = "hello"
+=> "hello"
+irb> a[0..2]
+=> "hel"
+irb> a[0...2]
+=> "he"
+~~~
+
 ## Symbols
 
 Symbols consist of letters, digits, or underscores, and are preceded by a `:`.
@@ -485,10 +529,66 @@ irb> a << 1
 key-value pairs with unique keys (also called dictionaries, associate arrays,
 `HashMap`, maps in other languages). You can use any object type as a key.
 
+Define a hash with some personal information and do some basics like getting a value for an existing key, a non-existing key, changing a value for an existing key, adding a value for a non-existing key, and removing a key/value pair:
+
+~~~
+irb> a = { "first" => "John", "last" => "Doe" }
+=> {"first"=>"John", "last"=>"Doe"}
+irb> a["first"]
+=> "John"
+irb> a["nothere"]
+=> nil
+irb> a["first"] = "Jane"
+=> "Jane"
+irb> a
+=> {"first"=>"Jane", "last"=>"Doe"}
+irb> a["first"]
+=> "Jane"
+irb> a["nothere"] = "now it is here"
+=> "now it is here"
+irb> a
+=> {"first"=>"Jane", "last"=>"Doe", "nothere"=>"now it is here"}
+irb> a.delete("nothere")
+=> "now it is here"
+irb> a
+=> {"first"=>"Jane", "last"=>"Doe"}
+~~~
+
+What type of objects can all be values? Any object.
+
+What type of objects can all be keys, surely only Strings right? Any object.
+
+Let's start with showing symbols as keys as there's some syntactic sugar for those.
+
+~~~
+irb> a = { :first => "John", :last => "Doe" }
+=> {:first=>"John", :last=>"Doe"}
+irb> a[:first]
+=> "John"
+~~~
+
+Nothing interesting happened. You used symbols `:first` and `:last` as keys. If
+you do that, you can get all JSON-y instead:
+
+~~~
+irb> a = { first: "John", last: "Doe" }
+=> {:first=>"John", :last=>"Doe"}
+~~~
+
+Same hot sauce though.
+
+
+TODO:
+
+- use any object as hash keys
+- a word on order of keys
+
 ## Looping through Arrays and Hashes
 
 
 # Functions
+
+TODO: mention [hashes as arguments](https://docs.ruby-lang.org/en/2.6.0/Hash.html)
 
 # Classes and Methods
 
