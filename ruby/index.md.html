@@ -577,14 +577,51 @@ irb> a = { first: "John", last: "Doe" }
 
 Same hot sauce though.
 
-
-TODO:
-
-- use any object as hash keys
-- a word on order of keys
+I confidently said you can use any object as a hash key. You can both in order
+to have certain expectations met (like: if the objects are the "same", only 1
+hash key that is that object should be in your hash). This relies on properly
+overriding `hash` and `eql?` (the latter being what
+[Hash](https://docs.ruby-lang.org/en/2.6.0/Hash.html) uses for testing equality
+of keys. [Two objects will then refer to the same key when their `hash` value
+is identical and the 2 objects `eql?` each
+other](https://docs.ruby-lang.org/en/2.6.0/Hash.html#class-Hash-label-Hash+Keys).
+Is this still elemental? Probably not. Moving on.
 
 ## Looping through Arrays and Hashes
 
+You will spend half of your life looping through arrays and hashes. Say you have an array:
+
+~~~
+a = [100, 200, 300]
+~~~
+
+Let's print each element.
+
+~~~
+a.each { |el| puts el }
+~~~
+
+No `for` in sight. Use `each` when you can. `each` iterates through the
+elements of the array and binds each to _el_ in the block `{ |el| puts el }`,
+and then executes the `puts el`. Often you'll do more than a one-liner, and
+you'll use the `do` variety:
+
+~~~
+a.each do |el|
+  puts el
+  puts el
+end
+~~~
+
+Same thing, but you use `do...end`
+
+
+TODO: 
+
+- each with index
+- hash iterating
+- mention that hashes enumerate their values in the order of key insertion.
+- mention some common operations on collections such as `inject`, and `map`.
 
 # Functions
 
