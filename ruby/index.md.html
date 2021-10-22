@@ -606,7 +606,7 @@ elements of the array and binds each to _el_ in the block `{ |el| puts el }`,
 and then executes the `puts el`. Often you'll do more than a one-liner, and
 you'll use the `do` variety:
 
-~~~
+~~~ruby
 a.each do |el|
   puts el
   puts el
@@ -615,11 +615,55 @@ end
 
 Same thing, but you use `do...end`
 
+Sometimes you will want the index as well. So similar to the trickery we saw before you could do:
+
+~~~ruby
+a.length.times { |i| puts a[i] }
+~~~
+
+That works obviously as computers do not have opinions. More idiomatic as far
+as I could tell is to use `each_with_index`. Let's also throw that string
+interpolation in the mix:
+
+~~~
+irb> a.each_with_index { |el, i| puts "#{i}: #{el}" }
+0: 100
+1: 200
+2: 300
+~~~
+
+Yeah, get those [Anki flashcards](https://apps.ankiweb.net/) out to memorize
+the order of that `|el, i|`. Alternatively, in ruby syntax, it often works to
+think "how would I say this out loud?": in the array `a`, for _each_ `el` at
+index `i`, do something. If you naturally go to _for each index `i` which has
+element `el`_ you're on your own in this mess, my friend.
+
+You can loop over a hash with `each` as well:
+
+~~~
+irb> a = { first: "John", last: "Doe" }
+=> {:first=>"John", :last=>"Doe"}
+irb> a.each { |key, value|  puts "#{key} -> #{value}" }
+first -> John
+last -> Doe
+~~~
+
+This should not be suprising. In case you want to see just the keys of a hash, you have
+
+~~~
+irb> a.keys
+=> [:first, :last]
+~~~
+
+And similarly for the values in a hash:
+
+~~~
+irb> a.values
+=> ["John", "Doe"]
+~~~
 
 TODO: 
 
-- each with index
-- hash iterating
 - mention that hashes enumerate their values in the order of key insertion.
 - mention some common operations on collections such as `inject`, and `map`.
 
@@ -630,6 +674,10 @@ TODO: mention [hashes as arguments](https://docs.ruby-lang.org/en/2.6.0/Hash.htm
 # Classes and Methods
 
 # Modules
+
+TODO:
+
+- class `extend` a module
 
 # Testing
 
