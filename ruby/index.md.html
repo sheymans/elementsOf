@@ -662,10 +662,72 @@ irb> a.values
 => ["John", "Doe"]
 ~~~
 
-TODO: 
+In contrast to usual hashes (e.g., in Java), you _can_ assume an order on key-value pairs in ruby. They will be in the order they were inserted:
 
-- mention that hashes enumerate their values in the order of key insertion.
-- mention some common operations on collections such as `inject`, and `map`.
+~~~
+irb> a = {}
+=> {}
+irb> a["first"] = 1
+=> 1
+irb> a["second"] = 2
+=> 2
+irb> a.each { |key, value|  puts "#{key} -> #{value}" }
+first -> 1
+second -> 2
+~~~
+
+Sometimes you can benefit from going one abstraction higher than pure looping, and use a [`map`](https://docs.ruby-lang.org/en/2.6.0/Array.html#method-i-map):
+
+~~~
+irb> a = [1, 2, 3]
+=> [1, 2, 3]
+irb> b = a.map { |x| x * 2 }
+=> [2, 4, 6]
+irb> a
+=> [1, 2, 3]
+~~~
+
+If you do not want a new array, you can use the [destructive variant
+`map!`](https://docs.ruby-lang.org/en/2.6.0/Array.html#method-i-map-21):
+
+~~~
+irb> a.map! { |x| x * 2 }
+=> [2, 4, 6]
+irb> a
+=> [2, 4, 6]
+~~~
+
+The convention in Ruby is to indeed append `!` to function names if those
+functions are supposed to be destructive.
+
+We can also map hashes. For example, collect all keys of a map, but uppercased:
+
+~~~
+irb> a = { first: "John", last: "Doe" }
+=> {:first=>"John", :last=>"Doe"}
+irb> a.map { |key, value| key.upcase }
+=> [:FIRST, :LAST]
+~~~
+
+Instead of that 1 value in the block arguments, we have 2: `|key, value|` as we're dealing with a Hash. We map that key-value pair to `key.upcase`, and `map` collects those in an Array. What if you want to map a Hash to a Hash, but just keeping the keys but uppercasing the values:
+
+~~~
+irb> a.map { |key, value| [key, value.upcase] }.to_h
+=> {:first=>"JOHN", :last=>"DOE"}
+~~~
+
+The tricky part is that the `map` gives us an array of `[key, value.upcase]`
+arrays. So we use `to_h` to convert that very specific array to a hash.
+Generally:
+
+~~~
+irb> [[1, 2], [3, 4]].to_h
+=> {1=>2, 3=>4}
+~~~
+
+We're verging to the non-elemental, so moving on.
+
+
 
 # Functions
 
