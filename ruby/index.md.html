@@ -727,9 +727,50 @@ irb> [[1, 2], [3, 4]].to_h
 
 We're verging to the non-elemental, so moving on.
 
-
-
 # Functions
+
+Your first unit of abstraction are functions (or _methods_, when appearing in classes, same potato). Functions take the following shape:
+
+~~~ruby
+def function_name(arg1, arg2,...)
+  # do stuff
+end
+~~~
+
+Functions start with `def` and end with `end`. A function that doubles an array `a`:
+
+~~~ruby
+def double_all(a)
+  a.map { |x| x * 2 }
+end
+~~~
+
+"Oh no," you may say. "They forgot to type the arguments, what a nightmare to
+read code like that,". Yes, but embrace it. Essentially, your `a` can be
+anything as long as it understands `map`. Yes, yes, interfaces and all. 
+
+Calling functions is as you would expect:
+
+~~~
+irb> a = [1, 2, 3]
+irb> puts double_all(a)
+2
+4
+6
+~~~
+
+
+You have options if you do not want to embrace it. Check out
+[sorbet](https://sorbet.org/) which allows you to annotate your functions with
+type information. For example, the above would be intended for:
+
+~~~ruby
+sig { params(a: T::Array[Integer].returns(T::Array[Integer]) }
+def double_all(a)
+  a.map { |x| x * 2 }
+end
+~~~
+
 
 TODO: mention [hashes as arguments](https://docs.ruby-lang.org/en/2.6.0/Hash.html)
 
