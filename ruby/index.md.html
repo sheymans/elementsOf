@@ -771,6 +771,69 @@ def double_all(a)
 end
 ~~~
 
+You can have defaults for your arguments:
+
+~~~ruby
+def double_all(a = [1, 2])
+  a.map { |x| x * 2 }
+end
+~~~
+
+You can then just do:
+
+~~~
+irb> puts double_all
+2
+4
+~~~
+
+You can have of courses have a hash as an argument:
+
+~~~ruby
+def hash_keys(h)
+  h.each { |key, value| puts "#{key}: #{value}" }
+end
+~~~
+
+And then:
+
+~~~
+irb> puts hash_keys({ :a => 1, :b => 2 })
+a
+b
+~~~
+
+Here's some fun. If a hash is the last argument of the function call, you can just leave off the curly brackets:
+
+~~~
+irb> puts hash_keys(:a => 1, :b => 2)
+a
+b
+~~~
+
+Sure, but recall that the hash `{ :a => 1, :b => 2 }` can also be written as the equivalent `{ a: 1, b: 2 }` and leaving off the brackets in the call is then:
+
+~~~
+irb> puts hash_keys(a: 1, b: 2)
+a
+b
+~~~
+
+That looks a whole lots like keyword arguments at that point. And yes, it's easy to see that you could now just change the calling order without effects:
+
+~~~
+irb> puts hash_keys(b: 2, a: 2)
+a
+b
+~~~
+
+
+
+
+
+
+
+
 
 TODO: mention [hashes as arguments](https://docs.ruby-lang.org/en/2.6.0/Hash.html)
 
