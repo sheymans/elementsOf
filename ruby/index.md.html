@@ -791,53 +791,93 @@ You can have of courses have a hash as an argument:
 
 ~~~ruby
 def hash_keys(h)
-  h.each { |key, value| puts "#{key}: #{value}" }
+  puts "a: #{h[:a]}"
+  puts "b: #{h[:b]}"
 end
 ~~~
 
 And then:
 
 ~~~
-irb> puts hash_keys({ :a => 1, :b => 2 })
-a
-b
+irb> puts hash_keys({ a: 1, b: 2 })
+a: 1
+b: 2
 ~~~
 
 Here's some fun. If a hash is the last argument of the function call, you can just leave off the curly brackets:
 
 ~~~
-irb> puts hash_keys(:a => 1, :b => 2)
-a
-b
-~~~
-
-Sure, but recall that the hash `{ :a => 1, :b => 2 }` can also be written as the equivalent `{ a: 1, b: 2 }` and leaving off the brackets in the call is then:
-
-~~~
 irb> puts hash_keys(a: 1, b: 2)
-a
-b
+a: 1
+b: 2
 ~~~
 
-That looks a whole lots like keyword arguments at that point. And yes, it's easy to see that you could now just change the calling order without effects:
+That looks a whole lots like keyword arguments at that point. And yes, it's
+easy to see that you could now just change the calling order without effects:
 
 ~~~
-irb> puts hash_keys(b: 2, a: 2)
-a
-b
+irb> puts hash_keys(b: 2, a: 1)
+a: 1
+b: 2
 ~~~
-
-
-
-
-
-
-
-
-
-TODO: mention [hashes as arguments](https://docs.ruby-lang.org/en/2.6.0/Hash.html)
 
 # Classes and Methods
+
+A minimal class is defined with the `class` keyword, a name, and ends with `end`:
+
+~~~ruby
+class A
+
+end
+~~~
+
+Despite this not doing much more then introducing `A` into your world. Let's see how to create a new `A` object `a`, how to ask it's `object_id`, how to get its string representation with `to_s` and finally how to ask an objects it's class:
+
+~~~
+irb> a = A.new
+=> #<A:0x00007f913a9bb5e0>
+irb> a.to_s
+=> "#<A:0x00007f913a9bb5e0>"
+irb> a.object_id
+=> 70130865134320
+irb> a.class
+=> A
+~~~
+
+Not bad for a minute of work. You may be wondering where does all this functionality come from. Let's poke at the class hierarchy:
+
+~~~
+irb> a.class.ancestors
+=> [A, Object, Kernel, BasicObject]
+~~~
+
+So `a` is an `A` which is an `Object` which is a `Kernel`, which is a
+`BasicObject`. Forget about the latter 2. Do it. And note that of course
+`Object` already has all that functionality, so we're merely tapping into
+_inherited_ methods from `Object`:
+
+~~~
+irb> o = Object.new
+=> #<Object:0x00007f913a82f898>
+irb> o.to_s
+=> "#<Object:0x00007f913a82f898>"
+irb> o.object_id
+=> 70130864323660
+irb> o.class
+=> Object
+irb> o.class.ancestors
+=> [Object, Kernel, BasicObject]
+~~~
+
+TODO:
+
+- show inequality of 2 `A`s and show how override equality
+- instance variables and custom initialize
+- instance methods
+- class variables
+- class methods
+- inheritance
+
 
 # Modules
 
