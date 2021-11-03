@@ -1096,9 +1096,57 @@ irb> x.a = 6
 If you only want the getter, you can use `attr_reader`. If you only want a
 setter (who are you?), you can use `attr_writer`.
 
+As for some fun. What do you think will `x == y` be?
+
+~~~
+irb> x = A.new(3)
+=> #<A:0x00007fa3d6194778 @a=3>
+irb> y = A.new(3)
+=> #<A:0x00007fa3d58ed458 @a=3>
+irb> x == y
+~~~
+
+That's right. False. `x` and `y` are different objects and `==` is using
+`Object` equality in this case. Sometimes it makes sense, to have `x` and `y`
+be equal as they represent the same data namely an `A` with data `3`. If you
+think, "yeah right", think of strings: `"I am right" == "I am right"` are the
+same strings and we expect this to be `true`.
+
+You can override `==` to accomplish that.
+
+~~~ruby
+class A
+  attr_accessor :a
+
+  def initialize(a)
+    @a = a
+  end
+
+  def ==(other)
+    self.a == other.a
+  end
+end
+~~~
+
+And then:
+
+~~~
+irb> x = A.new(3)
+=> #<A:0x00007fb47c1805a0 @a=3>
+irb> y = A.new(3)
+=> #<A:0x00007fb47c189268 @a=3>
+irb> x == y
+=> true
+~~~
+
+Couple of things worth pointing to:
+
+- `==` can be just an instance method defined as any other method.  The reason is that `x == y`, is really just `x.==(y)` as if `==` is any other method name.
+- I used `self` which is very similar to Java's `this` at least in _this_ [context](https://airbrake.io/blog/ruby/self-ruby-overview). Here it's the an instance of this object itself. So when we're doing `x == y`, and we thus execute `==` for the object `x`, then `self` would be `x`. Caveat emptor: `self` may mean other things. We will see in a bit how to use `self` to define _class methods_. 
+- I did not actually have to use `self` here. There was no ambiguity if I'd have done `a == other.a`. The first `a` would have referred to the method `a` defined in `A` (by way of the `attr_accessor` and would have allowed me to check equality of the instance variable `@a` with `other.a` (aka the `@a` of the `other` object).
+
 TODO:
 
-- show inequality of 2 `A`s and show how override equality
 - class variables
 - class methods
 - inheritance
