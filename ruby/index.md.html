@@ -978,10 +978,126 @@ This is interesting in that `result` is a _local_ variable to the instance
 method `print_your_state_with_a_factor` and thus there's no `@` in sight when
 `put`ing it.
 
+Note that instance variables are _encapsulated_: you cannot get to its value from outside the class:
+
+~~~
+irb> x = A.new(3)
+=> #<A:0x00007fc8cc180280 @a=3>
+irb> x.a
+Traceback (most recent call last):
+        4: from /usr/bin/irb:23:in `<main>'
+        3: from /usr/bin/irb:23:in `load'
+        2: from /Library/Ruby/Gems/2.6.0/gems/irb-1.0.0/exe/irb:11:in `<top (required)>'
+        1: from (irb):4
+NoMethodError (undefined method `a' for #<A:0x00007fc8cc180280 @a=3>)
+~~~
+
+That makes some sort of sense thinking of, for example, private instance variables in Java. You'd usually define a getter of some sorts:
+
+~~~ruby
+class A
+
+  def initialize(a)
+    @a = a
+  end
+
+  def a
+    @a
+  end
+end
+~~~
+
+And then:
+
+~~~
+irb> x = A.new(3)
+=> #<A:0x00007f913a943c70 @a=3>
+irb> x.a
+=> 3
+~~~
+
+You could still not write to `@a` as that requires some sort of setter:
+
+~~~
+irb> x.a = 5
+Traceback (most recent call last):
+        4: from /usr/bin/irb:23:in `<main>'
+        3: from /usr/bin/irb:23:in `load'
+        2: from /Library/Ruby/Gems/2.6.0/gems/irb-1.0.0/exe/irb:11:in `<top (required)>'
+        1: from (irb):20
+NoMethodError (undefined method `a=' for #<A:0x00007f913a943c70 @a=3>)
+Did you mean?  a
+~~~
+
+We can write this ourselves:
+
+~~~ruby
+class A
+
+  def initialize(a)
+    @a = a
+  end
+
+  def a
+    @a
+  end
+
+  def a=(a)
+    @a = a
+  end
+end
+~~~
+
+and then:
+
+~~~
+irb> x = A.new(3)
+=> #<A:0x00007fb09b838558 @a=3>
+irb> x.a
+=> 3
+irb> x.a = 5
+=> 5
+irb> x.a
+=> 5
+~~~
+
+I'll pauze, so you can take this in.
+
+~~~ruby
+def a=(a)
+  @a = a
+end
+~~~
+
+That latter thing is an [assignment method](https://docs.ruby-lang.org/en/2.6.0/doc/syntax/assignment_rdoc.html#label-Assignment+Methods).
+At this point the whole thing has become terribly obnoxious. Luckily, we have shorthand. We can accomplish what we had (a getter and a setter), by using `attr_accessor` as follows:
+
+~~~ruby
+class A
+  attr_accessor :a
+
+  def initialize(a)
+    @a = a
+  end
+end
+~~~
+
+Yes, you write `:a` there. 
+
+~~~
+irb> x = A.new(3)
+=> #<A:0x00007fc5ab109988 @a=3>
+irb> x.a
+=> 3
+irb> x.a = 6
+=> 6
+~~~
+
+If you only want the getter, you can use `attr_reader`. If you only want a
+setter (who are you?), you can use `attr_writer`.
 
 TODO:
 
-- indicate that instance variable is encapsulated, you can write your own methods exposing it and setting it, or you can use shorthand attribute accessors
 - show inequality of 2 `A`s and show how override equality
 - class variables
 - class methods
