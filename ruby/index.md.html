@@ -1145,10 +1145,45 @@ Couple of things worth pointing to:
 - I used `self` which is very similar to Java's `this` at least in _this_ [context](https://airbrake.io/blog/ruby/self-ruby-overview). Here it's the an instance of this object itself. So when we're doing `x == y`, and we thus execute `==` for the object `x`, then `self` would be `x`. Caveat emptor: `self` may mean other things. We will see in a bit how to use `self` to define _class methods_. 
 - I did not actually have to use `self` here. There was no ambiguity if I'd have done `a == other.a`. The first `a` would have referred to the method `a` defined in `A` (by way of the `attr_accessor` and would have allowed me to check equality of the instance variable `@a` with `other.a` (aka the `@a` of the `other` object).
 
+If you know `Java`, you must have met `static`. Used to indicate both variables
+and methods in Java classes that belong to the type rather than the instance.
+Aka, you can ask the class for the variables/methods. No need for an object. 
+
+In Ruby _class variables_ are indicated with `@@` (recall that instance variables are indicated with `@`). _Class methods_ are indicated by preceding the name with `self`. The body is not yet cold and here we are: `self` in this context, refers to the class (rather than the object). Let's see this in practice:
+
+~~~ruby
+class A
+  @@counter = 0
+
+  def initialize
+    @@counter += 1
+  end
+
+  def self.counter
+    @@counter
+  end
+
+end
+~~~
+
+And then:
+
+~~~
+irb> x = A.new
+=> #<A:0x00007fc82595ce60>
+irb> A.counter
+=> 1
+irb> y = A.new
+=> #<A:0x00007fc8259642a0>
+irb> A.counter
+=> 2
+~~~
+
+Note that we asked `A` for the `counter` (not `x`, nor `y`). In fact, doing
+`x.counter` would lead to an `undefined method` error.
+
 TODO:
 
-- class variables
-- class methods
 - inheritance
 
 # Modules
