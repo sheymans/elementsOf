@@ -1149,7 +1149,11 @@ If you know `Java`, you must have met `static`. Used to indicate both variables
 and methods in Java classes that belong to the type rather than the instance.
 Aka, you can ask the class for the variables/methods. No need for an object. 
 
-In Ruby _class variables_ are indicated with `@@` (recall that instance variables are indicated with `@`). _Class methods_ are indicated by preceding the name with `self`. The body is not yet cold and here we are: `self` in this context, refers to the class (rather than the object). Let's see this in practice:
+In Ruby _class variables_ are indicated with `@@` (recall that instance
+variables are indicated with `@`). _Class methods_ are indicated by preceding
+the name with `self`. The body is not yet cold and here we are: `self` in this
+context, refers to the class (rather than the object). Let's see this in
+practice:
 
 ~~~ruby
 class A
@@ -1182,9 +1186,56 @@ irb> A.counter
 Note that we asked `A` for the `counter` (not `x`, nor `y`). In fact, doing
 `x.counter` would lead to an `undefined method` error.
 
-TODO:
+I avoided it for a while, but let's talk about inheritance. In the below I make `B` a subclass of `A` by indicating `B < A`.
 
-- inheritance
+~~~ruby
+class A
+  attr_accessor :a
+
+  def initialize(a)
+    @a = a
+  end
+
+  def double
+    2 * @a
+  end
+end
+
+class B < A
+  def triple
+    3 * @a
+  end
+end
+~~~
+
+And some poking at this:
+
+~~~
+irb(main):011:0> x = A.new(3)
+=> #<A:0x00007fa19e02dd10 @a=3>
+irb(main):012:0> x.double
+=> 6
+irb(main):013:0> y = B.new
+Traceback (most recent call last):
+        6: from /usr/bin/irb:23:in `<main>'
+        5: from /usr/bin/irb:23:in `load'
+        4: from /Library/Ruby/Gems/2.6.0/gems/irb-1.0.0/exe/irb:11:in `<top (required)>'
+        3: from (irb):13
+        2: from (irb):13:in `new'
+        1: from /Users/sheymans/Workspaces/ruby_playground/src/ruby_playground.rb:7:in `initialize'
+ArgumentError (wrong number of arguments (given 0, expected 1))
+irb(main):014:0> y = B.new(5)
+=> #<B:0x00007fa19f2184a8 @a=5>
+irb(main):015:0> y.double
+=> 10
+irb(main):016:0> y.triple
+=> 15
+~~~
+
+This works you expect it to work. Some quick notes:
+
+- I did not give an `initialize` to `B` so we're forced to use the one of `A` which requires 1 argument `a` (which is what the _wrong number of arguments_ tells us)
+- I could access the instance variable `@a` in `B`, given that was initialized in `A`. This could be surprising as in _where in the name does `@a` here comes from?_. I hope you got a decent IDE going for you.
 
 # Modules
 
