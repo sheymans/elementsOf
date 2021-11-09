@@ -1239,9 +1239,38 @@ This works you expect it to work. Some quick notes:
 
 # Modules
 
-TODO:
+The general syntax of a module is easy. Use keyword `module`, give it a name and end with `end`:
 
-- class `extend` a module
+~~~ruby
+module HomeMade
+  class A
+    attr_accessor :a
+
+    def initialize(a)
+      @a = a
+    end
+
+    def double
+      2 * @a
+    end
+  end
+
+end
+~~~
+
+And then prepend `HomeMade::` to your class name `A` if you want an instance of this particular `A`:
+
+~~~
+irb> a = HomeMade::A.new(3)
+=> #<HomeMade::A:0x00007fdf07147448 @a=3>
+irb> a.double
+=> 6
+~~~
+
+## As Namespaces
+
+
+## As Mixins
 
 # Testing
 
