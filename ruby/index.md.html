@@ -1269,6 +1269,42 @@ irb> a.double
 
 ## As Namespaces
 
+But why? One simple reason is that your neighbor also would like a class with
+name `A`. That's just how he is. With modules, you can nicely isolate names:
+
+~~~ruby
+module HomeMade
+  class A
+    attr_accessor :a
+
+    def initialize(a)
+      @a = a
+    end
+
+    def double
+      2 * @a
+    end
+  end
+end
+
+module NeighborMade
+  class A
+    # Same name A
+  end
+end
+~~~
+
+And now you can nicely differentiate which `A` you mean:
+
+~~~
+irb> a = HomeMade::A.new(3)
+=> #<HomeMade::A:0x00007f95eb03f0b0 @a=3>
+irb> b = NeighborMade::A.new
+=> #<NeighborMade::A:0x00007f95ef0ef998>
+~~~
+
+In other words, modules can help you logically organize your classes/functions
+within your application.
 
 ## As Mixins
 
