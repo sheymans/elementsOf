@@ -1434,9 +1434,83 @@ a.map do |el|
 end
 ~~~
 
+Essentially you're giving one function `map` another function (the block) as an
+argument. It's what they call higher-order functions in school children.
 
+How do you define your own higher order function? Let's define a function that starts by printing "here we are now", and ends by priting "entertain us" to whatever function call we'd like. For example, say we want to print those 2 lines around a function call of `lost`:
+
+~~~ruby
+def lost
+  puts 'a lost generation'
+end
+~~~
+
+We could of course just do:
+
+~~~ruby
+puts 'here we are now'
+lost
+puts 'entertain us'
+~~~
+
+But if I'd want to do the same to another function than `lost` I'd have to repeat that. Let's define a higher-function that can prints those things for any other function:
+
+~~~
+def smells_like
+  puts 'here we are now'
+  yield
+  puts 'entertain us'
+end
+~~~
+
+You saw it: `yield`. That keyword tells the function `smells_like` _and now
+execute the block that was given to your call my friend_. So if we do
+`smells_like { lost }`, you see:
+
+```
+here we are now
+a lost generation
+entertain us
+```
+
+You could also just do `smells_like { puts 'a broken generation' }` and see:
+
+```
+here we are now
+a broken generation
+entertain us
+```
+
+What about blocks with parameters? For example, what if I want to be able to do
+`smells_like('broken') { |x| puts "a #{x} generation" }`? `yield` can take
+arguments, and yields arguments get shuttled into the block's arguments:
+
+~~~ruby
+def smells_like(something)
+  puts 'here we are now'
+  yield(something)
+  puts 'entertain us'
+end
+~~~
+
+And then:
+
+~~~
+irb> smells_like('lost') { |x| puts "a #{x} generation" }
+here we are now
+a lost generation
+entertain us
+irb> smells_like('broken') { |x| puts "a #{x} generation" }
+here we are now
+a broken generation
+entertain us
+~~~
+
+Good times.
 
 # Conclusion
+
+We reached the end.
 
 
 <link rel="stylesheet" href="https://casual-effects.com/markdeep/latest/latex.css?">
