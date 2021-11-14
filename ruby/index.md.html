@@ -1308,12 +1308,132 @@ within your application.
 
 ## As Mixins
 
+Say you have 2 modules, 1 for logging and 1 for doing more long-term analytics (like sending Kafka events):
+
+~~~ruby
+module Logger
+  def log_it(what)
+    puts what
+  end
+end
+
+module Analytics
+  def send_event(event)
+    puts event
+  end
+end
+~~~
+
+And you have a class `A` that would like to re-use the methods provided by both the `Logger` and `Analytics` modules:
+
+~~~ruby
+class A
+
+  def do_something
+    log_it("we're loggin this")
+    send_event('for long term analytics we send this')
+  end
+end
+~~~
+
+Trying this as is, will give you a `NoMethodError` for `log_it` and `send_event` if you try to do `a.do_something` for an object `a` of type `A`. `A` does not know about these things. You could be clever and say, well, let `A` inherit from `Logger`. Yes. And you'd want `A` to also inherit from `Analytics`. However, ruby does not allow multiple inheritance. You can only inherit from 1 class (ignoring for a minute that `Logger` and `Analytics` are not actually classes, they are modules).
+
+We can solve this by _mixing in_ the 2 modules in the class `A` by using `include`:
+
+~~~ruby
+class A
+  include Logger
+  include Analytics
+
+  def do_something
+    log_it("we're loggin this")
+    send_event('for long term analytics we send this')
+  end
+end
+~~~
+
+`include` makes all methods of the modules available as _instance_ methods in
+your class. In the Java world, and maybe other worlds as well, you are reminded
+immediately of the dreaded Utility class. Banish that memory.
+
 # Testing
+
+Say you have a class `A` that doubles, defined in a file `ruby_playground.rb`:
+
+~~~ruby
+class A
+  def initialize(a)
+    @a = a
+  end
+
+  def double
+    @a * 2
+  end
+end
+~~~
+
+Let's unit test `double` by creating a new file `test_ruby_playground.rb` for it:
+
+~~~ruby
+require 'test/unit'
+require './ruby_playground'
+
+class RubyPlayGroundTest < Test::Unit::TestCase
+  def test_double
+    a = A.new(3)
+    assert_equal 6, a.double
+  end
+
+end
+~~~
+
+This should look fairly familiar by now. Some new things:
+
+- we `require` the `test/unit` Ruby gem which defines the class `Test::Unit::TestCase` for us.
+- we `require` the file that has our own `A` with its `double`
+- we create a new class `RubyPlayGroundTest` that inherits from that `Test::Unit::TestCase`
+- we write a method that starts with `test_` and we use `assert_equal` to test whether `6` is indeed the result of `a.double`.
+
+Running that test file should result in success with statistics:
+
+~~~
+$ ruby test_ruby_playground.rb
+Loaded suite test_ruby_playground
+Started
+.
+Finished in 0.000298 seconds.
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+1 tests, 1 assertions, 0 failures, 0 errors, 0 pendings, 0 omissions, 0 notifications
+100% passed
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+3355.70 tests/s, 3355.70 assertions/s
+~~~
+
+Try making the test fail and run the test again. Do it.
 
 # Blocks
 
-Abandoning the structure of [Introducing
-Go](https://www.goodreads.com/book/show/27015358-introducing-go) to go a bit deeper into _blocks_.
+
+A quick reminder that we already saw blocks in action:
+
+~~~
+irb> a = [1, 2, 3]
+=> [1, 2, 3]
+irb> a.map { |el| el * 2 }
+=> [2, 4, 6]
+~~~
+
+The piece `{ |el| el * 2 } is a _block_. You can distinguis the parameter part
+`|el|` as well as the _body_ of that block `el * 2`. For multi-line blocks,
+you'd use the `do...end` form, same potato though:
+
+~~~ruby
+a.map do |el|
+ double = el * 2
+ double + 1
+end
+~~~
+
 
 
 # Conclusion
