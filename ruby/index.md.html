@@ -1,20 +1,22 @@
 <meta charset="utf-8">
                             **Elements of Ruby**
                             Stijn Heymans
-
+                            published: 1 December 2021
 
 # Introduction
 
-I will attempt to introduce you to the elements of programming in
-[Ruby](https://www.ruby-lang.org) from a beginner's mindset. I will assume you
-can program in some other language (Java,
-[Perl](http://www.stijnheymans.net/elements_of_perl.html), Python, whatever)
-and so I'll not explain recursion, object-oriented programming, or other
-concepts common to most programming languages.
+I will introduce you to the elements of programming in
+[Ruby](https://www.ruby-lang.org). I assume you can program in some other
+language such as Java,
+[Perl](http://www.stijnheymans.net/elements_of_perl.html), Python, Go, ...
 
-I will mostly use 2 sources that were helpful to me and are worth digging into yourself:
+Background sources that were helpful to me:
 
-- [Why's (Poignant) Guide to Ruby](https://poignant.guide/) by _why the lucky stiff_. That book is more art project than programming book, but it's also the one beginner's resource I found that gives an elemental overview of the language _with_ intuition of why things are the way they are in Ruby. If you already read that book, you can stop reading this article. You will not learn anything more than you already know.
+- [Why's (Poignant) Guide to Ruby](https://poignant.guide/) by _why the lucky
+  stiff_. More art project than programming book, but a beginner's resource
+  that gives an elemental overview of the language _with_ intuition of why
+  things are the way they are in Ruby. If you read that book, you can stop
+  reading this article. There's nothing here for you.
 
 - [Eloquent Ruby](https://www.goodreads.com/book/show/9364729-eloquent-ruby) by Russ Olsen. This takes things a step further and highlights the _Ruby_ way of doing common tasks, but also goes into meta-programming with Ruby that is easy to understand and gives you an inkling why Ruby might be different than some of the other languages out there.
 
@@ -28,7 +30,7 @@ Something I aspire to in this article. Let's try.
 # Getting Started
 
 I assume you have some familiarity with basic command-line usage. Check whether
-ruby is installed:
+Ruby is installed:
 
 ~~~shell
 $ ruby --version
@@ -38,7 +40,7 @@ For me, it returns `ruby 2.6.3p62 (2019-04-16 revision 67580)
 [universal.x86_64-darwin20]`). If you don't have it installed, you can get it
 at [the ruby-lang website](https://www.ruby-lang.org/en/downloads/).
 
-If you have ruby, you will have an interactive interpreter called
+If you have Ruby, you will have an interactive interpreter called
 [irb](https://github.com/ruby/irb). On the command-line, type `irb`.
 
 ~~~
@@ -55,7 +57,7 @@ without `irb`. Open a file (make it end on `rb`, for example
 puts 'Hello World!'
 ~~~
 
-Close the file and at the command-line, have ruby execute it:
+Close the file and at the command-line, have Ruby execute it:
 
 ~~~
 $ ruby ruby_playground.rb
@@ -65,7 +67,7 @@ Hello World!
 Want to know more about `puts`? Get in the habit of looking that sort of info
 up in the [official docs](https://docs.ruby-lang.org/en/) -
 pick the right version of the docs corresponding to what you saw in your
-initial `ruby --version`. I picked `2.6.0` as my ruby version is `2.6.3`.
+initial `ruby --version`. I picked `2.6.0` as my Ruby version is `2.6.3`.
 
 This got us started.
 
@@ -73,8 +75,8 @@ This got us started.
 
 ## Numbers
 
-Unsuprisingly, integers are represented as we expect: `3`, `5, `-100`, ...
-Suprisingly, everything in ruby is an object so you can ask the class of an
+Unsurprisingly, integers are represented as we expect: `3`, `5, `-100`, ...
+Surprisingly, everything in Ruby is an object so you can ask the class of an
 integer by doing `5.class`, which will return
 [Integer](https://docs.ruby-lang.org/en/2.6.0/Integer.html). 
 
@@ -296,7 +298,7 @@ Conditions can of course be the result of a function or method call which could
 be true or false as well.
 
 Your conditions will often compare things (if variable `a` is equal `"dog"`,
-then do this). While you have `==`, `===`, `equal?`, and `eql?` in ruby, you
+then do this). While you have `==`, `===`, `equal?`, and `eql?` in Ruby, you
 will mostly use:
 
 - `==` for checking whether values are equal as far as the class designer of the objects you're comparing is concerned. 
@@ -343,9 +345,9 @@ unless condition
 end
 ~~~
 
-While this takes some getting used to, especially for my head, it's the ruby way.
+While this takes some getting used to, especially for my head, it's the Ruby way.
 
-Furthermore, if `do_something` is just one line, ruby often prefers the one-liner:
+Furthermore, if `do_something` is just one line, Ruby often prefers the one-liner:
 
 ~~~ruby
 do_something if condition
@@ -365,7 +367,7 @@ return if invalid_parameters
 
 ## Looping
 
-This is an area where ruby is opinionated. Say there's no collection like an
+This is an area where Ruby is opinionated. Say there's no collection like an
 Array or Hash in sight, and in some other language (say `go`), we'd write:
 
 ~~~go
@@ -385,7 +387,7 @@ This would print:
 4
 ~~~
 
-There's a variety of ways to write this in valid ruby, but the construct as
+There's a variety of ways to write this in valid Ruby, but the construct as
 above does not exist.
 
 Closest in spirit to the above one is to probably use a while:
@@ -401,7 +403,7 @@ end
 
 which is arguably slightly more verbose than the corresponding `for` loop in `go`.
 
-A more ruby way is to probably use [`times`](https://docs.ruby-lang.org/en/2.6.0/Integer.html#method-i-times):
+A more Ruby way is to probably use [`times`](https://docs.ruby-lang.org/en/2.6.0/Integer.html#method-i-times):
 
 ~~~ruby
 n.times { |i| puts i }
@@ -417,7 +419,7 @@ Let's analyze it's parts:
 
 We'll do more looping in the Arrays and Hashes section, as most of the time
 your looping will be in the context of some collection and also in that case
-ruby has opinions.
+Ruby has opinions.
 
 # Arrays and Hashes
 
@@ -431,7 +433,7 @@ irb> a = ["x", 1, :y]
 ~~~
 
 Arrays are in other words not restricted to 1 type of objects. You can shuffle
-in there what'd you like. "Oh yeah??!!". Yes:
+in there what you like. "Oh yeah??!!". Yes:
 
 ~~~
 irb> a = ["x", [1, 2], :y]
@@ -633,7 +635,7 @@ irb> a.each_with_index { |el, i| puts "#{i}: #{el}" }
 ~~~
 
 Yeah, get those [Anki flashcards](https://apps.ankiweb.net/) out to memorize
-the order of that `|el, i|`. Alternatively, in ruby syntax, it often works to
+the order of that `|el, i|`. Alternatively, in Ruby syntax, it often works to
 think "how would I say this out loud?": in the array `a`, for _each_ `el` at
 index `i`, do something. If you naturally go to _for each index `i` which has
 element `el`_ you're on your own in this mess, my friend.
@@ -648,7 +650,7 @@ first -> John
 last -> Doe
 ~~~
 
-This should not be suprising. In case you want to see just the keys of a hash, you have
+This should not be surprising. In case you want to see just the keys of a hash, you have
 
 ~~~
 irb> a.keys
@@ -662,7 +664,7 @@ irb> a.values
 => ["John", "Doe"]
 ~~~
 
-In contrast to usual hashes (e.g., in Java), you _can_ assume an order on key-value pairs in ruby. They will be in the order they were inserted:
+In contrast to usual hashes (e.g., in Java), you _can_ assume an order on key-value pairs in Ruby. They will be in the order they were inserted:
 
 ~~~
 irb> a = {}
@@ -907,7 +909,7 @@ The class `A` is mostly useless. Usually classes carry some _state_ (cars have
 doors and color, some cars have 4 doors, some 5, some cars are blue, some cars
 are yellow). We capture that state using instance variables.
 
-In ruby, instance variables start with an `@`. So for example, let's give `A` some state:
+In Ruby, instance variables start with an `@`. So for example, let's give `A` some state:
 
 ~~~ruby
 class A
@@ -1061,7 +1063,7 @@ irb> x.a
 => 5
 ~~~
 
-I'll pauze, so you can take this in.
+I'll pause, so you can take this in.
 
 ~~~ruby
 def a=(a)
@@ -1330,13 +1332,13 @@ And you have a class `A` that would like to re-use the methods provided by both 
 class A
 
   def do_something
-    log_it("we're loggin this")
+    log_it("we're logging this")
     send_event('for long term analytics we send this')
   end
 end
 ~~~
 
-Trying this as is, will give you a `NoMethodError` for `log_it` and `send_event` if you try to do `a.do_something` for an object `a` of type `A`. `A` does not know about these things. You could be clever and say, well, let `A` inherit from `Logger`. Yes. And you'd want `A` to also inherit from `Analytics`. However, ruby does not allow multiple inheritance. You can only inherit from 1 class (ignoring for a minute that `Logger` and `Analytics` are not actually classes, they are modules).
+Trying this as is, will give you a `NoMethodError` for `log_it` and `send_event` if you try to do `a.do_something` for an object `a` of type `A`. `A` does not know about these things. You could be clever and say, well, let `A` inherit from `Logger`. Yes. And you'd want `A` to also inherit from `Analytics`. However, Ruby does not allow multiple inheritance. You can only inherit from 1 class (ignoring for a minute that `Logger` and `Analytics` are not actually classes, they are modules).
 
 We can solve this by _mixing in_ the 2 modules in the class `A` by using `include`:
 
@@ -1346,7 +1348,7 @@ class A
   include Analytics
 
   def do_something
-    log_it("we're loggin this")
+    log_it("we're logging this")
     send_event('for long term analytics we send this')
   end
 end
@@ -1423,7 +1425,7 @@ irb> a.map { |el| el * 2 }
 => [2, 4, 6]
 ~~~
 
-The piece `{ |el| el * 2 } is a _block_. You can distinguis the parameter part
+The piece `{ |el| el * 2 } is a _block_. You can distinguish the parameter part
 `|el|` as well as the _body_ of that block `el * 2`. For multi-line blocks,
 you'd use the `do...end` form, same potato though:
 
@@ -1437,7 +1439,7 @@ end
 Essentially you're giving one function `map` another function (the block) as an
 argument. It's what they call higher-order functions in school children.
 
-How do you define your own higher order function? Let's define a function that starts by printing "here we are now", and ends by priting "entertain us" to whatever function call we'd like. For example, say we want to print those 2 lines around a function call of `lost`:
+How do you define your own higher order function? Let's define a function that starts by printing "here we are now", and ends by printing "entertain us" to whatever function call we'd like. For example, say we want to print those 2 lines around a function call of `lost`:
 
 ~~~ruby
 def lost
