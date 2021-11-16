@@ -14,33 +14,35 @@ Background sources that were helpful to me:
 
 - [Why's (Poignant) Guide to Ruby](https://poignant.guide/) by _why the lucky
   stiff_. More art project than programming book, but a beginner's resource
-  that gives an elemental overview of the language _with_ intuition of why
-  things are the way they are in Ruby. If you read that book, you can stop
-  reading this article. There's nothing here for you.
+  that gives an elemental overview of the language _with_ intuition of the Ruby
+  language.  If you read that book, you can stop reading this article. There's
+  nothing here for you.
 
-- [Eloquent Ruby](https://www.goodreads.com/book/show/9364729-eloquent-ruby) by Russ Olsen. This takes things a step further and highlights the _Ruby_ way of doing common tasks, but also goes into meta-programming with Ruby that is easy to understand and gives you an inkling why Ruby might be different than some of the other languages out there.
+- [Eloquent Ruby](https://www.goodreads.com/book/show/9364729-eloquent-ruby) by
+  Russ Olsen. A bit more advanced than _Why's (Poignant) Guide to Ruby_. The
+  book ventures into meta-programming with Ruby. To see what sets Ruby apart, I
+  recommend this book.
 
-Finally, and the source that stands a bit out, I will follow a structure that is
-loosely inspired by the structure of [Introducing
+In this article, I will follow a structure that is loosely inspired by the
+structure of [Introducing
 Go](https://www.goodreads.com/book/show/27015358-introducing-go) by Caleb
-Doxsey. It's a great little book on Go, but most of all it's a great little
-_short_ book on Go that manages to bring the basics across without decorum.
-Something I aspire to in this article. Let's try.
+Doxsey. Not a Ruby book, but a Go, book. It's a _short_ book on Go that manages
+to bring the basics across.  Something I will aspire to in this article, for
+Ruby.
 
 # Getting Started
 
-I assume you have some familiarity with basic command-line usage. Check whether
-Ruby is installed:
+On the command-line, check whether Ruby is installed:
 
 ~~~shell
 $ ruby --version
 ~~~
 
-For me, it returns `ruby 2.6.3p62 (2019-04-16 revision 67580)
-[universal.x86_64-darwin20]`). If you don't have it installed, you can get it
-at [the ruby-lang website](https://www.ruby-lang.org/en/downloads/).
+For me, this shows `ruby 2.6.3p62 (2019-04-16 revision 67580)
+[universal.x86_64-darwin20]`). If you don't have Ruby installed, get it at [the
+ruby-lang website](https://www.ruby-lang.org/en/downloads/).
 
-If you have Ruby, you will have an interactive interpreter called
+If you have Ruby installed, you also have an interactive interpreter called
 [irb](https://github.com/ruby/irb). On the command-line, type `irb`.
 
 ~~~
@@ -49,9 +51,9 @@ Hello World!
 => nil
 ~~~
 
-Leave the interactive interpreter `irb` by typing `exit`. Now the same but
+Leave the interactive interpreter `irb` by typing `exit`. Now let's a `Hello World!` again, but
 without `irb`. Open a file (make it end on `rb`, for example
-`ruby_playground.rb`) and put the following line in it:
+`ruby_playground.rb`) and write the following line in it:
 
 ~~~ruby
 puts 'Hello World!'
@@ -64,34 +66,32 @@ $ ruby ruby_playground.rb
 Hello World!
 ~~~
 
-Want to know more about `puts`? Get in the habit of looking that sort of info
-up in the [official docs](https://docs.ruby-lang.org/en/) -
-pick the right version of the docs corresponding to what you saw in your
-initial `ruby --version`. I picked `2.6.0` as my Ruby version is `2.6.3`.
-
-This got us started.
+Do you want to know more about `puts`? Get in the habit of using the [official
+docs](https://docs.ruby-lang.org/en/).  Pick the right version of the docs
+corresponding to what you saw in your initial `ruby --version`. I picked
+`2.6.0` as my Ruby version is `2.6.3` and found this
+[explanation](https://docs.ruby-lang.org/en/2.6.0/ARGF.html#method-i-puts).
 
 # The Basic Classes
 
 ## Numbers
 
-Unsurprisingly, integers are represented as we expect: `3`, `5, `-100`, ...
+Unsurprisingly, integers are represented as we expect: `3`, `5`, `-100`, ...
 Surprisingly, everything in Ruby is an object so you can ask the class of an
-integer by doing `5.class`, which will return
+integer: `5.class`. This returns
 [Integer](https://docs.ruby-lang.org/en/2.6.0/Integer.html). 
 
-Since they're full-fledged objects there's more fun stuff one can do: 
+Since integers are objects there's more fun stuff one can ask them: 
 
 ~~~
 irb> 123.digits
 => [3, 2, 1]
 ~~~
 
-Yep, you can get an array of all digits that make up the integer. Fans of
-coding interviews will like that, cause that's literally the only place you'll
+Fans of coding interviews will appreciate this. That's the only place you will
 ever need that.
 
-You can do the usual math:
+Simple math is ready for you and has been since you were 7:
 
 ~~~
 irb> 1 + 2
@@ -102,16 +102,16 @@ irb> 8 / 4
 => 2
 ~~~
 
-Besides integers, you have our favorite inexact real numbers, represented by
-[Float](https://docs.ruby-lang.org/en/2.6.0/Float.html) and in its literal form
-things containing a decimal point:`1.0`, `9.9999`, ...
+There's also the number type that keeps it real and inexact, le
+[Float](https://docs.ruby-lang.org/en/2.6.0/Float.html). In its literal
+representation, it's _things_ that contain a decimal point:`1.0`, `9.9999`, ...
 
 ~~~
 irb> 1.0.class
 => Float
 ~~~
 
-First encounters are often unpleasant:
+First encounters are frequently unpleasant:
 
 ~~~
 irb> 7 / 2
@@ -128,9 +128,8 @@ irb> 7.to_f / 2
 
 ## Strings
 
-String are any characters surrounded by single quotes or double quotes:
-`'Hello'` or `"Hello"`. The double-quoted variety are a bit special. I'll show
-after talking about variables.
+String are characters surrounded by single quotes or double quotes: `'Hello'`
+or `"Hello"`. The double-quoted variety is special. More later. Be patient.
 
 Use `+` to concatenate 2 strings without changing the original strings. Use
 `<<` to concanate and destroy the string you're appending to:
@@ -154,7 +153,7 @@ irb> b
 => "world"
 ~~~
 
-You can use similar operations as for arrays to get to individual parts of the String:
+Pull characters out of a String:
 
 ~~~
 irb> a = "hello"
@@ -179,10 +178,10 @@ irb> a[0...2]
 ## Symbols
 
 Symbols consist of letters, digits, or underscores, and are preceded by a `:`.
-For example, `:a`, `:a_2`, `:an_orange`. Well, why not just use Strings? [Great
+For example, `:a`, `:a_2`, `:an_orange`. Why not just use Strings? [Great
 question](https://stackoverflow.com/questions/255078/whats-the-difference-between-a-string-and-a-symbol-in-ruby).
 
-Remember that I said everything is an object? So let's look a bit at how strings are different from objects:
+Remember that I said everything is an object? So let's look a bit at how strings are different from symbols by looking at their `object_id`:
 
 ~~~
 irb> "bar".object_id
