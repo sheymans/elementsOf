@@ -177,11 +177,12 @@ irb> a[0...2]
 
 ## Symbols
 
-Symbols consist of letters, digits, or underscores, and are preceded by a `:`.
+Symbols consist of letters, digits, or underscores, and are preceded by a `:` .
 For example, `:a`, `:a_2`, `:an_orange`. Why not just use Strings? [Great
 question](https://stackoverflow.com/questions/255078/whats-the-difference-between-a-string-and-a-symbol-in-ruby).
 
-Remember that I said everything is an object? So let's look a bit at how strings are different from symbols by looking at their `object_id`:
+Let's explore how strings are different from symbols by asking for their
+`object_id`:
 
 ~~~
 irb> "bar".object_id
@@ -194,16 +195,15 @@ irb> :foo.object_id
 => 1516508
 ~~~
 
-You can learn several things from this:
+From that `irb` session, you can (if you truly want) learn that
 
-- every object apparently has a method `object_id` that gives some sort of id.
-- strings that look the same do not necessarily have the same `object_id`, which _probably_ has memory consequences
-- symbols that look the same have the same `object_id`, which _probably_ has memory consequences
+- every object has a method `object_id` that returns _some_ id.
+- strings that appear the same do not necessarily have the same `object_id`, which _probably_ has memory consequences
+- symbols that appear the same have the same `object_id`, which _probably_ has memory consequences
 
 ## Booleans
 
-`true` and `false`. There.
-
+`true` and `false`. This section seems awfully incomplete doesn't it? It's not.
 
 # Variables
 
@@ -219,13 +219,15 @@ irb> x = true
 => true
 ~~~
 
-Note that you can assign and re-assign `x` to your heart's content and to
-different types while you're at it. And you're at it.
+I assigned and re-assigned that `x` to my heart's content with different values
+_and_ different types.
 
-Now is the time to start letting go of your _this is insane_ resistance.
-Embrace it. When in Stockholm do like the Stockholmers do.
+You feel resistance. "But this is insane," you say. You do not like it and you
+want the world to know it. You take the matter to twitter, but twitter is just
+an empty army of machines.  No-one listens, not truly, not anymore. It's 2021
+kid, the humans lost.
 
-And as far as those single and double quotes go: 
+And as far as single and double quotes go: 
 
 ~~~
 irb> x = 2
@@ -247,18 +249,17 @@ irb> X = 6
 (irb):5: warning: already initialized constant X
 ~~~
 
-Capitalize your variable and it becomes _constant_: initialize it once and
-never more.
+Capitalize your variable and it becomes _constant_. 
 
 A word on camels and snakes when naming variables or really anything. Use snake
 case almost everywhere: `lowercase_words_separated_by_underscores`. Except
-`ClassNames`, go for camel case there. Classes will be take their turn later.
+`ClassNames`, go for camel case there. Later more on classes.
 
 # Control Structures
 
 ## Conditions and `if`
 
-Here's the basic form:
+Here's the basic form of an `if`:
 
 ~~~ruby
 if condition
@@ -266,10 +267,10 @@ if condition
 end
 ~~~
 
-So no parentheses (`(condition)`), no colon (`condition:`), no curly brackets
-(`{ do_something }`). And `end` to end it.
+So no parentheses as in `(condition)`, no colon as in `condition:`, no curly brackets
+as in `{ do_something }`). And `end` to end it.
 
-The usual `else if` and `else` work like so:
+The usual `else if` and `else`:
 
 ~~~ruby
 if condition
@@ -282,7 +283,7 @@ end
 ~~~
 
 Conditions in `if` statements are expressions that evaluate to true or false.
-So what all evaluates to true?
+What expressions evaluates to true?
 
 - all numbers (including `0`) are true
 - all strings (including `''` -- the empty string) are true
@@ -293,11 +294,8 @@ So what all evaluates to true?
 - the boolean expression `a || b` is true if `a` or `b` are true
 - the boolean expression `!a` is true if a is not true
 
-Conditions can of course be the result of a function or method call which could
-be true or false as well.
-
-Your conditions will often compare things (if variable `a` is equal `"dog"`,
-then do this). While you have `==`, `===`, `equal?`, and `eql?` in Ruby, you
+Your conditions will often compare things: if variable `a` is equal to `"dog"`,
+then do this. While Ruby has `==`, `===`, `equal?`, and `eql?`, you
 will mostly use:
 
 - `==` for checking whether values are equal as far as the class designer of the objects you're comparing is concerned. 
@@ -307,9 +305,9 @@ In fact, `equal?` and `==` as defined in the
 [`Object`](https://ruby-doc.org/core-3.0.2/Object.html#method-i-eql-3F) are
 equal. Pun intended.
 
-The intent is that `==` is overridden by class designers to something that
-makes sense for your class, but that `equal?` always stands for object
-equality. Take `String`:
+The intent is that class designers override `==` to something that
+makes sense for the class, but that `equal?` always stands for object
+equality. Take the `String` class:
 
 ~~~
 irb> "a" == "a"
@@ -318,8 +316,8 @@ irb> "a".equal?("a")
 => false
 ~~~
 
-So `"a"` is equal to `"a"` as values but as we saw before, they're not the same
-objects. Looking at symbols:
+So `"a"` is equal to `"a"` as values, but, as we saw before, they're not the same
+objects. However, for symbols:
 
 ~~~
 irb> :a == :a
@@ -328,7 +326,7 @@ irb> :a.equal?(:a)
 => true
 ~~~
 
-Back to our `if` for a bit. It's usual to instead of:
+Back to our `if` for a bit. Instead of:
 
 ~~~ruby
 if !condition
@@ -336,15 +334,13 @@ if !condition
 end
 ~~~
 
-to write:
+write:
 
 ~~~ruby
 unless condition
   do_something
 end
 ~~~
-
-While this takes some getting used to, especially for my head, it's the Ruby way.
 
 Furthermore, if `do_something` is just one line, Ruby often prefers the one-liner:
 
