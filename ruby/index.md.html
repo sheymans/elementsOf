@@ -362,8 +362,7 @@ return if invalid_parameters
 
 ## Looping
 
-This is an area where Ruby is opinionated. Say there's no collection like an
-Array or Hash in sight, and in some other language (say `go`), we'd write:
+Take a look at a relatively standard loop-pattern in programming. For example, this `go` loop:
 
 ~~~go
 n := 5
@@ -372,7 +371,7 @@ for i := 0; i < n; i++ {
 }
 ~~~
 
-This would print:
+This prints:
 
 ~~~
 0
@@ -382,10 +381,9 @@ This would print:
 4
 ~~~
 
-There's a variety of ways to write this in valid Ruby, but the construct as
-above does not exist.
-
-Closest in spirit to the above one is to probably use a while:
+There's a variety of ways to write this in Ruby, but the above classic `for`
+construct is not one of them.  Closest in spirit is to
+use a `while`:
 
 ~~~ruby
 n = 5
@@ -396,27 +394,23 @@ while i < n
 end
 ~~~
 
-which is arguably slightly more verbose than the corresponding `for` loop in `go`.
-
-A more Ruby way is to probably use [`times`](https://docs.ruby-lang.org/en/2.6.0/Integer.html#method-i-times):
+This is more verbose than the corresponding `for` loop in `go`.
+More idiomatic Ruby uses [`times`](https://docs.ruby-lang.org/en/2.6.0/Integer.html#method-i-times):
 
 ~~~ruby
 n.times { |i| puts i }
 ~~~
 
-Now this is arguably quite elegant. But what's going on?
+More elegant than the clunky `while`.  Deconstruct this expression:
 
-Let's analyze it's parts:
+- `n`. An `Integer`, and thus an object that has methods.
+- `times`. A [method](https://docs.ruby-lang.org/en/2.6.0/Integer.html#method-i-times) that is called on the object `n` and _iterates_ the following block `{ |i| puts i}` from `0` to `n - 1`, passing in those values to `i` with each iteration. More on blocks later, but for those familiar, the block is essentially an anonymous function or lambda with parameter `i` (or arrow function for the Javascript knowledgeables). 
+- `{ |i| puts i }`. We spoiled it. This is a `block` that prints `i` with `i` ranging over values `0` to `n - 1`. This _ranging over values_ is accomplished by `times`. We'll see later how we can write functions such as `times` ourselves in the section on Blocks. For now, you can see `times` as an higher-order function that takes another function as an argument.
 
-- `n`. An `Integer`, so an an object that has methods
-- `times`. A [method](https://docs.ruby-lang.org/en/2.6.0/Integer.html#method-i-times) that is called on the object and _iterates_ the following block `{ |i| puts i}` from `0` to `n - 1`, passing in those values to `i` with each iteration. Wow. More on blocks later. For those familiar, the block is essentially an anonymous function or lambda with parameter `i` (or arrow function for the Javascript knowledgeables). 
-- `{ |i| puts i }`. We spoiled it, but this is a `block` that prints `i` with `i` ranging over values `0` to `n - 1`. This _feeding_ is accomplished by `times`. We'll see later how we can write functions such as `times` ourselves in the section on Blocks. For now, you can see `times` as an higher-order function that takes another function as an argument and executes. 
+Most of the time your looping will be in the context of some collection so I'll
+talk more about looping in that section.
 
-We'll do more looping in the Arrays and Hashes section, as most of the time
-your looping will be in the context of some collection and also in that case
-Ruby has opinions.
-
-# Arrays and Hashes
+# Collections
 
 ## Arrays
 
@@ -427,8 +421,8 @@ irb> a = ["x", 1, :y]
 => ["x", 1, :y]
 ~~~
 
-Arrays are in other words not restricted to 1 type of objects. You can shuffle
-in there what you like. "Oh yeah??!!". Yes:
+Arrays are not restricted to contain only 1 type of objects. You can shove
+in there what you like: 
 
 ~~~
 irb> a = ["x", [1, 2], :y]
@@ -481,18 +475,17 @@ irb> a.unshift("x_new")
 => ["x_new", [1, 2], :y, :b]
 ~~~
 
-But `pop/push` must be more efficient than `shift/unshift` right? Seems [it
-hardly
+`pop/push` must be more efficient than `shift/unshift`? Seems it [hardly
 matters](https://stackoverflow.com/questions/8353026/what-is-the-run-time-of-shift-unshift-in-a-ruby-array).
 
 What if you have a second array `b = [:b1, :b2]` that you want to append (i.e., add each element) to `a`? Just using `push` will not do what you want:
 
 ~~~
-irb(main):019:0> a = ["x", [1, 2], :y]
+irb> a = ["x", [1, 2], :y]
 => ["x", [1, 2], :y]
-irb(main):020:0> b = [:b1, :b2]
+irb> b = [:b1, :b2]
 => [:b1, :b2]
-irb(main):021:0> a.push(b)
+irb> a.push(b)
 => ["x", [1, 2], :y, [:b1, :b2]]
 ~~~
 
@@ -506,11 +499,11 @@ irb> a.push(*b)
 ~~~
 
 `*b` for an array `b` in the context of a function call (`push` here) will send
-each element of the array as an individual argument to the function. In other
-words, `a.push(*b)` is the same as `a.push(:b1, :b2)`.
+each element of the array as an individual argument to the function. Thus,
+`a.push(*b)` is the same as `a.push(:b1, :b2)`.
 
-So far we initialized arrays using their literal form (such as `a = [1, 2]`).
-We can also initialize them using the `new` method from the
+I initialized arrays using their literal form (such as `a = [1, 2]`).  I can
+also initialize them using the `new` method from the
 [Array](https://docs.ruby-lang.org/en/2.6.0/Array.html) class:
 
 ~~~
@@ -522,11 +515,13 @@ irb> a << 1
 
 ## Hashes
 
-[Hashes](https://docs.ruby-lang.org/en/2.6.0/Hash.html) are structures to store
-key-value pairs with unique keys (also called dictionaries, associate arrays,
+[Hashes](https://docs.ruby-lang.org/en/2.6.0/Hash.html) are structures that store
+key-value pairs with unique keys (also called dictionaries, associative arrays,
 `HashMap`, maps in other languages). You can use any object type as a key.
 
-Define a hash with some personal information and do some basics like getting a value for an existing key, a non-existing key, changing a value for an existing key, adding a value for a non-existing key, and removing a key/value pair:
+Let's define a hash with some personal information and get a
+value for an existing/non-existing key, change a value for an existing
+key, add a value for a non-existing key, and remove a key/value pair:
 
 ~~~
 irb> a = { "first" => "John", "last" => "Doe" }
@@ -551,11 +546,11 @@ irb> a
 => {"first"=>"Jane", "last"=>"Doe"}
 ~~~
 
-What type of objects can all be values? Any object.
+What type of objects can be values? Any object.
+What type of objects can be keys, surely only strings right? Any object.
 
-What type of objects can all be keys, surely only Strings right? Any object.
-
-Let's start with showing symbols as keys as there's some syntactic sugar for those.
+In the above rundown, all keys were strings. When keys are symbols, there's
+some syntactic sugar that tastes almost like the real thing:
 
 ~~~
 irb> a = { :first => "John", :last => "Doe" }
@@ -564,19 +559,17 @@ irb> a[:first]
 => "John"
 ~~~
 
-Nothing interesting happened. You used symbols `:first` and `:last` as keys. If
-you do that, you can get all JSON-y instead:
+Nothing interesting happened. You used symbols `:first` and `:last` as keys.
+However, if you want symbols as keys, you can party as wild as JSON does on
+Friday night, evoking nothing but bleak memories of what used to be a life with
+promise:
 
 ~~~
 irb> a = { first: "John", last: "Doe" }
 => {:first=>"John", :last=>"Doe"}
 ~~~
 
-Same hot sauce though.
-
-I confidently said you can use any object as a hash key. You can both in order
-to have certain expectations met (like: if the objects are the "same", only 1
-hash key that is that object should be in your hash). This relies on properly
+I confidently said you can use any object as a hash key. This relies on properly
 overriding `hash` and `eql?` (the latter being what
 [Hash](https://docs.ruby-lang.org/en/2.6.0/Hash.html) uses for testing equality
 of keys. [Two objects will then refer to the same key when their `hash` value
