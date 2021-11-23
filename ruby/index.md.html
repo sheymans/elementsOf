@@ -579,22 +579,22 @@ Is this still elemental? Probably not. Moving on.
 
 ## Looping through Arrays and Hashes
 
-You will spend half of your life looping through arrays and hashes. Say you have an array:
+You will spend half of your life looping through arrays and hashes. Given an array:
 
 ~~~
 a = [100, 200, 300]
 ~~~
 
-Let's print each element.
+Print each element:
 
 ~~~
 a.each { |el| puts el }
 ~~~
 
 No `for` in sight. Use `each` when you can. `each` iterates through the
-elements of the array and binds each to _el_ in the block `{ |el| puts el }`,
-and then executes the `puts el`. Often you'll do more than a one-liner, and
-you'll use the `do` variety:
+elements of the array and binds each of those elements to _el_ in the block `{
+|el| puts el }`, and then executes the `puts el`. If you need more than a
+one-liner, do use `do...end`:
 
 ~~~ruby
 a.each do |el|
@@ -603,17 +603,14 @@ a.each do |el|
 end
 ~~~
 
-Same thing, but you use `do...end`
-
-Sometimes you will want the index as well. So similar to the trickery we saw before you could do:
+Sometimes you want the index as well as the element (mostly in interviews, in
+real life not so much). So similar to the trickery we saw before you could do:
 
 ~~~ruby
 a.length.times { |i| puts a[i] }
 ~~~
 
-That works obviously as computers do not have opinions. More idiomatic as far
-as I could tell is to use `each_with_index`. Let's also throw that string
-interpolation in the mix:
+However, the thought police favors `each_with_index`:
 
 ~~~
 irb> a.each_with_index { |el, i| puts "#{i}: #{el}" }
@@ -623,12 +620,16 @@ irb> a.each_with_index { |el, i| puts "#{i}: #{el}" }
 ~~~
 
 Yeah, get those [Anki flashcards](https://apps.ankiweb.net/) out to memorize
-the order of that `|el, i|`. Alternatively, in Ruby syntax, it often works to
-think "how would I say this out loud?": in the array `a`, for _each_ `el` at
-index `i`, do something. If you naturally go to _for each index `i` which has
-element `el`_ you're on your own in this mess, my friend.
+the order of that `|el, i|`. You did not ask for it, but here's a tip: in Ruby, it often works to
+ask "how would I say this out loud?". 
 
-You can loop over a hash with `each` as well:
+!!!
+   In the array `a`, for _each_ `el` at index `i`, do something. 
+
+If your intuition is _for each index `i` which has element `el`_, change your
+intuition.
+
+You can loop over a hash with `each`:
 
 ~~~
 irb> a = { first: "John", last: "Doe" }
@@ -638,21 +639,19 @@ first -> John
 last -> Doe
 ~~~
 
-This should not be surprising. In case you want to see just the keys of a hash, you have
+Sometimes you only want to loop through the keys or values of a hash. You can
+use `keys` and `values`:
 
 ~~~
 irb> a.keys
 => [:first, :last]
-~~~
-
-And similarly for the values in a hash:
-
-~~~
 irb> a.values
 => ["John", "Doe"]
 ~~~
 
-In contrast to usual hashes (e.g., in Java), you _can_ assume an order on key-value pairs in Ruby. They will be in the order they were inserted:
+In contrast to hashes in other languages (e.g. `HashMap` in Java), you _can_
+assume an order on key-value pairs. They will be in the order they were
+inserted:
 
 ~~~
 irb> a = {}
@@ -666,7 +665,8 @@ first -> 1
 second -> 2
 ~~~
 
-Sometimes you can benefit from going one abstraction higher than pure looping, and use a [`map`](https://docs.ruby-lang.org/en/2.6.0/Array.html#method-i-map):
+Sometimes you can benefit from going one abstraction higher than pure looping,
+and use a [`map`](https://docs.ruby-lang.org/en/2.6.0/Array.html#method-i-map):
 
 ~~~
 irb> a = [1, 2, 3]
@@ -687,8 +687,9 @@ irb> a
 => [2, 4, 6]
 ~~~
 
-The convention in Ruby is to indeed append `!` to function names if those
-functions are supposed to be destructive.
+I know you saw the exclamation mark. That was not an indication of surprise (_"a `map` here?!"_). The convention in Ruby is to append `!` to function names if those
+functions are supposed to be destructive. The exclamation mark is a regular
+part of the function name.
 
 We can also map hashes. For example, collect all keys of a map, but uppercased:
 
@@ -699,23 +700,23 @@ irb> a.map { |key, value| key.upcase }
 => [:FIRST, :LAST]
 ~~~
 
-Instead of that 1 value in the block arguments, we have 2: `|key, value|` as we're dealing with a Hash. We map that key-value pair to `key.upcase`, and `map` collects those in an Array. What if you want to map a Hash to a Hash, but just keeping the keys but uppercasing the values:
+What if you want to map a Hash to a Hash, but just keeping the keys but
+uppercasing the values?
 
 ~~~
 irb> a.map { |key, value| [key, value.upcase] }.to_h
 => {:first=>"JOHN", :last=>"DOE"}
 ~~~
 
-The tricky part is that the `map` gives us an array of `[key, value.upcase]`
-arrays. So we use `to_h` to convert that very specific array to a hash.
-Generally:
+The `map` returns an array of `[key, value.upcase]` arrays. So I use `to_h` to
+convert that very specific array to a hash.  Generally:
 
 ~~~
 irb> [[1, 2], [3, 4]].to_h
 => {1=>2, 3=>4}
 ~~~
 
-We're verging to the non-elemental, so moving on.
+We're verging to the non-elemental.
 
 # Functions
 
