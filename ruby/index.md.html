@@ -720,7 +720,8 @@ We're verging to the non-elemental.
 
 # Functions
 
-Your first unit of abstraction are functions (or _methods_, when appearing in classes, same potato). Functions take the following shape:
+Functions (or _methods_, when appearing in classes, same potato) have this
+shape:
 
 ~~~ruby
 def function_name(arg1, arg2,...)
@@ -728,7 +729,8 @@ def function_name(arg1, arg2,...)
 end
 ~~~
 
-Functions start with `def` and end with `end`. A function that doubles an array `a`:
+Functions start with `def` and end with `end`. A function that doubles every
+element in an array:
 
 ~~~ruby
 def double_all(a)
@@ -736,9 +738,8 @@ def double_all(a)
 end
 ~~~
 
-"Oh no," you may say. "They forgot to type the arguments, what a nightmare to
-read code like that,". Yes, but embrace it. Essentially, your `a` can be
-anything as long as it understands `map`. Yes, yes, interfaces and all. 
+"Oh no," you say. "They forgot to type the arguments." Yes. That `a` can be
+anything as long as it understands `map`. 
 
 Calling functions is as you would expect:
 
@@ -750,10 +751,10 @@ irb> puts double_all(a)
 6
 ~~~
 
-
-You have options if you do not want to embrace it. Check out
-[sorbet](https://sorbet.org/) which allows you to annotate your functions with
-type information. For example, the above would be intended for:
+If you miss types, or you work in a large code base with many developers and
+you prefer sanity over insanity, check out [sorbet](https://sorbet.org/). Sorbet
+allows you to annotate your functions with type information. For example, the
+above could be:
 
 ~~~ruby
 sig { params(a: T::Array[Integer].returns(T::Array[Integer]) }
@@ -761,6 +762,9 @@ def double_all(a)
   a.map { |x| x * 2 }
 end
 ~~~
+
+This indicates that `double_all` takes in an array of integers `a` and returns
+an array of integers.
 
 You can have defaults for your arguments:
 
@@ -770,7 +774,7 @@ def double_all(a = [1, 2])
 end
 ~~~
 
-You can then just do:
+You can then leave off the argument to `double_all`:
 
 ~~~
 irb> puts double_all
@@ -778,7 +782,7 @@ irb> puts double_all
 4
 ~~~
 
-You can have of courses have a hash as an argument:
+A function with a Hash as an argument:
 
 ~~~ruby
 def hash_keys(h)
@@ -795,7 +799,8 @@ a: 1
 b: 2
 ~~~
 
-Here's some fun. If a hash is the last argument of the function call, you can just leave off the curly brackets:
+If a hash is the last argument of the function call, you can leave off the
+curly braces:
 
 ~~~
 irb> puts hash_keys(a: 1, b: 2)
@@ -803,8 +808,8 @@ a: 1
 b: 2
 ~~~
 
-That looks a whole lots like keyword arguments at that point. And yes, it's
-easy to see that you could now just change the calling order without effects:
+That looks a lot like keyword arguments. Indeed,  you can now change the
+calling order:
 
 ~~~
 irb> puts hash_keys(b: 2, a: 1)
@@ -814,7 +819,7 @@ b: 2
 
 # Classes and Methods
 
-A minimal class is defined with the `class` keyword, a name, and ends with `end`:
+You can define a minimal class with the `class` keyword, a name, and `end`:
 
 ~~~ruby
 class A
@@ -822,7 +827,9 @@ class A
 end
 ~~~
 
-Despite this not doing much more then introducing `A` into your world. Let's see how to create a new `A` object `a`, how to ask it's `object_id`, how to get its string representation with `to_s` and finally how to ask an objects it's class:
+This does not do more then introduce `A` into the world.  Let's see how to
+create a new `A` object `a`, how to ask its `object_id`, how to get its String
+representation with `to_s`, and finally how to get an object's class:
 
 ~~~
 irb> a = A.new
@@ -835,7 +842,8 @@ irb> a.class
 => A
 ~~~
 
-Not bad for a minute of work. You may be wondering where does all this functionality come from. Let's poke at the class hierarchy:
+Not bad for a minute of work. You may be wondering why a minimal `A` object can
+do all of this.  Poke at the class hierarchy:
 
 ~~~
 irb> a.class.ancestors
@@ -843,9 +851,9 @@ irb> a.class.ancestors
 ~~~
 
 So `a` is an `A` which is an `Object` which is a `Kernel`, which is a
-`BasicObject`. Forget about the latter 2. Do it. And note that of course
-`Object` already has all that functionality, so we're merely tapping into
-_inherited_ methods from `Object`:
+`BasicObject`. Forget about the latter 2. You've forgotten it.  `Object` has
+the functionality that we saw on the `A` object. We're tapping into _inherited_
+methods from `Object`:
 
 ~~~
 irb> o = Object.new
@@ -862,12 +870,14 @@ irb> o.class.ancestors
 
 What about equality of such objects?
 
+HERE
+
 ~~~
-irb(main):013:0> a = A.new
+irb> a = A.new
 => #<A:0x00007f913d853380>
-irb(main):014:0> b = A.new
+irb> b = A.new
 => #<A:0x00007f913d85a478>
-irb(main):015:0> a == b
+irb> a == b
 => false
 ~~~
 
