@@ -868,47 +868,34 @@ irb> o.class.ancestors
 => [Object, Kernel, BasicObject]
 ~~~
 
-What about equality of such objects?
-
-HERE
-
-~~~
-irb> a = A.new
-=> #<A:0x00007f913d853380>
-irb> b = A.new
-=> #<A:0x00007f913d85a478>
-irb> a == b
-=> false
-~~~
-
-You may be used to constructors in other languages that get called by when
-creating new objects using `new`. With an empty class we just use the
-`initialize` of `Object`, but if you want to use your own (and you almost
-always want to), here's how that would go:
+You may be used to defining _constructors_ in classes that get called when
+creating objects using `new`. With a minimal class like `A` we use the
+`initialize` of `Object`. If you want to use your own _constructor_ you can
+define your own `initialize`:
 
 ~~~ruby
 class A
 
   def initialize
-    puts "you called new didn't you?"
+    puts "you called new!"
   end
 
 end
 ~~~
 
-And then creating a new `A` would show:
+Creating a new `A`:
 
 ~~~
 irb> a = A.new
-you called new didn't you?
+you called new!
 => #<A:0x00007fc4eb1b8bd8>
 ~~~
 
-The class `A` is mostly useless. Usually classes carry some _state_ (cars have
+Right now, the class `A` is mostly useless. Usually classes carry some _state_ (cars have
 doors and color, some cars have 4 doors, some 5, some cars are blue, some cars
 are yellow). We capture that state using instance variables.
 
-In Ruby, instance variables start with an `@`. So for example, let's give `A` some state:
+In Ruby, instance variables start with an `@`. Give `A` some state:
 
 ~~~ruby
 class A
@@ -924,10 +911,10 @@ class A
 end
 ~~~
 
-We did two things that are new:
+I did two new things:
 
-- we're setting the value of `@a` in the `initialize`. Given what you know at this point, you'd expect that when you create a new `A` object that `@a = 10` line gets executed
-- we've introduce an _instance_method_ called `print_your_state`. If you have an `A` object called `x` you can do `x.print_your_state`. This will execute the `puts` line for your object `x`.
+- I've set the value of `@a` in the `initialize`. Given what you know at this point, you know that when you create a new `A` object that the `@a = 10` line gets executed
+- I've introduced an _instance_method_ called `print_your_state`. If you have an `A` object called `x` you can do `x.print_your_state`. This will execute the `puts` line for your object `x`.
 
 ~~~
 irb> x = A.new
@@ -936,9 +923,23 @@ irb> x.print_your_state
 my state is 10
 ~~~
 
-Of course, every object would have `@a` equal to 10, whereas you'd like to
-create objects with different states. You can accomplish this unexpectedly by
-giving `initialize` arguments:
+Every object has `@a` equal to 10. Useless as far as state goes for objects. You want to
+create objects with different states. Give 
+`initialize` arguments that indicate the state you want to give the object:
+
+~~~ruby
+class A
+
+  def initialize(a)
+    @a = a
+  end
+
+  def print_your_state
+    puts "my state is #{@a}"
+  end
+
+end
+~~~
 
 ~~~
 irb> x = A.new(10)
@@ -951,7 +952,8 @@ irb(main):014:0> y.print_your_state
 my state is 11
 ~~~
 
-You can of course also give instance methods arguments:
+On the topic of arguments, you can of course also give instance methods
+arguments:
 
 ~~~ruby
 class A
@@ -975,11 +977,12 @@ irb> x.print_your_state_with_a_factor(3)
 my state is 30
 ~~~
 
-This is interesting in that `result` is a _local_ variable to the instance
-method `print_your_state_with_a_factor` and thus there's no `@` in sight when
-`put`ing it.
+Note that `result` is a _local_ variable to the instance method
+`print_your_state_with_a_factor` and thus there's no `@` in sight when `put`ing
+it.
 
-Note that instance variables are _encapsulated_: you cannot get to its value from outside the class:
+Instance variables are _encapsulated_. You cannot get to their value from
+outside the class:
 
 ~~~
 irb> x = A.new(3)
@@ -993,7 +996,9 @@ Traceback (most recent call last):
 NoMethodError (undefined method `a' for #<A:0x00007fc8cc180280 @a=3>)
 ~~~
 
-That makes some sort of sense thinking of, for example, private instance variables in Java. You'd usually define a getter of some sorts:
+Ruby's instance variables are thus by default a bit like private instance
+variables in Java. If you want direct access to the instance variable, you need
+to define a getter:
 
 ~~~ruby
 class A
@@ -1017,7 +1022,7 @@ irb> x.a
 => 3
 ~~~
 
-You could still not write to `@a` as that requires some sort of setter:
+You could still not write directly to `@a` as that requires a _setter_:
 
 ~~~
 irb> x.a = 5
@@ -1070,8 +1075,10 @@ def a=(a)
 end
 ~~~
 
-That latter thing is an [assignment method](https://docs.ruby-lang.org/en/2.6.0/doc/syntax/assignment_rdoc.html#label-Assignment+Methods).
-At this point the whole thing has become terribly obnoxious. Luckily, we have shorthand. We can accomplish what we had (a getter and a setter), by using `attr_accessor` as follows:
+That latter is an [assignment
+method](https://docs.ruby-lang.org/en/2.6.0/doc/syntax/assignment_rdoc.html#label-Assignment+Methods).
+At this point the whole thing has has become an ordeal. Luckily, we have
+shorthand for the getter and setter by using `attr_accessor` as follows:
 
 ~~~ruby
 class A
@@ -1097,7 +1104,7 @@ irb> x.a = 6
 If you only want the getter, you can use `attr_reader`. If you only want a
 setter (who are you?), you can use `attr_writer`.
 
-As for some fun. What do you think will `x == y` be?
+What do you think will `x == y` be in the below?
 
 ~~~
 irb> x = A.new(3)
@@ -1109,11 +1116,13 @@ irb> x == y
 
 That's right. False. `x` and `y` are different objects and `==` is using
 `Object` equality in this case. Sometimes it makes sense, to have `x` and `y`
-be equal as they represent the same data namely an `A` with data `3`. If you
-think, "yeah right", think of strings: `"I am right" == "I am right"` are the
-same strings and we expect this to be `true`.
+be equal as they represent the same data namely an `A` with state `3`. For
+example, for Strings: `"I am right" == "I am right"` are the same strings and
+violating this expectation would be shocking to all but the most hardened
+developers.
 
-You can override `==` to accomplish that.
+You can override `==` in `A` to get equality based on state, rather than on
+object identity:
 
 ~~~ruby
 class A
@@ -1142,9 +1151,11 @@ irb> x == y
 
 Couple of things worth pointing to:
 
-- `==` can be just an instance method defined as any other method.  The reason is that `x == y`, is really just `x.==(y)` as if `==` is any other method name.
-- I used `self` which is very similar to Java's `this` at least in _this_ [context](https://airbrake.io/blog/ruby/self-ruby-overview). Here it's the an instance of this object itself. So when we're doing `x == y`, and we thus execute `==` for the object `x`, then `self` would be `x`. Caveat emptor: `self` may mean other things. We will see in a bit how to use `self` to define _class methods_. 
-- I did not actually have to use `self` here. There was no ambiguity if I'd have done `a == other.a`. The first `a` would have referred to the method `a` defined in `A` (by way of the `attr_accessor` and would have allowed me to check equality of the instance variable `@a` with `other.a` (aka the `@a` of the `other` object).
+- `==` can is an instance method defined as any other method.  The reason is that `x == y`, is really just `x.==(y)` as if `==` is any other method name.
+- I used `self` which is very similar to Java's `this` at least in _this_ [context](https://airbrake.io/blog/ruby/self-ruby-overview). Here it's an instance of this object itself. So when doing `x == y`, and we thus execute `==` for the object `x`, then `self` is `x`. Caveat emptor: `self` may mean other things. We will see in a bit how to use `self` to define _class methods_. 
+- I did not actually have to use `self` here. There is no ambiguity if I would do `a == other.a`. The first `a` refers to the method `a` defined in `A` (by way of the `attr_accessor`) and allows me to check equality of the instance variable `@a` with `other.a` (aka the `@a` of the `other` object). You are right to think that I could do `@a == other.a` directly. But why make it simple when you can make it complicated?
+
+HERE
 
 If you know `Java`, you must have met `static`. Used to indicate both variables
 and methods in Java classes that belong to the type rather than the instance.
