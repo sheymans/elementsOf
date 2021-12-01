@@ -1155,17 +1155,14 @@ Couple of things worth pointing to:
 - I used `self` which is very similar to Java's `this` at least in _this_ [context](https://airbrake.io/blog/ruby/self-ruby-overview). Here it's an instance of this object itself. So when doing `x == y`, and we thus execute `==` for the object `x`, then `self` is `x`. Caveat emptor: `self` may mean other things. We will see in a bit how to use `self` to define _class methods_. 
 - I did not actually have to use `self` here. There is no ambiguity if I would do `a == other.a`. The first `a` refers to the method `a` defined in `A` (by way of the `attr_accessor`) and allows me to check equality of the instance variable `@a` with `other.a` (aka the `@a` of the `other` object). You are right to think that I could do `@a == other.a` directly. But why make it simple when you can make it complicated?
 
-HERE
-
-If you know `Java`, you must have met `static`. Used to indicate both variables
-and methods in Java classes that belong to the type rather than the instance.
-Aka, you can ask the class for the variables/methods. No need for an object. 
+If you know `Java`, you must have met `static`. _static variables or methods_
+in Java classes indicate that they belong to the class rather than the
+instance.
 
 In Ruby _class variables_ are indicated with `@@` (recall that instance
 variables are indicated with `@`). _Class methods_ are indicated by preceding
 the name with `self`. The body is not yet cold and here we are: `self` in this
-context, refers to the class (rather than the object). Let's see this in
-practice:
+context refers to the class (rather than the object). An example: 
 
 ~~~ruby
 class A
@@ -1198,7 +1195,8 @@ irb> A.counter
 Note that we asked `A` for the `counter` (not `x`, nor `y`). In fact, doing
 `x.counter` would lead to an `undefined method` error.
 
-I avoided it for a while, but let's talk about inheritance. In the below I make `B` a subclass of `A` by indicating `B < A`.
+I avoided it for a while, but sometimes you have to talk about inheritance. In
+the below I make `B` a subclass of `A` by indicating `B < A`.
 
 ~~~ruby
 class A
@@ -1220,14 +1218,14 @@ class B < A
 end
 ~~~
 
-And some poking at this:
+Poke around:
 
 ~~~
-irb(main):011:0> x = A.new(3)
+irb> x = A.new(3)
 => #<A:0x00007fa19e02dd10 @a=3>
-irb(main):012:0> x.double
+irb> x.double
 => 6
-irb(main):013:0> y = B.new
+irb> y = B.new
 Traceback (most recent call last):
         6: from /usr/bin/irb:23:in `<main>'
         5: from /usr/bin/irb:23:in `load'
@@ -1236,22 +1234,22 @@ Traceback (most recent call last):
         2: from (irb):13:in `new'
         1: from /Users/sheymans/Workspaces/ruby_playground/src/ruby_playground.rb:7:in `initialize'
 ArgumentError (wrong number of arguments (given 0, expected 1))
-irb(main):014:0> y = B.new(5)
+irb> y = B.new(5)
 => #<B:0x00007fa19f2184a8 @a=5>
-irb(main):015:0> y.double
+irb> y.double
 => 10
-irb(main):016:0> y.triple
+irb> y.triple
 => 15
 ~~~
 
-This works you expect it to work. Some quick notes:
+If you're familiar with inheritance, this looks encouraging. Some points to emphasize:
 
-- I did not give an `initialize` to `B` so we're forced to use the one of `A` which requires 1 argument `a` (which is what the _wrong number of arguments_ tells us)
-- I could access the instance variable `@a` in `B`, given that was initialized in `A`. This could be surprising as in _where in the name does `@a` here comes from?_. I hope you got a decent IDE going for you.
+- I did not define an `initialize` for `B` so we're forced to use the one of `A` which requires 1 argument `a`
+- I accessed the instance variable `@a` in `B. This sometimes leads to surprises, but I hope you have a good [IDE](https://www.jetbrains.com/idea/) going for you
 
 # Modules
 
-The general syntax of a module is easy. Use keyword `module`, give it a name and end with `end`:
+The syntax of a module is easy. Use keyword `module`, give it a name, and end with `end`:
 
 ~~~ruby
 module HomeMade
@@ -1270,7 +1268,8 @@ module HomeMade
 end
 ~~~
 
-And then prepend `HomeMade::` to your class name `A` if you want an instance of this particular `A`:
+Prepend `HomeMade::` to your class name `A` if you want an instance of the `A`
+in the `HomeMade` module:
 
 ~~~
 irb> a = HomeMade::A.new(3)
@@ -1281,8 +1280,8 @@ irb> a.double
 
 ## As Namespaces
 
-But why? One simple reason is that your neighbor also would like a class with
-name `A`. That's just how he is. With modules, you can nicely isolate names:
+Why modules? Because your neighbor also wants a class with name `A`. That's how
+your neighbor is. Modules provide little name islands of peace and quiet:
 
 ~~~ruby
 module HomeMade
@@ -1306,7 +1305,7 @@ module NeighborMade
 end
 ~~~
 
-And now you can nicely differentiate which `A` you mean:
+You can then pick your `A` without conflict:
 
 ~~~
 irb> a = HomeMade::A.new(3)
@@ -1315,12 +1314,13 @@ irb> b = NeighborMade::A.new
 => #<NeighborMade::A:0x00007f95ef0ef998>
 ~~~
 
-In other words, modules can help you logically organize your classes/functions
-within your application.
+Modules help you to logically organize your classes/functions within your
+application.
 
 ## As Mixins
 
-Say you have 2 modules, 1 for logging and 1 for doing more long-term analytics (like sending Kafka events):
+Imagine (imagine!) you have 2 modules, 1 for logging and 1 for doing more
+long-term analytics (for example, for sending Kafka events):
 
 ~~~ruby
 module Logger
@@ -1336,7 +1336,7 @@ module Analytics
 end
 ~~~
 
-And you have a class `A` that would like to re-use the methods provided by both the `Logger` and `Analytics` modules:
+And you have a class `A` that would like to use the methods from both the `Logger` and `Analytics` modules:
 
 ~~~ruby
 class A
@@ -1345,12 +1345,23 @@ class A
     log_it("we're logging this")
     send_event('for long term analytics we send this')
   end
+
 end
 ~~~
 
-Trying this as is, will give you a `NoMethodError` for `log_it` and `send_event` if you try to do `a.do_something` for an object `a` of type `A`. `A` does not know about these things. You could be clever and say, well, let `A` inherit from `Logger`. Yes. And you'd want `A` to also inherit from `Analytics`. However, Ruby does not allow multiple inheritance. You can only inherit from 1 class (ignoring for a minute that `Logger` and `Analytics` are not actually classes, they are modules).
+If you try `a.do_something` for an object `a` of type `A`, you get a
+`NoMethodError` for `log_it` and `send_event`. You are very smart (your
+grandmother told you so), and you say, "let `A` inherit from `Logger`."  Yes,
+give me more of that smartness. What a joy.  And "also let `A` inherit from
+`Analytics`." So much goodness. Wonderful.
 
-We can solve this by _mixing in_ the 2 modules in the class `A` by using `include`:
+Ruby does not allow for multiple inheritance. You can only inherit from 1 class
+(ignoring for a minute that `Logger` and `Analytics` are not actually classes,
+they are modules).
+
+We (I say _We_ but I really mean _I_; you have turned out a massive
+disappointment; and you also thought the semi-colon is dead; it's not) can
+solve this by _mixing in_ the 2 modules in the class `A` by using `include`:
 
 ~~~ruby
 class A
@@ -1366,7 +1377,7 @@ end
 
 `include` makes all methods of the modules available as _instance_ methods in
 your class. In the Java world, and maybe other worlds as well, you are reminded
-immediately of the dreaded Utility class. Banish that memory.
+immediately of the dreaded Utility class.
 
 # Testing
 
