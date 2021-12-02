@@ -45,7 +45,7 @@ ruby-lang website](https://www.ruby-lang.org/en/downloads/).
 If you have Ruby installed, you also have an interactive interpreter called
 [irb](https://github.com/ruby/irb). On the command-line, type `irb`.
 
-~~~
+~~~none
 irb> puts 'Hello World!'
 Hello World!
 => nil
@@ -61,7 +61,7 @@ puts 'Hello World!'
 
 Close the file and at the command-line, have Ruby execute it:
 
-~~~
+~~~none
 $ ruby ruby_playground.rb
 Hello World!
 ~~~
@@ -83,7 +83,7 @@ integer: `5.class`. This returns
 
 Since integers are objects there's more fun stuff one can ask them: 
 
-~~~
+~~~none
 irb> 123.digits
 => [3, 2, 1]
 ~~~
@@ -93,7 +93,7 @@ ever need that.
 
 Simple math is ready for you and has been since you were 7:
 
-~~~
+~~~none
 irb> 1 + 2
 => 3
 irb> 2 * 3
@@ -106,14 +106,14 @@ There's also the number type that keeps it real and inexact, le
 [Float](https://docs.ruby-lang.org/en/2.6.0/Float.html). In its literal
 representation, it's _things_ that contain a decimal point:`1.0`, `9.9999`, ...
 
-~~~
+~~~none
 irb> 1.0.class
 => Float
 ~~~
 
 First encounters are frequently unpleasant:
 
-~~~
+~~~none
 irb> 7 / 2
 => 3
 ~~~
@@ -121,7 +121,7 @@ irb> 7 / 2
 Dividing 2 integers results in integer division. Force one to be a `Float`
 using `to_f`:
 
-~~~
+~~~none
 irb> 7.to_f / 2
 => 3.5
 ~~~
@@ -134,7 +134,7 @@ or `"Hello"`. The double-quoted variety is special. More later. Be patient.
 Use `+` to concatenate 2 strings without changing the original strings. Use
 `<<` to concanate and destroy the string you're appending to:
 
-~~~
+~~~none
 irb> a = "hello"
 => "hello"
 irb> b = "world"
@@ -155,7 +155,7 @@ irb> b
 
 Pull characters out of a String:
 
-~~~
+~~~none
 irb> a = "hello"
 => "hello"
 irb> a[0]
@@ -166,7 +166,7 @@ irb> a[-1]
 
 You can get substrings by using inclusive (`..`) or exclusive (`...`) ranges:
 
-~~~
+~~~none
 irb> a = "hello"
 => "hello"
 irb> a[0..2]
@@ -184,7 +184,7 @@ question](https://stackoverflow.com/questions/255078/whats-the-difference-betwee
 Let's explore how strings are different from symbols by asking for their
 `object_id`:
 
-~~~
+~~~none
 irb> "bar".object_id
 => 70236502854760
 irb> "bar".object_id
@@ -210,7 +210,7 @@ From that `irb` session, you can (if you truly want) learn that
 Like symbols they consist of letters, digits, or underscores. Unlike symbols,
 they do not start with colons. You initialize them:
 
-~~~
+~~~none
 irb> x = 'hello'
 => "hello"
 irb> x = 5
@@ -229,7 +229,7 @@ kid, the humans lost.
 
 And as far as single and double quotes go: 
 
-~~~
+~~~none
 irb> x = 2
 => 2
 irb> "we were #{x}"
@@ -242,7 +242,7 @@ irb> 'we were #{x}'
 
 And sometimes variables are not so variable:
 
-~~~
+~~~none
 irb> X = 5
 => 5
 irb> X = 6
@@ -309,7 +309,7 @@ The intent is that class designers override `==` to something that
 makes sense for the class, but that `equal?` always stands for object
 equality. Take the `String` class:
 
-~~~
+~~~none
 irb> "a" == "a"
 => true
 irb> "a".equal?("a")
@@ -319,7 +319,7 @@ irb> "a".equal?("a")
 So `"a"` is equal to `"a"` as values, but, as we saw before, they're not the same
 objects. However, for symbols:
 
-~~~
+~~~none
 irb> :a == :a
 => true
 irb> :a.equal?(:a)
@@ -373,7 +373,7 @@ for i := 0; i < n; i++ {
 
 This prints:
 
-~~~
+~~~none
 0
 1
 2
@@ -416,7 +416,7 @@ talk more about looping in that section.
 
 An array is an [ordered integer-indexed collection](https://docs.ruby-lang.org/en/2.6.0/Array.html) of objects. Let's initialize one:
 
-~~~
+~~~none
 irb> a = ["x", 1, :y]
 => ["x", 1, :y]
 ~~~
@@ -424,14 +424,14 @@ irb> a = ["x", 1, :y]
 Arrays are not restricted to contain only 1 type of objects. You can shove
 in there what you like: 
 
-~~~
+~~~none
 irb> a = ["x", [1, 2], :y]
 => ["x", [1, 2], :y]
 ~~~
 
 The usual suspects with a special mention for `-1` (the last of the elements):
 
-~~~
+~~~none
 irb> a = ["x", [1, 2], :y]
 => ["x", [1, 2], :y]
 irb> a.length
@@ -444,7 +444,7 @@ irb> a[-1]
 
 You can add elements to the back of an array using `<<` or `push`. Both are destructive operations:
 
-~~~
+~~~none
 irb> a << :b
 => ["x", [1, 2], :y, :b]
 irb> a.push(:c)
@@ -455,7 +455,7 @@ irb> a
 
 You can remove that last element again using `pop`:
 
-~~~
+~~~none
 irb> l = a.pop
 => :c
 irb> a
@@ -464,7 +464,7 @@ irb> a
 
 What about adding and removing to the _front_ of an array? Use `unshift` and `shift`. As far as unsavory mnemonics go, remove the `f` to remember which does what.
 
-~~~
+~~~none
 irb> a
 => ["x", [1, 2], :y, :b]
 irb> f = a.shift
@@ -480,7 +480,7 @@ matters](https://stackoverflow.com/questions/8353026/what-is-the-run-time-of-shi
 
 What if you have a second array `b = [:b1, :b2]` that you want to append (i.e., add each element) to `a`? Just using `push` will not do what you want:
 
-~~~
+~~~none
 irb> a = ["x", [1, 2], :y]
 => ["x", [1, 2], :y]
 irb> b = [:b1, :b2]
@@ -491,7 +491,7 @@ irb> a.push(b)
 
 However, using the _splat_ operator `*` will:
 
-~~~
+~~~none
 irb> b = [:b1, :b2]
 => [:b1, :b2]
 irb> a.push(*b)
@@ -506,7 +506,7 @@ I initialized arrays using their literal form (such as `a = [1, 2]`).  I can
 also initialize them using the `new` method from the
 [Array](https://docs.ruby-lang.org/en/2.6.0/Array.html) class:
 
-~~~
+~~~none
 irb> a = Array.new
 => []
 irb> a << 1
@@ -523,7 +523,7 @@ Let's define a hash with some personal information and get a
 value for an existing/non-existing key, change a value for an existing
 key, add a value for a non-existing key, and remove a key/value pair:
 
-~~~
+~~~none
 irb> a = { "first" => "John", "last" => "Doe" }
 => {"first"=>"John", "last"=>"Doe"}
 irb> a["first"]
@@ -552,7 +552,7 @@ What type of objects can be keys, surely only strings right? Any object.
 In the above rundown, all keys were strings. When keys are symbols, there's
 some syntactic sugar that tastes almost like the real thing:
 
-~~~
+~~~none
 irb> a = { :first => "John", :last => "Doe" }
 => {:first=>"John", :last=>"Doe"}
 irb> a[:first]
@@ -564,7 +564,7 @@ However, if you want symbols as keys, you can party as wild as JSON does on
 Friday night, evoking nothing but bleak memories of what used to be a life with
 promise:
 
-~~~
+~~~none
 irb> a = { first: "John", last: "Doe" }
 => {:first=>"John", :last=>"Doe"}
 ~~~
@@ -581,13 +581,13 @@ Is this still elemental? Probably not. Moving on.
 
 You will spend half of your life looping through arrays and hashes. Given an array:
 
-~~~
+~~~none
 a = [100, 200, 300]
 ~~~
 
 Print each element:
 
-~~~
+~~~none
 a.each { |el| puts el }
 ~~~
 
@@ -612,7 +612,7 @@ a.length.times { |i| puts a[i] }
 
 However, the thought police favors `each_with_index`:
 
-~~~
+~~~none
 irb> a.each_with_index { |el, i| puts "#{i}: #{el}" }
 0: 100
 1: 200
@@ -631,7 +631,7 @@ intuition.
 
 You can loop over a hash with `each`:
 
-~~~
+~~~none
 irb> a = { first: "John", last: "Doe" }
 => {:first=>"John", :last=>"Doe"}
 irb> a.each { |key, value|  puts "#{key} -> #{value}" }
@@ -642,7 +642,7 @@ last -> Doe
 Sometimes you only want to loop through the keys or values of a hash. You can
 use `keys` and `values`:
 
-~~~
+~~~none
 irb> a.keys
 => [:first, :last]
 irb> a.values
@@ -653,7 +653,7 @@ In contrast to hashes in other languages (e.g. `HashMap` in Java), you _can_
 assume an order on key-value pairs. They will be in the order they were
 inserted:
 
-~~~
+~~~none
 irb> a = {}
 => {}
 irb> a["first"] = 1
@@ -668,7 +668,7 @@ second -> 2
 Sometimes you can benefit from going one abstraction higher than pure looping,
 and use a [`map`](https://docs.ruby-lang.org/en/2.6.0/Array.html#method-i-map):
 
-~~~
+~~~none
 irb> a = [1, 2, 3]
 => [1, 2, 3]
 irb> b = a.map { |x| x * 2 }
@@ -680,7 +680,7 @@ irb> a
 If you do not want a new array, you can use the [destructive variant
 `map!`](https://docs.ruby-lang.org/en/2.6.0/Array.html#method-i-map-21):
 
-~~~
+~~~none
 irb> a.map! { |x| x * 2 }
 => [2, 4, 6]
 irb> a
@@ -693,7 +693,7 @@ part of the function name.
 
 We can also map hashes. For example, collect all keys of a map, but uppercased:
 
-~~~
+~~~none
 irb> a = { first: "John", last: "Doe" }
 => {:first=>"John", :last=>"Doe"}
 irb> a.map { |key, value| key.upcase }
@@ -703,7 +703,7 @@ irb> a.map { |key, value| key.upcase }
 What if you want to map a Hash to a Hash, but just keeping the keys but
 uppercasing the values?
 
-~~~
+~~~none
 irb> a.map { |key, value| [key, value.upcase] }.to_h
 => {:first=>"JOHN", :last=>"DOE"}
 ~~~
@@ -711,7 +711,7 @@ irb> a.map { |key, value| [key, value.upcase] }.to_h
 The `map` returns an array of `[key, value.upcase]` arrays. So I use `to_h` to
 convert that very specific array to a hash.  Generally:
 
-~~~
+~~~none
 irb> [[1, 2], [3, 4]].to_h
 => {1=>2, 3=>4}
 ~~~
@@ -743,7 +743,7 @@ anything as long as it understands `map`.
 
 Calling functions is as you would expect:
 
-~~~
+~~~none
 irb> a = [1, 2, 3]
 irb> puts double_all(a)
 2
@@ -776,7 +776,7 @@ end
 
 You can then leave off the argument to `double_all`:
 
-~~~
+~~~none
 irb> puts double_all
 2
 4
@@ -793,7 +793,7 @@ end
 
 And then:
 
-~~~
+~~~none
 irb> puts hash_keys({ a: 1, b: 2 })
 a: 1
 b: 2
@@ -802,7 +802,7 @@ b: 2
 If a hash is the last argument of the function call, you can leave off the
 curly braces:
 
-~~~
+~~~none
 irb> puts hash_keys(a: 1, b: 2)
 a: 1
 b: 2
@@ -811,7 +811,7 @@ b: 2
 That looks a lot like keyword arguments. Indeed,  you can now change the
 calling order:
 
-~~~
+~~~none
 irb> puts hash_keys(b: 2, a: 1)
 a: 1
 b: 2
@@ -831,7 +831,7 @@ This does not do more then introduce `A` into the world.  Let's see how to
 create a new `A` object `a`, how to ask its `object_id`, how to get its String
 representation with `to_s`, and finally how to get an object's class:
 
-~~~
+~~~none
 irb> a = A.new
 => #<A:0x00007f913a9bb5e0>
 irb> a.to_s
@@ -845,7 +845,7 @@ irb> a.class
 Not bad for a minute of work. You may be wondering why a minimal `A` object can
 do all of this.  Poke at the class hierarchy:
 
-~~~
+~~~none
 irb> a.class.ancestors
 => [A, Object, Kernel, BasicObject]
 ~~~
@@ -855,7 +855,7 @@ So `a` is an `A` which is an `Object` which is a `Kernel`, which is a
 the functionality that we saw on the `A` object. We're tapping into _inherited_
 methods from `Object`:
 
-~~~
+~~~none
 irb> o = Object.new
 => #<Object:0x00007f913a82f898>
 irb> o.to_s
@@ -885,7 +885,7 @@ end
 
 Creating a new `A`:
 
-~~~
+~~~none
 irb> a = A.new
 you called new!
 => #<A:0x00007fc4eb1b8bd8>
@@ -916,7 +916,7 @@ I did two new things:
 - I've set the value of `@a` in the `initialize`. Given what you know at this point, you know that when you create a new `A` object that the `@a = 10` line gets executed
 - I've introduced an _instance_method_ called `print_your_state`. If you have an `A` object called `x` you can do `x.print_your_state`. This will execute the `puts` line for your object `x`.
 
-~~~
+~~~none
 irb> x = A.new
 => #<A:0x00007fc4ea1190c0 @a=10>
 irb> x.print_your_state
@@ -941,7 +941,7 @@ class A
 end
 ~~~
 
-~~~
+~~~none
 irb> x = A.new(10)
 => #<A:0x00007fc4eb1c1f80 @a=10>
 irb> y = A.new(11)
@@ -970,7 +970,7 @@ class A
 
 And then:
 
-~~~
+~~~none
 irb> x = A.new(10)
 => #<A:0x00007fc4eb145778 @a=10>
 irb> x.print_your_state_with_a_factor(3)
@@ -984,7 +984,7 @@ it.
 Instance variables are _encapsulated_. You cannot get to their value from
 outside the class:
 
-~~~
+~~~none
 irb> x = A.new(3)
 => #<A:0x00007fc8cc180280 @a=3>
 irb> x.a
@@ -1015,7 +1015,7 @@ end
 
 And then:
 
-~~~
+~~~none
 irb> x = A.new(3)
 => #<A:0x00007f913a943c70 @a=3>
 irb> x.a
@@ -1024,7 +1024,7 @@ irb> x.a
 
 You could still not write directly to `@a` as that requires a _setter_:
 
-~~~
+~~~none
 irb> x.a = 5
 Traceback (most recent call last):
         4: from /usr/bin/irb:23:in `<main>'
@@ -1056,7 +1056,7 @@ end
 
 and then:
 
-~~~
+~~~none
 irb> x = A.new(3)
 => #<A:0x00007fb09b838558 @a=3>
 irb> x.a
@@ -1092,7 +1092,7 @@ end
 
 Yes, you write `:a` there. 
 
-~~~
+~~~none
 irb> x = A.new(3)
 => #<A:0x00007fc5ab109988 @a=3>
 irb> x.a
@@ -1106,7 +1106,7 @@ setter (who are you?), you can use `attr_writer`.
 
 What do you think will `x == y` be in the below?
 
-~~~
+~~~none
 irb> x = A.new(3)
 => #<A:0x00007fa3d6194778 @a=3>
 irb> y = A.new(3)
@@ -1140,7 +1140,7 @@ end
 
 And then:
 
-~~~
+~~~none
 irb> x = A.new(3)
 => #<A:0x00007fb47c1805a0 @a=3>
 irb> y = A.new(3)
@@ -1181,7 +1181,7 @@ end
 
 And then:
 
-~~~
+~~~none
 irb> x = A.new
 => #<A:0x00007fc82595ce60>
 irb> A.counter
@@ -1220,7 +1220,7 @@ end
 
 Poke around:
 
-~~~
+~~~none
 irb> x = A.new(3)
 => #<A:0x00007fa19e02dd10 @a=3>
 irb> x.double
@@ -1271,7 +1271,7 @@ end
 Prepend `HomeMade::` to your class name `A` if you want an instance of the `A`
 in the `HomeMade` module:
 
-~~~
+~~~none
 irb> a = HomeMade::A.new(3)
 => #<HomeMade::A:0x00007fdf07147448 @a=3>
 irb> a.double
@@ -1307,7 +1307,7 @@ end
 
 You can then pick your `A` without conflict:
 
-~~~
+~~~none
 irb> a = HomeMade::A.new(3)
 => #<HomeMade::A:0x00007f95eb03f0b0 @a=3>
 irb> b = NeighborMade::A.new
@@ -1381,7 +1381,7 @@ immediately of the dreaded Utility class.
 
 # Testing
 
-Say you have a class `A` that doubles, defined in a file `ruby_playground.rb`:
+Class `A` can double, and is defined in `ruby_playground.rb`:
 
 ~~~ruby
 class A
@@ -1395,7 +1395,7 @@ class A
 end
 ~~~
 
-Let's unit test `double` by creating a new file `test_ruby_playground.rb` for it:
+How to unit test `double`? Create a file `test_ruby_playground.rb`:
 
 ~~~ruby
 require 'test/unit'
@@ -1410,16 +1410,16 @@ class RubyPlayGroundTest < Test::Unit::TestCase
 end
 ~~~
 
-This should look fairly familiar by now. Some new things:
+Note:
 
-- we `require` the `test/unit` Ruby gem which defines the class `Test::Unit::TestCase` for us.
-- we `require` the file that has our own `A` with its `double`
-- we create a new class `RubyPlayGroundTest` that inherits from that `Test::Unit::TestCase`
-- we write a method that starts with `test_` and we use `assert_equal` to test whether `6` is indeed the result of `a.double`.
+- `require` the `test/unit` Ruby [gem](https://en.wikipedia.org/wiki/RubyGems) which defines the class [`Test::Unit::TestCase`](https://www.rubydoc.info/github/test-unit/test-unit/Test/Unit/TestCase)
+- `require` the file that has `A` 
+- create a new class `RubyPlayGroundTest` that inherits from `Test::Unit::TestCase`
+- write a method that starts with `test_` and use `assert_equal` to test whether `6` is the result of `a.double`
 
 Running that test file should result in success with statistics:
 
-~~~
+~~~none
 $ ruby test_ruby_playground.rb
 Loaded suite test_ruby_playground
 Started
@@ -1432,23 +1432,22 @@ Finished in 0.000298 seconds.
 3355.70 tests/s, 3355.70 assertions/s
 ~~~
 
-Try making the test fail and run the test again. Do it.
+Make the test fail and run the test again.
 
 # Blocks
 
+A reminder that you already saw _blocks_:
 
-A quick reminder that we already saw blocks in action:
-
-~~~
+~~~none
 irb> a = [1, 2, 3]
 => [1, 2, 3]
 irb> a.map { |el| el * 2 }
 => [2, 4, 6]
 ~~~
 
-The piece `{ |el| el * 2 } is a _block_. You can distinguish the parameter part
-`|el|` as well as the _body_ of that block `el * 2`. For multi-line blocks,
-you'd use the `do...end` form, same potato though:
+The part `{ |el| el * 2 }` is a _block_. It has a parameter part
+`|el|` as well as a _body_ `el * 2`. For multi-line blocks,
+use the `do...end` form.
 
 ~~~ruby
 a.map do |el|
@@ -1457,10 +1456,13 @@ a.map do |el|
 end
 ~~~
 
-Essentially you're giving one function `map` another function (the block) as an
-argument. It's what they call higher-order functions in school children.
+One function (`map`) has as its argument another function (the block) and is
+thus a so-called _higher-order function_.
 
-How do you define your own higher order function? Let's define a function that starts by printing "here we are now", and ends by printing "entertain us" to whatever function call we'd like. For example, say we want to print those 2 lines around a function call of `lost`:
+How do you define your own higher-order function? Let's define a function that
+starts by printing "here we are now", calls _some_ function, and then ends by
+printing "entertain us".
+For example, assume you have function called `lost`:
 
 ~~~ruby
 def lost
@@ -1468,7 +1470,8 @@ def lost
 end
 ~~~
 
-We could of course just do:
+You now want to print your two lines "here we are now" and "entertain us" around a call to `lost`. 
+You could do:
 
 ~~~ruby
 puts 'here we are now'
@@ -1476,9 +1479,10 @@ lost
 puts 'entertain us'
 ~~~
 
-But if I'd want to do the same to another function than `lost` I'd have to repeat that. Let's define a higher-function that can prints those things for any other function:
+But if you want to do the same to another function than `lost` you have to
+repeat that pattern. Instead, define a higher-function:
 
-~~~
+~~~none
 def smells_like
   puts 'here we are now'
   yield
@@ -1486,23 +1490,23 @@ def smells_like
 end
 ~~~
 
-You saw it: `yield`. That keyword tells the function `smells_like` _and now
+Note the `yield` keyword. That keyword tells the function `smells_like` _and now
 execute the block that was given to your call my friend_. So if we do
 `smells_like { lost }`, you see:
 
-```
+~~~none
 here we are now
 a lost generation
 entertain us
-```
+~~~
 
 You could also just do `smells_like { puts 'a broken generation' }` and see:
 
-```
+~~~none
 here we are now
 a broken generation
 entertain us
-```
+~~~
 
 What about blocks with parameters? For example, what if I want to be able to do
 `smells_like('broken') { |x| puts "a #{x} generation" }`? `yield` can take
@@ -1518,7 +1522,7 @@ end
 
 And then:
 
-~~~
+~~~none
 irb> smells_like('lost') { |x| puts "a #{x} generation" }
 here we are now
 a lost generation
