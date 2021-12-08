@@ -1249,7 +1249,8 @@ If you're familiar with inheritance, this looks encouraging. Some points to emph
 
 # Modules
 
-The syntax of a module is easy. Use keyword `module`, give it a name, and end with `end`:
+To define a module, start with keyword `module`, give it a name, do your thing,
+and end with `end`:
 
 ~~~ruby
 module HomeMade
@@ -1280,8 +1281,8 @@ irb> a.double
 
 ## As Namespaces
 
-Why modules? Because your neighbor also wants a class with name `A`. That's how
-your neighbor is. Modules provide little name islands of peace and quiet:
+Why modules? Because your neighbor also wants a class with name `A`. Typical.
+Modules are name islands of peace and quiet:
 
 ~~~ruby
 module HomeMade
@@ -1300,7 +1301,7 @@ end
 
 module NeighborMade
   class A
-    # Same name A
+    # Same name A, yet worse
   end
 end
 ~~~
@@ -1314,8 +1315,7 @@ irb> b = NeighborMade::A.new
 => #<NeighborMade::A:0x00007f95ef0ef998>
 ~~~
 
-Modules help you to logically organize your classes/functions within your
-application.
+Modules organize code within your application.
 
 ## As Mixins
 
@@ -1381,7 +1381,7 @@ immediately of the dreaded Utility class.
 
 # Testing
 
-Class `A` can double, and is defined in `ruby_playground.rb`:
+Define a class `A` in some file `ruby_playground.rb`:
 
 ~~~ruby
 class A
@@ -1413,7 +1413,7 @@ end
 Note:
 
 - `require` the `test/unit` Ruby [gem](https://en.wikipedia.org/wiki/RubyGems) which defines the class [`Test::Unit::TestCase`](https://www.rubydoc.info/github/test-unit/test-unit/Test/Unit/TestCase)
-- `require` the file that has `A` 
+- `require` the file that contains the class `A` 
 - create a new class `RubyPlayGroundTest` that inherits from `Test::Unit::TestCase`
 - write a method that starts with `test_` and use `assert_equal` to test whether `6` is the result of `a.double`
 
@@ -1432,11 +1432,11 @@ Finished in 0.000298 seconds.
 3355.70 tests/s, 3355.70 assertions/s
 ~~~
 
-Make the test fail and run the test again.
+Change `double` to do `@a * 4`. Run the test again. It fails.
 
 # Blocks
 
-A reminder that you already saw _blocks_:
+You already saw _blocks_:
 
 ~~~none
 irb> a = [1, 2, 3]
@@ -1445,8 +1445,8 @@ irb> a.map { |el| el * 2 }
 => [2, 4, 6]
 ~~~
 
-The part `{ |el| el * 2 }` is a _block_. It has a parameter part
-`|el|` as well as a _body_ `el * 2`. For multi-line blocks,
+The part `{|el| el * 2 }` is a _block_. It has _parameters_ 
+`|el|` and a _body_ `el * 2`. For multi-line blocks,
 use the `do...end` form.
 
 ~~~ruby
@@ -1456,13 +1456,10 @@ a.map do |el|
 end
 ~~~
 
-One function (`map`) has as its argument another function (the block) and is
-thus a so-called _higher-order function_.
-
-How do you define your own higher-order function? Let's define a function that
-starts by printing "here we are now", calls _some_ function, and then ends by
-printing "entertain us".
-For example, assume you have function called `lost`:
+In this example, `map` has as its argument another function (the block) and is
+thus a _higher-order function_.  How do you define your own higher-order
+functions? Define a function that prints "here we are now", calls _some_
+function, and prints "entertain us".  For example, take a function `lost`:
 
 ~~~ruby
 def lost
@@ -1470,8 +1467,8 @@ def lost
 end
 ~~~
 
-You now want to print your two lines "here we are now" and "entertain us" around a call to `lost`. 
-You could do:
+Print your two lines "here we are now" and "entertain us" around a call to
+`lost`: 
 
 ~~~ruby
 puts 'here we are now'
@@ -1479,10 +1476,10 @@ lost
 puts 'entertain us'
 ~~~
 
-But if you want to do the same to another function than `lost` you have to
+If you want to do the same to another function than `lost` you have to
 repeat that pattern. Instead, define a higher-function:
 
-~~~none
+~~~ruby
 def smells_like
   puts 'here we are now'
   yield
@@ -1510,7 +1507,7 @@ entertain us
 
 What about blocks with parameters? For example, what if I want to be able to do
 `smells_like('broken') { |x| puts "a #{x} generation" }`? `yield` can take
-arguments, and yields arguments get shuttled into the block's arguments:
+arguments, and `yield`'s arguments get shuttled into the block's parameters:
 
 ~~~ruby
 def smells_like(something)
@@ -1534,11 +1531,6 @@ entertain us
 ~~~
 
 Good times.
-
-# Conclusion
-
-We reached the end.
-
 
 <link rel="stylesheet" href="https://casual-effects.com/markdeep/latest/latex.css?">
 <!-- Markdeep: --><style class="fallback">body{visibility:hidden}</style><script src="https://casual-effects.com/markdeep/latest/markdeep.min.js?" charset="utf-8"></script>
