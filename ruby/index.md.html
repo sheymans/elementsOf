@@ -819,7 +819,7 @@ b: 2
 
 # Classes and Methods
 
-You can define a minimal class with the `class` keyword, a name, and `end`:
+Define a minimal class with the `class` keyword, a name, and `end`:
 
 ~~~ruby
 class A
@@ -827,7 +827,7 @@ class A
 end
 ~~~
 
-This does not do more then introduce `A` into the world.  Let's see how to
+This does not do more then introduce `A` into the world.  Here's how to
 create a new `A` object `a`, how to ask its `object_id`, how to get its String
 representation with `to_s`, and finally how to get an object's class:
 
@@ -842,17 +842,17 @@ irb> a.class
 => A
 ~~~
 
-Not bad for a minute of work. You may be wondering why a minimal `A` object can
-do all of this.  Poke at the class hierarchy:
+Not bad for a minute of work. You may wonder why a minimal `A` object can do
+all of this.  Poke at the class hierarchy:
 
 ~~~none
 irb> a.class.ancestors
 => [A, Object, Kernel, BasicObject]
 ~~~
 
-So `a` is an `A` which is an `Object` which is a `Kernel`, which is a
-`BasicObject`. Forget about the latter 2. You've forgotten it.  `Object` has
-the functionality that we saw on the `A` object. We're tapping into _inherited_
+So `a` is an `A`, which is an `Object`, which is a `Kernel`, which is a
+`BasicObject`. Forget about the latter 2 (_it is forgotten_). `Object` has the
+functionality that we saw on the `A` object. We're tapping into _inherited_
 methods from `Object`:
 
 ~~~none
@@ -1281,8 +1281,8 @@ irb> a.double
 
 ## As Namespaces
 
-Why modules? Because your neighbor also wants a class with name `A`. Typical.
-Modules are name islands of peace and quiet:
+Why modules? Because your neighbor also wants a class with name `A`.  Modules
+are name islands of peace and quiet:
 
 ~~~ruby
 module HomeMade
@@ -1319,8 +1319,8 @@ Modules organize code within your application.
 
 ## As Mixins
 
-Imagine (imagine!) you have 2 modules, 1 for logging and 1 for doing more
-long-term analytics (for example, for sending Kafka events):
+Imagine (imagine!) you have 2 modules, 1 for logging and 1 for 
+long-term analytics:
 
 ~~~ruby
 module Logger
@@ -1336,7 +1336,8 @@ module Analytics
 end
 ~~~
 
-And you have a class `A` that would like to use the methods from both the `Logger` and `Analytics` modules:
+Imagine (imagine!) you have a class `A` that wants to use the methods from the
+`Logger` and `Analytics` modules:
 
 ~~~ruby
 class A
@@ -1350,18 +1351,19 @@ end
 ~~~
 
 If you try `a.do_something` for an object `a` of type `A`, you get a
-`NoMethodError` for `log_it` and `send_event`. You are very smart (your
+`NoMethodError` for `log_it` and `send_event`. You are smart (your
 grandmother told you so), and you say, "let `A` inherit from `Logger`."  Yes,
-give me more of that smartness. What a joy.  And "also let `A` inherit from
-`Analytics`." So much goodness. Wonderful.
+more of that smartness. What a joy.  And "also let `A` inherit from
+`Analytics`." Wonderful.
 
 Ruby does not allow for multiple inheritance. You can only inherit from 1 class
 (ignoring for a minute that `Logger` and `Analytics` are not actually classes,
 they are modules).
 
-We (I say _We_ but I really mean _I_; you have turned out a massive
-disappointment; and you also thought the semi-colon is dead; it's not) can
-solve this by _mixing in_ the 2 modules in the class `A` by using `include`:
+We (I say _We_ but I really mean _I_; you have turned out to be a bit of a
+disappointment in these last 2 paragraphs; you also thought the semi-colon
+is dead; it's not) can solve this by _mixing in_ the 2 modules in the class `A`
+by using `include`:
 
 ~~~ruby
 class A
@@ -1376,8 +1378,8 @@ end
 ~~~
 
 `include` makes all methods of the modules available as _instance_ methods in
-your class. In the Java world, and maybe other worlds as well, you are reminded
-immediately of the dreaded Utility class.
+your class. Those familiar with the Java world, and maybe other worlds as well,
+are reminded of the Utility class. You long for a better life.
 
 # Testing
 
