@@ -1,7 +1,7 @@
 <meta charset="utf-8">
                             **Elements of Ruby**
                             Stijn Heymans
-                            published: 1 December 2021
+                            published: 23 December 2021
 
 # Introduction
 
@@ -827,9 +827,9 @@ class A
 end
 ~~~
 
-This does not do more then introduce `A` into the world.  Here's how to
-create a new `A` object `a`, how to ask its `object_id`, how to get its String
-representation with `to_s`, and finally how to get an object's class:
+This introduces `A` into the world.  Here's how to create a new `A` object `a`,
+how to ask its `object_id`, how to get its String representation with `to_s`,
+and how to get its class:
 
 ~~~none
 irb> a = A.new
@@ -842,8 +842,8 @@ irb> a.class
 => A
 ~~~
 
-Not bad for a minute of work. You may wonder why a minimal `A` object can do
-all of this.  Poke at the class hierarchy:
+Not bad for a minute of work. You wonder why our minimal `A` object can do all
+of this.  Poke at the class hierarchy:
 
 ~~~none
 irb> a.class.ancestors
@@ -851,9 +851,7 @@ irb> a.class.ancestors
 ~~~
 
 So `a` is an `A`, which is an `Object`, which is a `Kernel`, which is a
-`BasicObject`. Forget about the latter 2 (_it is forgotten_). `Object` has the
-functionality that we saw on the `A` object. We're tapping into _inherited_
-methods from `Object`:
+`BasicObject`.  We're tapping into _inherited_ methods:
 
 ~~~none
 irb> o = Object.new
@@ -868,10 +866,10 @@ irb> o.class.ancestors
 => [Object, Kernel, BasicObject]
 ~~~
 
-You may be used to defining _constructors_ in classes that get called when
-creating objects using `new`. With a minimal class like `A` we use the
+You may have expected to see the definition of a _constructor_ when you saw
+`A.new` used to create a new object.  For a minimal class like `A` we use the
 `initialize` of `Object`. If you want to use your own _constructor_ you can
-define your own `initialize`:
+need to define your own `initialize`:
 
 ~~~ruby
 class A
@@ -891,11 +889,11 @@ you called new!
 => #<A:0x00007fc4eb1b8bd8>
 ~~~
 
-Right now, the class `A` is mostly useless. Usually classes carry some _state_ (cars have
-doors and color, some cars have 4 doors, some 5, some cars are blue, some cars
-are yellow). We capture that state using instance variables.
+The class `A` is useless. Usually classes carry some _state_ (cars have doors
+and color, some cars have 4 doors, some 5, some cars are blue, some cars are
+yellow). _Instance variables_ capture that state.
 
-In Ruby, instance variables start with an `@`. Give `A` some state:
+In Ruby, instance variables start with an `@`. Give `A` state:
 
 ~~~ruby
 class A
@@ -911,10 +909,14 @@ class A
 end
 ~~~
 
-I did two new things:
+Note:
 
-- I've set the value of `@a` in the `initialize`. Given what you know at this point, you know that when you create a new `A` object that the `@a = 10` line gets executed
-- I've introduced an _instance_method_ called `print_your_state`. If you have an `A` object called `x` you can do `x.print_your_state`. This will execute the `puts` line for your object `x`.
+- I've set the value of `@a` in the `initialize`. When you create a new `A`
+  object, the `@a = 10` line gets executed.
+
+- I've introduced an _instance method_ `print_your_state`. If you have an `A`
+  object `x` you can do `x.print_your_state`. This executes the `puts` line for
+  your object `x`.
 
 ~~~none
 irb> x = A.new
@@ -923,9 +925,9 @@ irb> x.print_your_state
 my state is 10
 ~~~
 
-Every object has `@a` equal to 10. Useless as far as state goes for objects. You want to
-create objects with different states. Give 
-`initialize` arguments that indicate the state you want to give the object:
+Every object has `@a` equal to 10. Useless as far as state goes for objects.
+You want to create objects with different states. Give `initialize` arguments
+that indicate the initial state you want for the object:
 
 ~~~ruby
 class A
@@ -952,8 +954,7 @@ irb(main):014:0> y.print_your_state
 my state is 11
 ~~~
 
-On the topic of arguments, you can of course also give instance methods
-arguments:
+You can also give instance methods arguments:
 
 ~~~ruby
 class A
@@ -978,8 +979,7 @@ my state is 30
 ~~~
 
 Note that `result` is a _local_ variable to the instance method
-`print_your_state_with_a_factor` and thus there's no `@` in sight when `put`ing
-it.
+`print_your_state_with_a_factor`.
 
 Instance variables are _encapsulated_. You cannot get to their value from
 outside the class:
@@ -996,9 +996,8 @@ Traceback (most recent call last):
 NoMethodError (undefined method `a' for #<A:0x00007fc8cc180280 @a=3>)
 ~~~
 
-Ruby's instance variables are thus by default a bit like private instance
-variables in Java. If you want direct access to the instance variable, you need
-to define a getter:
+Ruby's instance variables are thus by default like private instance variables
+in Java. If you want direct access to the instance variable, you need a getter:
 
 ~~~ruby
 class A
@@ -1022,7 +1021,7 @@ irb> x.a
 => 3
 ~~~
 
-You could still not write directly to `@a` as that requires a _setter_:
+You can still not write to `@a` from outside the class as that requires a _setter_:
 
 ~~~none
 irb> x.a = 5
@@ -1035,7 +1034,7 @@ NoMethodError (undefined method `a=' for #<A:0x00007f913a943c70 @a=3>)
 Did you mean?  a
 ~~~
 
-We can write this ourselves:
+Write a setter:
 
 ~~~ruby
 class A
@@ -1067,7 +1066,7 @@ irb> x.a
 => 5
 ~~~
 
-I'll pause, so you can take this in.
+I'll pause, so you can enjoy the view.
 
 ~~~ruby
 def a=(a)
@@ -1077,8 +1076,10 @@ end
 
 That latter is an [assignment
 method](https://docs.ruby-lang.org/en/2.6.0/doc/syntax/assignment_rdoc.html#label-Assignment+Methods).
-At this point the whole thing has has become an ordeal. Luckily, we have
-shorthand for the getter and setter by using `attr_accessor` as follows:
+By now, the whole thing is an ordeal. As fortune may have it,we have shorthand
+for getting and setting a getter and setter:
+
+HERE
 
 ~~~ruby
 class A
