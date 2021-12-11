@@ -819,6 +819,8 @@ b: 2
 
 # Classes and Methods
 
+## Defining classes
+
 Define a minimal class with the `class` keyword, a name, and `end`:
 
 ~~~ruby
@@ -981,6 +983,8 @@ my state is 30
 Note that `result` is a _local_ variable to the instance method
 `print_your_state_with_a_factor`.
 
+## Getters and Setters and Bouviers
+
 Instance variables are _encapsulated_. You cannot get to their value from
 outside the class:
 
@@ -1074,12 +1078,10 @@ def a=(a)
 end
 ~~~
 
-That latter is an [assignment
+That `a=` is an [assignment
 method](https://docs.ruby-lang.org/en/2.6.0/doc/syntax/assignment_rdoc.html#label-Assignment+Methods).
-By now, the whole thing is an ordeal. As fortune may have it,we have shorthand
-for getting and setting a getter and setter:
-
-HERE
+This is an ordeal. As fortune has it, there is shorthand for getting and
+setting a getter and setter:
 
 ~~~ruby
 class A
@@ -1103,9 +1105,12 @@ irb> x.a = 6
 ~~~
 
 If you only want the getter, you can use `attr_reader`. If you only want a
-setter (who are you?), you can use `attr_writer`.
+setter, you probably also put pineapple on your pizza. Anyhow, you can use
+`attr_writer`.
 
-What do you think will `x == y` be in the below?
+## Equality
+
+What is `x == y` in the below?
 
 ~~~none
 irb> x = A.new(3)
@@ -1115,12 +1120,10 @@ irb> y = A.new(3)
 irb> x == y
 ~~~
 
-That's right. False. `x` and `y` are different objects and `==` is using
-`Object` equality in this case. Sometimes it makes sense, to have `x` and `y`
-be equal as they represent the same data namely an `A` with state `3`. For
-example, for Strings: `"I am right" == "I am right"` are the same strings and
-violating this expectation would be shocking to all but the most hardened
-developers.
+False. `x` and `y` are different objects and `==` is `Object` equality.
+Sometimes you want `x` and `y` to be equal as they represent the same data,
+they are both `A` objects with the same state `3`. For example, it makes sense
+to most that `"I am right" == "I am right"` is `true`.
 
 You can override `==` in `A` to get equality based on state, rather than on
 object identity:
@@ -1150,20 +1153,34 @@ irb> x == y
 => true
 ~~~
 
-Couple of things worth pointing to:
+Observe:
 
-- `==` can is an instance method defined as any other method.  The reason is that `x == y`, is really just `x.==(y)` as if `==` is any other method name.
-- I used `self` which is very similar to Java's `this` at least in _this_ [context](https://airbrake.io/blog/ruby/self-ruby-overview). Here it's an instance of this object itself. So when doing `x == y`, and we thus execute `==` for the object `x`, then `self` is `x`. Caveat emptor: `self` may mean other things. We will see in a bit how to use `self` to define _class methods_. 
-- I did not actually have to use `self` here. There is no ambiguity if I would do `a == other.a`. The first `a` refers to the method `a` defined in `A` (by way of the `attr_accessor`) and allows me to check equality of the instance variable `@a` with `other.a` (aka the `@a` of the `other` object). You are right to think that I could do `@a == other.a` directly. But why make it simple when you can make it complicated?
+- `==` is an instance method defined as any other method:  `x == y` is really
+  just `x.==(y)` as if `==` is any other method name.
+
+- I used `self` which is similar to Java's `this` at least in _this_
+  [context](https://airbrake.io/blog/ruby/self-ruby-overview). Here it's an
+  instance of this object itself. So when doing `x == y`, we execute `==` for
+  the object `x`, and `self` refers to `x`. Caveat emptor: `self` may mean
+  other things. We will see how to use `self` to define _class methods_. 
+
+- I did not actually have to use `self` here. There is no ambiguity if I would
+  do `a == other.a`. The first `a` refers to the method `a` defined in `A` (by
+  way of the `attr_accessor`) and allows me to check equality of the instance
+  variable `@a` with `other.a` (aka the `@a` of the `other` object). You are
+  right: I can do `@a == other.a`
+  [directly](https://www.merriam-webster.com/dictionary/pedantic). 
+
+## Class Methods and Variables
 
 If you know `Java`, you must have met `static`. _static variables or methods_
 in Java classes indicate that they belong to the class rather than the
 instance.
 
-In Ruby _class variables_ are indicated with `@@` (recall that instance
-variables are indicated with `@`). _Class methods_ are indicated by preceding
-the name with `self`. The body is not yet cold and here we are: `self` in this
-context refers to the class (rather than the object). An example: 
+In Ruby _class variables_ start with `@@` (recall that instance variables start
+with `@`). _Class methods_ have their name preceded with `self`. The body is
+not yet cold and here we are: `self` in this context refers to the class rather
+than the object. An example: 
 
 ~~~ruby
 class A
@@ -1193,11 +1210,12 @@ irb> A.counter
 => 2
 ~~~
 
-Note that we asked `A` for the `counter` (not `x`, nor `y`). In fact, doing
-`x.counter` would lead to an `undefined method` error.
+Note that I asked `A` for the `counter` (not `x`, nor `y`). In fact, doing
+`x.counter` leads to an `undefined method` error.
 
-I avoided it for a while, but sometimes you have to talk about inheritance. In
-the below I make `B` a subclass of `A` by indicating `B < A`.
+## Inheritance
+
+Make `B` a subclass of `A`:
 
 ~~~ruby
 class A
@@ -1243,10 +1261,13 @@ irb> y.triple
 => 15
 ~~~
 
-If you're familiar with inheritance, this looks encouraging. Some points to emphasize:
+If you're familiar with inheritance, this looks encouraging. Observe:
 
-- I did not define an `initialize` for `B` so we're forced to use the one of `A` which requires 1 argument `a`
-- I accessed the instance variable `@a` in `B. This sometimes leads to surprises, but I hope you have a good [IDE](https://www.jetbrains.com/idea/) going for you
+- I did not define an `initialize` for `B` so we're forced to use the one of
+  `A` which requires 1 argument `a`
+
+- I accessed the instance variable `@a` in `B. This sometimes leads to
+  surprises, but I hope you have a good [IDE](https://www.jetbrains.com/idea/)
 
 # Modules
 
