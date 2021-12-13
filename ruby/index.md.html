@@ -619,8 +619,8 @@ irb> a.each_with_index { |el, i| puts "#{i}: #{el}" }
 2: 300
 ~~~
 
-Yeah, get those [Anki flashcards](https://apps.ankiweb.net/) out to memorize
-the order of that `|el, i|`. You did not ask for it, but here's a tip: in Ruby, it often works to
+Get those [Anki flashcards](https://apps.ankiweb.net/) out to memorize
+the order of `|el, i|`. You did not ask for it, but here's a tip: in Ruby, it often works to
 ask "how would I say this out loud?". 
 
 !!!
@@ -687,9 +687,8 @@ irb> a
 => [2, 4, 6]
 ~~~
 
-I know you saw the exclamation mark. That was not an indication of surprise (_"a `map` here?!"_). The convention in Ruby is to append `!` to function names if those
-functions are supposed to be destructive. The exclamation mark is a regular
-part of the function name.
+The convention in Ruby is to append `!` to function names if those functions
+are destructive. The exclamation mark is a regular part of the function name.
 
 We can also map hashes. For example, collect all keys of a map, but uppercased:
 
@@ -700,8 +699,8 @@ irb> a.map { |key, value| key.upcase }
 => [:FIRST, :LAST]
 ~~~
 
-What if you want to map a Hash to a Hash, but just keeping the keys but
-uppercasing the values?
+What if you want to map a `Hash` to a `Hash`, and you want to keep the keys but
+uppercase the values?
 
 ~~~none
 irb> a.map { |key, value| [key, value.upcase] }.to_h
@@ -709,18 +708,18 @@ irb> a.map { |key, value| [key, value.upcase] }.to_h
 ~~~
 
 The `map` returns an array of `[key, value.upcase]` arrays. So I use `to_h` to
-convert that very specific array to a hash.  Generally:
+convert that array to a hash.  Generally:
 
 ~~~none
 irb> [[1, 2], [3, 4]].to_h
 => {1=>2, 3=>4}
 ~~~
 
-We're verging to the non-elemental.
+This is no longer elemental.
 
 # Functions
 
-Functions (or _methods_, when appearing in classes, same potato) have this
+Functions (or _methods_, when appearing in classes) have this
 shape:
 
 ~~~ruby
@@ -730,7 +729,7 @@ end
 ~~~
 
 Functions start with `def` and end with `end`. A function that doubles every
-element in an array:
+element in an array `a`:
 
 ~~~ruby
 def double_all(a)
@@ -741,7 +740,7 @@ end
 "Oh no," you say. "They forgot to type the arguments." Yes. That `a` can be
 anything as long as it understands `map`. 
 
-Calling functions is as you would expect:
+Call `double_all`:
 
 ~~~none
 irb> a = [1, 2, 3]
@@ -752,12 +751,12 @@ irb> puts double_all(a)
 ~~~
 
 If you miss types, or you work in a large code base with many developers and
-you prefer sanity over insanity, check out [sorbet](https://sorbet.org/). Sorbet
-allows you to annotate your functions with type information. For example, the
-above could be:
+you prefer sanity over insanity, check out [sorbet](https://sorbet.org/).
+Sorbet allows you to annotate functions with type information. For example, add
+a signature to `double_all` with the sorbet `sig` annotation:
 
 ~~~ruby
-sig { params(a: T::Array[Integer].returns(T::Array[Integer]) }
+sig { params(a: T::Array[Integer]).returns(T::Array[Integer]) }
 def double_all(a)
   a.map { |x| x * 2 }
 end
@@ -774,7 +773,7 @@ def double_all(a = [1, 2])
 end
 ~~~
 
-You can then leave off the argument to `double_all`:
+After which, you can leave off the argument to `double_all`:
 
 ~~~none
 irb> puts double_all
@@ -782,7 +781,7 @@ irb> puts double_all
 4
 ~~~
 
-A function with a Hash as an argument:
+A function with a `Hash` as an argument:
 
 ~~~ruby
 def hash_keys(h)
@@ -799,7 +798,7 @@ a: 1
 b: 2
 ~~~
 
-If a hash is the last argument of the function call, you can leave off the
+If a `Hash` is the last argument of the function call, you can leave off the
 curly braces:
 
 ~~~none
@@ -808,7 +807,7 @@ a: 1
 b: 2
 ~~~
 
-That looks a lot like keyword arguments. Indeed,  you can now change the
+That reminds of _keyword arguments_. Indeed,  you can now change the
 calling order:
 
 ~~~none
