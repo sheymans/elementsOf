@@ -414,15 +414,17 @@ talk more about looping in that section.
 
 ## Arrays
 
-An array is an [ordered integer-indexed collection](https://docs.ruby-lang.org/en/2.6.0/Array.html) of objects. Let's initialize one:
+An array is an [ordered integer-indexed
+collection](https://docs.ruby-lang.org/en/2.6.0/Array.html) of objects.
+Initialize an array:
 
 ~~~none
 irb> a = ["x", 1, :y]
 => ["x", 1, :y]
 ~~~
 
-Arrays are not restricted to contain only 1 type of objects. You can shove
-in there what you like: 
+Arrays are not restricted to contain only 1 type of object. You can shove in
+there what you fancy: 
 
 ~~~none
 irb> a = ["x", [1, 2], :y]
@@ -442,7 +444,8 @@ irb> a[-1]
 => :y
 ~~~
 
-You can add elements to the back of an array using `<<` or `push`. Both are destructive operations:
+Add elements to the back of an array using `<<` or `push`. Both are
+destructive operations:
 
 ~~~none
 irb> a << :b
@@ -453,7 +456,7 @@ irb> a
 => ["x", [1, 2], :y, :b, :c]
 ~~~
 
-You can remove that last element again using `pop`:
+Remove that last element with `pop`:
 
 ~~~none
 irb> l = a.pop
@@ -462,7 +465,9 @@ irb> a
 => ["x", [1, 2], :y, :b]
 ~~~
 
-What about adding and removing to the _front_ of an array? Use `unshift` and `shift`. As far as unsavory mnemonics go, remove the `f` to remember which does what.
+What about adding and removing to the _front_ of an array? Use `unshift` and
+`shift`. As far as unsavory mnemonics go, remove the `f` to remember which does
+what.
 
 ~~~none
 irb> a
@@ -478,7 +483,8 @@ irb> a.unshift("x_new")
 `pop/push` must be more efficient than `shift/unshift`? Seems it [hardly
 matters](https://stackoverflow.com/questions/8353026/what-is-the-run-time-of-shift-unshift-in-a-ruby-array).
 
-What if you have a second array `b = [:b1, :b2]` that you want to append (i.e., add each element) to `a`? Just using `push` will not do what you want:
+What if you have a second array `b = [:b1, :b2]` that you want to append (i.e.,
+add each element) to array `a`? `push` does not do what you want:
 
 ~~~none
 irb> a = ["x", [1, 2], :y]
@@ -498,8 +504,8 @@ irb> a.push(*b)
 => ["x", [1, 2], :y, :b1, :b2]
 ~~~
 
-`*b` for an array `b` in the context of a function call (`push` here) will send
-each element of the array as an individual argument to the function. Thus,
+`*b` for an array `b` in the context of a function call (`push` here) sends
+each element of the array `b` as an individual argument to the function. Thus,
 `a.push(*b)` is the same as `a.push(:b1, :b2)`.
 
 I initialized arrays using their literal form (such as `a = [1, 2]`).  I can
@@ -515,11 +521,11 @@ irb> a << 1
 
 ## Hashes
 
-[Hashes](https://docs.ruby-lang.org/en/2.6.0/Hash.html) are structures that store
-key-value pairs with unique keys (also called dictionaries, associative arrays,
-`HashMap`, maps in other languages). You can use any object type as a key.
+[Hashes](https://docs.ruby-lang.org/en/2.6.0/Hash.html) store key-value pairs
+with unique keys (also called dictionaries, associative arrays, or
+maps in other languages). Any object can be a key.
 
-Let's define a hash with some personal information and get a
+Define a hash that stores a first and last name, get a
 value for an existing/non-existing key, change a value for an existing
 key, add a value for a non-existing key, and remove a key/value pair:
 
@@ -546,11 +552,9 @@ irb> a
 => {"first"=>"Jane", "last"=>"Doe"}
 ~~~
 
-What type of objects can be values? Any object.
-What type of objects can be keys, surely only strings right? Any object.
-
-In the above rundown, all keys were strings. When keys are symbols, there's
-some syntactic sugar that tastes almost like the real thing:
+Any object can be a value in a Hash. Any object can be a key in a Hash.  In the
+above example, all keys were strings. Consider this example with symbols as
+keys:
 
 ~~~none
 irb> a = { :first => "John", :last => "Doe" }
@@ -559,23 +563,22 @@ irb> a[:first]
 => "John"
 ~~~
 
-Nothing interesting happened. You used symbols `:first` and `:last` as keys.
-However, if you want symbols as keys, you can party as wild as JSON does on
-Friday night, evoking nothing but bleak memories of what used to be a life with
-promise:
+The example used symbols `:first` and `:last` as keys.  If you use symbols as
+keys, you can party as wild as JSON on a Friday night: 
 
 ~~~none
 irb> a = { first: "John", last: "Doe" }
 => {:first=>"John", :last=>"Doe"}
 ~~~
 
-I confidently said you can use any object as a hash key. This relies on properly
-overriding `hash` and `eql?` (the latter being what
+I said you can use any object as a hash key. This relies on properly overriding
+`hash` and `eql?` (the latter is what
 [Hash](https://docs.ruby-lang.org/en/2.6.0/Hash.html) uses for testing equality
 of keys. [Two objects will then refer to the same key when their `hash` value
 is identical and the 2 objects `eql?` each
 other](https://docs.ruby-lang.org/en/2.6.0/Hash.html#class-Hash-label-Hash+Keys).
-Is this still elemental? Probably not. Moving on.
+
+Elemental? Probably not. Moving on.
 
 ## Looping through Arrays and Hashes
 
