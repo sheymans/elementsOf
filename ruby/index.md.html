@@ -259,7 +259,7 @@ case almost everywhere: `lowercase_words_separated_by_underscores`. Except
 
 ## Conditions and `if`
 
-Here's the basic form of an `if`:
+The basic `if`:
 
 ~~~ruby
 if condition
@@ -267,10 +267,10 @@ if condition
 end
 ~~~
 
-So no parentheses as in `(condition)`, no colon as in `condition:`, no curly brackets
-as in `{ do_something }`). And `end` to end it.
+No parentheses or curly brackets for the condition. No colon after the
+condition. `end` to end.
 
-The usual `else if` and `else`:
+`else if` and `else`:
 
 ~~~ruby
 if condition
@@ -287,27 +287,26 @@ What expressions evaluates to true?
 
 - all numbers (including `0`) are true
 - all strings (including `''` -- the empty string) are true
-- `nil` (yep, that's a null right there) is false
+- `nil` (yep, that's a null) is false
 - the boolean literal `true` is true
 - the boolean literal `false` is false
 - the boolean expression `a && b` is true if `a` and `b` are true
 - the boolean expression `a || b` is true if `a` or `b` are true
 - the boolean expression `!a` is true if a is not true
 
-Your conditions will often compare things: if variable `a` is equal to `"dog"`,
-then do this. While Ruby has `==`, `===`, `equal?`, and `eql?`, you
+Conditions often compare things: if variable `a` is equal to `"dog"`,
+then do this. Ruby has `==`, `===`, `equal?`, and `eql?`. You
 will mostly use:
 
 - `==` for checking whether values are equal as far as the class designer of the objects you're comparing is concerned. 
 - `equal?` for checking object equality.
 
 In fact, `equal?` and `==` as defined in the
-[`Object`](https://ruby-doc.org/core-3.0.2/Object.html#method-i-eql-3F) are
-equal. Pun intended.
+[`Object`](https://ruby-doc.org/core-3.0.2/Object.html#method-i-eql-3F) class
+are equal. _But how are they equal? How?_ 
 
-The intent is that class designers override `==` to something that
-makes sense for the class, but that `equal?` always stands for object
-equality. Take the `String` class:
+Class designers can override `==` to something that makes sense for the class.
+`equal?` should stand for object equality. Take the `String` class:
 
 ~~~none
 irb> "a" == "a"
@@ -326,7 +325,7 @@ irb> :a.equal?(:a)
 => true
 ~~~
 
-Back to our `if` for a bit. Instead of:
+Back to ur `if`. Instead of:
 
 ~~~ruby
 if !condition
@@ -342,7 +341,8 @@ unless condition
 end
 ~~~
 
-Furthermore, if `do_something` is just one line, Ruby often prefers the one-liner:
+Furthermore, if `do_something` is just one line, Ruby devs often prefer a
+one-liner:
 
 ~~~ruby
 do_something if condition
@@ -381,8 +381,8 @@ This prints:
 4
 ~~~
 
-There's a variety of ways to write this in Ruby, but the above classic `for`
-construct is not one of them.  Closest in spirit is to
+There's a variety of ways to write this in Ruby, but the above `for`
+construct is not one of them.  Closest in spirit to the original is to
 use a `while`:
 
 ~~~ruby
@@ -404,11 +404,23 @@ n.times { |i| puts i }
 More elegant than the clunky `while`.  Deconstruct this expression:
 
 - `n`. An `Integer`, and thus an object that has methods.
-- `times`. A [method](https://docs.ruby-lang.org/en/2.6.0/Integer.html#method-i-times) that is called on the object `n` and _iterates_ the following block `{ |i| puts i}` from `0` to `n - 1`, passing in those values to `i` with each iteration. More on blocks later, but for those familiar, the block is essentially an anonymous function or lambda with parameter `i` (or arrow function for the Javascript knowledgeables). 
-- `{ |i| puts i }`. We spoiled it. This is a `block` that prints `i` with `i` ranging over values `0` to `n - 1`. This _ranging over values_ is accomplished by `times`. We'll see later how we can write functions such as `times` ourselves in the section on Blocks. For now, you can see `times` as an higher-order function that takes another function as an argument.
+
+- `times`. A
+  [method](https://docs.ruby-lang.org/en/2.6.0/Integer.html#method-i-times)
+  that is called on the object `n` and _iterates_ the following block `{ |i|
+  puts i}` from `0` to `n - 1`, passing in those values to `i` with each
+  iteration. More on blocks later, but for those familiar, the block is
+  essentially an anonymous function or lambda with parameter `i` (or arrow
+  function for the Javascript knowledgeables). 
+
+- `{ |i| puts i }`. We spoiled it. This is a `block` that prints `i` with `i`
+  ranging over values `0` to `n - 1`. This _ranging over values_ is
+  accomplished by `times`. We'll see later how we can write functions such as
+  `times` ourselves in the section on Blocks. For now, you can see `times` as
+  an higher-order function that takes another function as an argument.
 
 Most of the time your looping will be in the context of some collection so I'll
-talk more about looping in that section.
+talk more about looping then.
 
 # Collections
 
