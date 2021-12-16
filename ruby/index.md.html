@@ -1,7 +1,7 @@
 <meta charset="utf-8">
                             **Elements of Ruby**
                             Stijn Heymans
-                            published: 23 December 2021
+                            published: 17 December 2021
 
 # Introduction
 
@@ -203,11 +203,11 @@ From that `irb` session, you can (if you truly want) learn that
 
 ## Booleans
 
-`true` and `false`. This section seems awfully incomplete doesn't it? It's not.
+`true` and `false` $\square$
 
 # Variables
 
-Like symbols they consist of letters, digits, or underscores. Unlike symbols,
+Like symbols, variables consist of letters, digits, or underscores. Unlike symbols,
 they do not start with colons. You initialize them:
 
 ~~~none
@@ -223,11 +223,10 @@ I assigned and re-assigned that `x` to my heart's content with different values
 _and_ different types.
 
 You feel resistance. "But this is insane," you say. You do not like it and you
-want the world to know it. You take the matter to twitter, but twitter is just
-an empty army of machines.  No-one listens, not truly, not anymore. It's 2021
-kid, the humans lost.
+want the world to know it. You take the matter to twitter, but twitter does not
+care.
 
-And as far as single and double quotes go: 
+Single and double quotes are different: 
 
 ~~~none
 irb> x = 2
@@ -240,7 +239,7 @@ irb> 'we were #{x}'
 
 [String interpolation](https://en.wikipedia.org/wiki/String_interpolation) yes.
 
-And sometimes variables are not so variable:
+And sometimes, variables are not variable:
 
 ~~~none
 irb> X = 5
@@ -249,11 +248,11 @@ irb> X = 6
 (irb):5: warning: already initialized constant X
 ~~~
 
-Capitalize your variable and it becomes _constant_. 
+Capitalize a variable and it becomes _constant_. 
 
-A word on camels and snakes when naming variables or really anything. Use snake
-case almost everywhere: `lowercase_words_separated_by_underscores`. Except
-`ClassNames`, go for camel case there. Later more on classes.
+A word on camels and snakes when naming in Ruby. Use snake case almost
+everywhere: `lowercase_words_separated_by_underscores`. Except `ClassNames` and
+`ModulesNames`, go for camel case there. Later more on classes and modules.
 
 # Control Structures
 
