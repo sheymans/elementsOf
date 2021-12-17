@@ -6,7 +6,7 @@
 # Introduction
 
 I will introduce you to the elements of programming in
-[Ruby](https://www.ruby-lang.org). I assume you can program in some other
+[Ruby](https://www.ruby-lang.org). I will assume you can program in some other
 language such as Java,
 [Perl](http://www.stijnheymans.net/elements_of_perl.html), Python, Go, ...
 
@@ -15,8 +15,8 @@ Background sources that were helpful to me:
 - [Why's (Poignant) Guide to Ruby](https://poignant.guide/) by _why the lucky
   stiff_. More art project than programming book, but a beginner's resource
   that gives an elemental overview of the language _with_ intuition of the Ruby
-  language.  If you read that book, you can stop reading this article. There's
-  nothing here for you.
+  language.  If you have read that book, you can stop reading this article.
+  There's nothing here for you.
 
 - [Eloquent Ruby](https://www.goodreads.com/book/show/9364729-eloquent-ruby) by
   Russ Olsen. A bit more advanced than _Why's (Poignant) Guide to Ruby_. The
@@ -26,9 +26,8 @@ Background sources that were helpful to me:
 In this article, I will follow a structure that is loosely inspired by the
 structure of [Introducing
 Go](https://www.goodreads.com/book/show/27015358-introducing-go) by Caleb
-Doxsey. Not a Ruby book, but a Go, book. It's a _short_ book on Go that manages
-to bring the basics across.  Something I will aspire to in this article, for
-Ruby.
+Doxsey. Not a Ruby book, but a Go book. It's a _short_ book on Go that manages
+to bring the basics across.  Something I aspire to in this article for Ruby.
 
 # Getting Started
 
@@ -51,15 +50,15 @@ Hello World!
 => nil
 ~~~
 
-Leave the interactive interpreter `irb` by typing `exit`. Now let's a `Hello World!` again, but
-without `irb`. Open a file (make it end on `rb`, for example
+Leave the interactive interpreter `irb` by typing `exit`. Now say `Hello
+World!` again, but without `irb`. Open a file (make it end on `rb`, for example
 `ruby_playground.rb`) and write the following line in it:
 
 ~~~ruby
 puts 'Hello World!'
 ~~~
 
-Close the file and at the command-line, have Ruby execute it:
+Close the file and at the command-line have Ruby interpret it:
 
 ~~~none
 $ ruby ruby_playground.rb
@@ -76,7 +75,7 @@ corresponding to what you saw in your initial `ruby --version`. I picked
 
 ## Numbers
 
-Unsurprisingly, integers are represented as we expect: `3`, `5`, `-100`, ...
+Unsurprisingly, integers are represented as `3`, `5`, `-100`, ...
 Surprisingly, everything in Ruby is an object so you can ask the class of an
 integer: `5.class`. This returns
 [Integer](https://docs.ruby-lang.org/en/2.6.0/Integer.html). 
@@ -88,10 +87,9 @@ irb> 123.digits
 => [3, 2, 1]
 ~~~
 
-Fans of coding interviews will appreciate this. That's the only place you will
-ever need that.
+Fans of coding interviews will appreciate this. 
 
-Simple math is ready for you and has been since you were 7:
+Simple math still works despite rumors:
 
 ~~~none
 irb> 1 + 2
@@ -102,7 +100,7 @@ irb> 8 / 4
 => 2
 ~~~
 
-There's also the number type that keeps it real and inexact, le
+Real but inexact numbers are of type
 [Float](https://docs.ruby-lang.org/en/2.6.0/Float.html). In its literal
 representation, it's _things_ that contain a decimal point:`1.0`, `9.9999`, ...
 
@@ -128,11 +126,12 @@ irb> 7.to_f / 2
 
 ## Strings
 
-String are characters surrounded by single quotes or double quotes: `'Hello'`
-or `"Hello"`. The double-quoted variety is special. More later. Be patient.
+String are sequences of characters surrounded by single or double
+quotes: `'Hello'` or `"Hello"`. The double-quoted variety is special. More
+later. Be patient.
 
-Use `+` to concatenate 2 strings without changing the original strings. Use
-`<<` to concanate and destroy the string you're appending to:
+Use `+` to concatenate 2 Strings without changing the original Strings. Use
+`<<` to concatenate and destroy the String you're appending to:
 
 ~~~none
 irb> a = "hello"
@@ -164,7 +163,7 @@ irb> a[-1]
 => "o"
 ~~~
 
-You can get substrings by using inclusive (`..`) or exclusive (`...`) ranges:
+Get substrings by using inclusive (`..`) or exclusive (`...`) ranges:
 
 ~~~none
 irb> a = "hello"
@@ -181,7 +180,7 @@ Symbols consist of letters, digits, or underscores, and are preceded by a `:` .
 For example, `:a`, `:a_2`, `:an_orange`. Why not just use Strings? [Great
 question](https://stackoverflow.com/questions/255078/whats-the-difference-between-a-string-and-a-symbol-in-ruby).
 
-Let's explore how strings are different from symbols by asking for their
+Explore how Strings are different from symbols by asking for their
 `object_id`:
 
 ~~~none
@@ -195,10 +194,10 @@ irb> :foo.object_id
 => 1516508
 ~~~
 
-From that `irb` session, you can (if you truly want) learn that
+From that `irb` session, note that
 
 - every object has a method `object_id` that returns _some_ id.
-- strings that appear the same do not necessarily have the same `object_id`, which _probably_ has memory consequences
+- Strings that appear the same do not necessarily have the same `object_id`, which _probably_ has memory consequences
 - symbols that appear the same have the same `object_id`, which _probably_ has memory consequences
 
 ## Booleans
@@ -252,7 +251,7 @@ Capitalize a variable and it becomes _constant_.
 
 A word on camels and snakes when naming in Ruby. Use snake case almost
 everywhere: `lowercase_words_separated_by_underscores`. Except `ClassNames` and
-`ModulesNames`, go for camel case there. Later more on classes and modules.
+`ModuleNames`, go for camel case there. Later more on classes and modules.
 
 # Control Structures
 
@@ -285,7 +284,7 @@ Conditions in `if` statements are expressions that evaluate to true or false.
 What expressions evaluates to true?
 
 - all numbers (including `0`) are true
-- all strings (including `''` -- the empty string) are true
+- all Strings (including `''` -- the empty String) are true
 - `nil` (yep, that's a null) is false
 - the boolean literal `true` is true
 - the boolean literal `false` is false
@@ -324,7 +323,7 @@ irb> :a.equal?(:a)
 => true
 ~~~
 
-Back to ur `if`. Instead of:
+Back to our `if`. Instead of:
 
 ~~~ruby
 if !condition
@@ -564,7 +563,7 @@ irb> a
 ~~~
 
 Any object can be a value in a Hash. Any object can be a key in a Hash.  In the
-above example, all keys were strings. Consider this example with symbols as
+above example, all keys were Strings. Consider this example with symbols as
 keys:
 
 ~~~none
