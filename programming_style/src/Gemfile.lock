@@ -2,6 +2,7 @@ GEM
   remote: https://rubygems.org/
   specs:
     ast (2.4.2)
+    language_server-protocol (3.16.0.3)
     parallel (1.21.0)
     parser (3.1.0.0)
       ast (~> 2.4.1)
@@ -19,7 +20,14 @@ GEM
       unicode-display_width (>= 1.4.0, < 3.0)
     rubocop-ast (1.15.1)
       parser (>= 3.0.1.1)
+    rubocop-lsp (0.1.6)
+      language_server-protocol (>= 3.16)
+      rubocop (>= 1.0)
     ruby-progressbar (1.11.0)
+    sorbet (0.5.9613)
+      sorbet-static (= 0.5.9613)
+    sorbet-runtime (0.5.9613)
+    sorbet-static (0.5.9613-universal-darwin-21)
     unicode-display_width (2.1.0)
 
 PLATFORMS
@@ -27,6 +35,9 @@ PLATFORMS
 
 DEPENDENCIES
   rubocop
+  rubocop-lsp
+  sorbet
+  sorbet-runtime
 
 BUNDLED WITH
    2.3.4

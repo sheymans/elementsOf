@@ -43,6 +43,29 @@ skillful developer to apply?
 
 # Expression
 
+## Say what you mean, simply and directly
+
+Let's start by looking at the following program:
+
+~~~ruby
+    sig { params(x: Integer, y: Integer, z: Integer).returns(Integer)}
+    def self.f(x, y, z)
+        if x <= y
+            if x <= z
+                return x
+            end
+            return z
+        end
+        if y <= z
+            return y
+        end
+        z
+    end
+~~~
+
+todo: mention sorbet
+todo: mention that original uses `GO TO`
+
 # Control Structure
 
 # Program Structure
