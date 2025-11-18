@@ -1,0 +1,1354 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Stijn Heymans" />
+  <meta name="dcterms.date" content="2021-12-17" />
+  <title>Elements of Ruby</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <link rel="stylesheet" href="../elements_of.css" />
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Elements of Ruby</h1>
+<p class="author">Stijn Heymans</p>
+<p class="date">17 December 2021</p>
+</header>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#introduction" id="toc-introduction">Introduction</a></li>
+<li><a href="#getting-started" id="toc-getting-started">Getting
+Started</a></li>
+<li><a href="#the-basic-classes" id="toc-the-basic-classes">The Basic
+Classes</a>
+<ul>
+<li><a href="#numbers" id="toc-numbers">Numbers</a></li>
+<li><a href="#strings" id="toc-strings">Strings</a></li>
+<li><a href="#symbols" id="toc-symbols">Symbols</a></li>
+<li><a href="#booleans" id="toc-booleans">Booleans</a></li>
+</ul></li>
+<li><a href="#variables" id="toc-variables">Variables</a></li>
+<li><a href="#control-structures" id="toc-control-structures">Control
+Structures</a>
+<ul>
+<li><a href="#conditions-and-if" id="toc-conditions-and-if">Conditions
+and <code>if</code></a></li>
+<li><a href="#looping" id="toc-looping">Looping</a></li>
+</ul></li>
+<li><a href="#collections" id="toc-collections">Collections</a>
+<ul>
+<li><a href="#arrays" id="toc-arrays">Arrays</a></li>
+<li><a href="#hashes" id="toc-hashes">Hashes</a></li>
+<li><a href="#looping-through-arrays-and-hashes"
+id="toc-looping-through-arrays-and-hashes">Looping through Arrays and
+Hashes</a></li>
+</ul></li>
+<li><a href="#functions" id="toc-functions">Functions</a></li>
+<li><a href="#classes-and-methods" id="toc-classes-and-methods">Classes
+and Methods</a>
+<ul>
+<li><a href="#defining-classes" id="toc-defining-classes">Defining
+classes</a></li>
+<li><a href="#getters-and-setters-and-bouviers"
+id="toc-getters-and-setters-and-bouviers">Getters and Setters and
+Bouviers</a></li>
+<li><a href="#equality" id="toc-equality">Equality</a></li>
+<li><a href="#class-methods-and-variables"
+id="toc-class-methods-and-variables">Class Methods and
+Variables</a></li>
+<li><a href="#inheritance" id="toc-inheritance">Inheritance</a></li>
+</ul></li>
+<li><a href="#modules" id="toc-modules">Modules</a>
+<ul>
+<li><a href="#as-namespaces" id="toc-as-namespaces">As
+Namespaces</a></li>
+<li><a href="#as-mixins" id="toc-as-mixins">As Mixins</a></li>
+</ul></li>
+<li><a href="#testing" id="toc-testing">Testing</a></li>
+<li><a href="#blocks" id="toc-blocks">Blocks</a></li>
+</ul>
+</nav>
+<h1 id="introduction">Introduction</h1>
+<p>I will introduce you to the elements of programming in <a
+href="https://www.ruby-lang.org">Ruby</a>. I will assume you can program
+in some other language such as Java, <a
+href="http://www.stijnheymans.net/elements_of_perl.html">Perl</a>,
+Python, Go, …</p>
+<p>Background sources that were helpful to me:</p>
+<ul>
+<li><p><a href="https://poignant.guide/">Why’s (Poignant) Guide to
+Ruby</a> by <em>why the lucky stiff</em>. More art project than
+programming book, but a beginner’s resource that gives an elemental
+overview of the language <em>with</em> intuition of the Ruby language.
+If you have read that book, you can stop reading this article. There’s
+nothing here for you.</p></li>
+<li><p><a
+href="https://www.goodreads.com/book/show/9364729-eloquent-ruby">Eloquent
+Ruby</a> by Russ Olsen. A bit more advanced than <em>Why’s (Poignant)
+Guide to Ruby</em>. The book ventures into meta-programming with Ruby.
+To see what sets Ruby apart, I recommend this book.</p></li>
+</ul>
+<p>In this article, I will follow a structure that is loosely inspired
+by the structure of <a
+href="https://www.goodreads.com/book/show/27015358-introducing-go">Introducing
+Go</a> by Caleb Doxsey. Not a Ruby book, but a Go book. It’s a
+<em>short</em> book on Go that manages to bring the basics across.
+Something I aspire to in this article for Ruby.</p>
+<h1 id="getting-started">Getting Started</h1>
+<p>On the command-line, check whether Ruby is installed:</p>
+<pre class="shell"><code>$ ruby --version</code></pre>
+<p>For me, this shows
+<code>ruby 2.6.3p62 (2019-04-16 revision 67580) [universal.x86_64-darwin20]</code>).
+If you don’t have Ruby installed, get it at <a
+href="https://www.ruby-lang.org/en/downloads/">the ruby-lang
+website</a>.</p>
+<p>If you have Ruby installed, you also have an interactive interpreter
+called <a href="https://github.com/ruby/irb">irb</a>. On the
+command-line, type <code>irb</code>.</p>
+<pre class="none"><code>irb&gt; puts &#39;Hello World!&#39;
+Hello World!
+=&gt; nil</code></pre>
+<p>Leave the interactive interpreter <code>irb</code> by typing
+<code>exit</code>. Now say <code>Hello World!</code> again, but without
+<code>irb</code>. Open a file (make it end on <code>rb</code>, for
+example <code>ruby_playground.rb</code>) and write the following line in
+it:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">puts</span> <span class="vs">&#39;Hello World!&#39;</span></span></code></pre></div>
+<p>Close the file and at the command-line have Ruby interpret it:</p>
+<pre class="none"><code>$ ruby ruby_playground.rb
+Hello World!</code></pre>
+<p>Do you want to know more about <code>puts</code>? Get in the habit of
+using the <a href="https://docs.ruby-lang.org/en/">official docs</a>.
+Pick the right version of the docs corresponding to what you saw in your
+initial <code>ruby --version</code>. I picked <code>2.6.0</code> as my
+Ruby version is <code>2.6.3</code> and found this <a
+href="https://docs.ruby-lang.org/en/2.6.0/ARGF.html#method-i-puts">explanation</a>.</p>
+<h1 id="the-basic-classes">The Basic Classes</h1>
+<h2 id="numbers">Numbers</h2>
+<p>Unsurprisingly, integers are represented as <code>3</code>,
+<code>5</code>, <code>-100</code>, … Surprisingly, everything in Ruby is
+an object so you can ask the class of an integer: <code>5.class</code>.
+This returns <a
+href="https://docs.ruby-lang.org/en/2.6.0/Integer.html">Integer</a>.</p>
+<p>Since integers are objects there’s more fun stuff one can ask
+them:</p>
+<pre class="none"><code>irb&gt; 123.digits
+=&gt; [3, 2, 1]</code></pre>
+<p>Fans of coding interviews will appreciate this.</p>
+<p>Simple math still works despite rumors:</p>
+<pre class="none"><code>irb&gt; 1 + 2
+=&gt; 3
+irb&gt; 2 * 3
+=&gt; 6
+irb&gt; 8 / 4
+=&gt; 2</code></pre>
+<p>Real but inexact numbers are of type <a
+href="https://docs.ruby-lang.org/en/2.6.0/Float.html">Float</a>. In its
+literal representation, it’s <em>things</em> that contain a decimal
+point:<code>1.0</code>, <code>9.9999</code>, …</p>
+<pre class="none"><code>irb&gt; 1.0.class
+=&gt; Float</code></pre>
+<p>First encounters are frequently unpleasant:</p>
+<pre class="none"><code>irb&gt; 7 / 2
+=&gt; 3</code></pre>
+<p>Dividing 2 integers results in integer division. Force one to be a
+<code>Float</code> using <code>to_f</code>:</p>
+<pre class="none"><code>irb&gt; 7.to_f / 2
+=&gt; 3.5</code></pre>
+<h2 id="strings">Strings</h2>
+<p>String are sequences of characters surrounded by single or double
+quotes: <code>'Hello'</code> or <code>"Hello"</code>. The double-quoted
+variety is special. More later. Be patient.</p>
+<p>Use <code>+</code> to concatenate 2 Strings without changing the
+original Strings. Use <code>&lt;&lt;</code> to concatenate and destroy
+the String you’re appending to:</p>
+<pre class="none"><code>irb&gt; a = &quot;hello&quot;
+=&gt; &quot;hello&quot;
+irb&gt; b = &quot;world&quot;
+=&gt; &quot;world&quot;
+irb&gt; a + b
+=&gt; &quot;helloworld&quot;
+irb&gt; a
+=&gt; &quot;hello&quot;
+irb&gt; b
+=&gt; &quot;world&quot;
+irb&gt; a &lt;&lt; b
+=&gt; &quot;helloworld&quot;
+irb&gt; a
+=&gt; &quot;helloworld&quot;
+irb&gt; b
+=&gt; &quot;world&quot;</code></pre>
+<p>Pull characters out of a String:</p>
+<pre class="none"><code>irb&gt; a = &quot;hello&quot;
+=&gt; &quot;hello&quot;
+irb&gt; a[0]
+=&gt; &quot;h&quot;
+irb&gt; a[-1]
+=&gt; &quot;o&quot;</code></pre>
+<p>Get substrings by using inclusive (<code>..</code>) or exclusive
+(<code>...</code>) ranges:</p>
+<pre class="none"><code>irb&gt; a = &quot;hello&quot;
+=&gt; &quot;hello&quot;
+irb&gt; a[0..2]
+=&gt; &quot;hel&quot;
+irb&gt; a[0...2]
+=&gt; &quot;he&quot;</code></pre>
+<h2 id="symbols">Symbols</h2>
+<p>Symbols consist of letters, digits, or underscores, and are preceded
+by a <code>:</code> . For example, <code>:a</code>, <code>:a_2</code>,
+<code>:an_orange</code>. Why not just use Strings? <a
+href="https://stackoverflow.com/questions/255078/whats-the-difference-between-a-string-and-a-symbol-in-ruby">Great
+question</a>.</p>
+<p>Explore how Strings are different from symbols by asking for their
+<code>object_id</code>:</p>
+<pre class="none"><code>irb&gt; &quot;bar&quot;.object_id
+=&gt; 70236502854760
+irb&gt; &quot;bar&quot;.object_id
+=&gt; 70236502887440
+irb&gt; :foo.object_id
+=&gt; 1516508
+irb&gt; :foo.object_id
+=&gt; 1516508</code></pre>
+<p>From that <code>irb</code> session, note that</p>
+<ul>
+<li>every object has a method <code>object_id</code> that returns
+<em>some</em> id.</li>
+<li>Strings that appear the same do not necessarily have the same
+<code>object_id</code>, which <em>probably</em> has memory
+consequences</li>
+<li>symbols that appear the same have the same <code>object_id</code>,
+which <em>probably</em> has memory consequences</li>
+</ul>
+<h2 id="booleans">Booleans</h2>
+<p><code>true</code> and <code>false</code> <span
+class="math inline">▫</span></p>
+<h1 id="variables">Variables</h1>
+<p>Like symbols, variables consist of letters, digits, or underscores.
+Unlike symbols, they do not start with colons. You initialize them:</p>
+<pre class="none"><code>irb&gt; x = &#39;hello&#39;
+=&gt; &quot;hello&quot;
+irb&gt; x = 5
+=&gt; 5
+irb&gt; x = true
+=&gt; true</code></pre>
+<p>I assigned and re-assigned that <code>x</code> to my heart’s content
+with different values <em>and</em> different types.</p>
+<p>You feel resistance. “But this is insane,” you say. You do not like
+it and you want the world to know it. You take the matter to twitter,
+but twitter does not care.</p>
+<p>Single and double quotes are different:</p>
+<pre class="none"><code>irb&gt; x = 2
+=&gt; 2
+irb&gt; &quot;we were #{x}&quot;
+=&gt; &quot;we were 2&quot;
+irb&gt; &#39;we were #{x}&#39;
+=&gt; &quot;we were \#{x}&quot;</code></pre>
+<p><a href="https://en.wikipedia.org/wiki/String_interpolation">String
+interpolation</a> yes.</p>
+<p>And sometimes, variables are not variable:</p>
+<pre class="none"><code>irb&gt; X = 5
+=&gt; 5
+irb&gt; X = 6
+(irb):5: warning: already initialized constant X</code></pre>
+<p>Capitalize a variable and it becomes <em>constant</em>.</p>
+<p>A word on camels and snakes when naming in Ruby. Use snake case
+almost everywhere:
+<code>lowercase_words_separated_by_underscores</code>. Except
+<code>ClassNames</code> and <code>ModuleNames</code>, go for camel case
+there. Later more on classes and modules.</p>
+<h1 id="control-structures">Control Structures</h1>
+<h2 id="conditions-and-if">Conditions and <code>if</code></h2>
+<p>The basic <code>if</code>:</p>
+<div class="sourceCode" id="cb17"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> condition</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  do_something</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
+<p>No parentheses or curly brackets for the condition. No colon after
+the condition. <code>end</code> to end.</p>
+<p><code>else if</code> and <code>else</code>:</p>
+<div class="sourceCode" id="cb18"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> condition</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  do_something</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="cf">elsif</span> other_condition</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>  do_something_else</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>  final_thing_you_can_do</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
+<p>Conditions in <code>if</code> statements are expressions that
+evaluate to true or false. What expressions evaluates to true?</p>
+<ul>
+<li>all numbers (including <code>0</code>) are true</li>
+<li>all Strings (including <code>''</code> – the empty String) are
+true</li>
+<li><code>nil</code> (yep, that’s a null) is false</li>
+<li>the boolean literal <code>true</code> is true</li>
+<li>the boolean literal <code>false</code> is false</li>
+<li>the boolean expression <code>a &amp;&amp; b</code> is true if
+<code>a</code> and <code>b</code> are true</li>
+<li>the boolean expression <code>a || b</code> is true if <code>a</code>
+or <code>b</code> are true</li>
+<li>the boolean expression <code>!a</code> is true if a is not true</li>
+</ul>
+<p>Conditions often compare things: if variable <code>a</code> is equal
+to <code>"dog"</code>, then do this. Ruby has <code>==</code>,
+<code>===</code>, <code>equal?</code>, and <code>eql?</code>. You will
+mostly use:</p>
+<ul>
+<li><code>==</code> for checking whether values are equal as far as the
+class designer of the objects you’re comparing is concerned.</li>
+<li><code>equal?</code> for checking object equality.</li>
+</ul>
+<p>In fact, <code>equal?</code> and <code>==</code> as defined in the <a
+href="https://ruby-doc.org/core-3.0.2/Object.html#method-i-eql-3F"><code>Object</code></a>
+class are equal. <em>But how are they equal? How?</em></p>
+<p>Class designers can override <code>==</code> to something that makes
+sense for the class. <code>equal?</code> should stand for object
+equality. Take the <code>String</code> class:</p>
+<pre class="none"><code>irb&gt; &quot;a&quot; == &quot;a&quot;
+=&gt; true
+irb&gt; &quot;a&quot;.equal?(&quot;a&quot;)
+=&gt; false</code></pre>
+<p>So <code>"a"</code> is equal to <code>"a"</code> as values, but, as
+we saw before, they’re not the same objects. However, for symbols:</p>
+<pre class="none"><code>irb&gt; :a == :a
+=&gt; true
+irb&gt; :a.equal?(:a)
+=&gt; true</code></pre>
+<p>Back to our <code>if</code>. Instead of:</p>
+<div class="sourceCode" id="cb21"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span><span class="kw"> !</span>condition</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  do_something</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
+<p>write:</p>
+<div class="sourceCode" id="cb22"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="cf">unless</span> condition</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  do_something</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
+<p>Furthermore, if <code>do_something</code> is just one line, Ruby devs
+often prefer a one-liner:</p>
+<div class="sourceCode" id="cb23"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>do_something <span class="cf">if</span> condition</span></code></pre></div>
+<p>or</p>
+<div class="sourceCode" id="cb24"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>do_something <span class="cf">unless</span> condition</span></code></pre></div>
+<p>Especially when returning early from functions, this makes code
+readable:</p>
+<div class="sourceCode" id="cb25"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="cf">return</span> <span class="cf">if</span> invalid_parameters</span></code></pre></div>
+<h2 id="looping">Looping</h2>
+<p>Take a look at a relatively standard loop-pattern in programming. For
+example, this <code>go</code> loop:</p>
+<div class="sourceCode" id="cb26"><pre
+class="sourceCode go"><code class="sourceCode go"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>n <span class="op">:=</span> <span class="dv">5</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="kw">for</span> i <span class="op">:=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> n<span class="op">;</span> i<span class="op">++</span> <span class="op">{</span></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  fmt<span class="op">.</span>Println<span class="op">(</span>i<span class="op">)</span></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>This prints:</p>
+<pre class="none"><code>0
+1
+2
+3
+4</code></pre>
+<p>There’s a variety of ways to write this in Ruby, but the above
+<code>for</code> construct is not one of them. Closest in spirit to the
+original is to use a <code>while</code>:</p>
+<div class="sourceCode" id="cb28"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>n <span class="kw">=</span> <span class="dv">5</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>i <span class="kw">=</span> <span class="dv">0</span></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> i <span class="kw">&lt;</span> n</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">puts</span> i</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>  i <span class="kw">+=</span> <span class="dv">1</span></span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
+<p>This is more verbose than the corresponding <code>for</code> loop in
+<code>go</code>. More idiomatic Ruby uses <a
+href="https://docs.ruby-lang.org/en/2.6.0/Integer.html#method-i-times"><code>times</code></a>:</p>
+<div class="sourceCode" id="cb29"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>n<span class="at">.times</span> <span class="kw">{</span> <span class="kw">|</span>i<span class="kw">|</span> <span class="fu">puts</span> i <span class="kw">}</span></span></code></pre></div>
+<p>More elegant than the clunky <code>while</code>. Deconstruct this
+expression:</p>
+<ul>
+<li><p><code>n</code>. An <code>Integer</code>, and thus an object that
+has methods.</p></li>
+<li><p><code>times</code>. A <a
+href="https://docs.ruby-lang.org/en/2.6.0/Integer.html#method-i-times">method</a>
+that is called on the object <code>n</code> and <em>iterates</em> the
+following block <code>{ |i|   puts i}</code> from <code>0</code> to
+<code>n - 1</code>, passing in those values to <code>i</code> with each
+iteration. More on blocks later, but for those familiar, the block is
+essentially an anonymous function or lambda with parameter
+<code>i</code> (or arrow function for the Javascript
+knowledgeables).</p></li>
+<li><p><code>{ |i| puts i }</code>. We spoiled it. This is a
+<code>block</code> that prints <code>i</code> with <code>i</code>
+ranging over values <code>0</code> to <code>n - 1</code>. This
+<em>ranging over values</em> is accomplished by <code>times</code>.
+We’ll see later how we can write functions such as <code>times</code>
+ourselves in the section on Blocks. For now, you can see
+<code>times</code> as an higher-order function that takes another
+function as an argument.</p></li>
+</ul>
+<p>Most of the time your looping will be in the context of some
+collection so I’ll talk more about looping then.</p>
+<h1 id="collections">Collections</h1>
+<h2 id="arrays">Arrays</h2>
+<p>An array is an <a
+href="https://docs.ruby-lang.org/en/2.6.0/Array.html">ordered
+integer-indexed collection</a> of objects. Initialize an array:</p>
+<pre class="none"><code>irb&gt; a = [&quot;x&quot;, 1, :y]
+=&gt; [&quot;x&quot;, 1, :y]</code></pre>
+<p>Arrays are not restricted to contain only 1 type of object. You can
+shove in there what you fancy:</p>
+<pre class="none"><code>irb&gt; a = [&quot;x&quot;, [1, 2], :y]
+=&gt; [&quot;x&quot;, [1, 2], :y]</code></pre>
+<p>The usual suspects with a special mention for <code>-1</code> (the
+last of the elements):</p>
+<pre class="none"><code>irb&gt; a = [&quot;x&quot;, [1, 2], :y]
+=&gt; [&quot;x&quot;, [1, 2], :y]
+irb&gt; a.length
+=&gt; 3
+irb&gt; a[1]
+=&gt; [1, 2]
+irb&gt; a[-1]
+=&gt; :y</code></pre>
+<p>Add elements to the back of an array using <code>&lt;&lt;</code> or
+<code>push</code>. Both are destructive operations:</p>
+<pre class="none"><code>irb&gt; a &lt;&lt; :b
+=&gt; [&quot;x&quot;, [1, 2], :y, :b]
+irb&gt; a.push(:c)
+=&gt; [&quot;x&quot;, [1, 2], :y, :b, :c]
+irb&gt; a
+=&gt; [&quot;x&quot;, [1, 2], :y, :b, :c]</code></pre>
+<p>Remove that last element with <code>pop</code>:</p>
+<pre class="none"><code>irb&gt; l = a.pop
+=&gt; :c
+irb&gt; a
+=&gt; [&quot;x&quot;, [1, 2], :y, :b]</code></pre>
+<p>What about adding and removing to the <em>front</em> of an array? Use
+<code>unshift</code> and <code>shift</code>. As far as unsavory
+mnemonics go, remove the <code>f</code> to remember which does what.</p>
+<pre class="none"><code>irb&gt; a
+=&gt; [&quot;x&quot;, [1, 2], :y, :b]
+irb&gt; f = a.shift
+=&gt; &quot;x&quot;
+irb&gt; a
+=&gt; [[1, 2], :y, :b]
+irb&gt; a.unshift(&quot;x_new&quot;)
+=&gt; [&quot;x_new&quot;, [1, 2], :y, :b]</code></pre>
+<p><code>pop/push</code> must be more efficient than
+<code>shift/unshift</code>? Seems it <a
+href="https://stackoverflow.com/questions/8353026/what-is-the-run-time-of-shift-unshift-in-a-ruby-array">hardly
+matters</a>.</p>
+<p>What if you have a second array <code>b = [:b1, :b2]</code> that you
+want to append (i.e., add each element) to array <code>a</code>?
+<code>push</code> does not do what you want:</p>
+<pre class="none"><code>irb&gt; a = [&quot;x&quot;, [1, 2], :y]
+=&gt; [&quot;x&quot;, [1, 2], :y]
+irb&gt; b = [:b1, :b2]
+=&gt; [:b1, :b2]
+irb&gt; a.push(b)
+=&gt; [&quot;x&quot;, [1, 2], :y, [:b1, :b2]]</code></pre>
+<p>However, using the <em>splat</em> operator <code>*</code> will:</p>
+<pre class="none"><code>irb&gt; b = [:b1, :b2]
+=&gt; [:b1, :b2]
+irb&gt; a.push(*b)
+=&gt; [&quot;x&quot;, [1, 2], :y, :b1, :b2]</code></pre>
+<p><code>*b</code> for an array <code>b</code> in the context of a
+function call (<code>push</code> here) sends each element of the array
+<code>b</code> as an individual argument to the function. Thus,
+<code>a.push(*b)</code> is the same as
+<code>a.push(:b1, :b2)</code>.</p>
+<p>I initialized arrays using their literal form (such as
+<code>a = [1, 2]</code>). I can also initialize them using the
+<code>new</code> method from the <a
+href="https://docs.ruby-lang.org/en/2.6.0/Array.html">Array</a>
+class:</p>
+<pre class="none"><code>irb&gt; a = Array.new
+=&gt; []
+irb&gt; a &lt;&lt; 1
+=&gt; [1]</code></pre>
+<h2 id="hashes">Hashes</h2>
+<p><a href="https://docs.ruby-lang.org/en/2.6.0/Hash.html">Hashes</a>
+store key-value pairs with unique keys (also called dictionaries,
+associative arrays, or maps in other languages). Any object can be a
+key.</p>
+<p>Define a hash that stores a first and last name, get a value for an
+existing/non-existing key, change a value for an existing key, add a
+value for a non-existing key, and remove a key/value pair:</p>
+<pre class="none"><code>irb&gt; a = { &quot;first&quot; =&gt; &quot;John&quot;, &quot;last&quot; =&gt; &quot;Doe&quot; }
+=&gt; {&quot;first&quot;=&gt;&quot;John&quot;, &quot;last&quot;=&gt;&quot;Doe&quot;}
+irb&gt; a[&quot;first&quot;]
+=&gt; &quot;John&quot;
+irb&gt; a[&quot;nothere&quot;]
+=&gt; nil
+irb&gt; a[&quot;first&quot;] = &quot;Jane&quot;
+=&gt; &quot;Jane&quot;
+irb&gt; a
+=&gt; {&quot;first&quot;=&gt;&quot;Jane&quot;, &quot;last&quot;=&gt;&quot;Doe&quot;}
+irb&gt; a[&quot;first&quot;]
+=&gt; &quot;Jane&quot;
+irb&gt; a[&quot;nothere&quot;] = &quot;now it is here&quot;
+=&gt; &quot;now it is here&quot;
+irb&gt; a
+=&gt; {&quot;first&quot;=&gt;&quot;Jane&quot;, &quot;last&quot;=&gt;&quot;Doe&quot;, &quot;nothere&quot;=&gt;&quot;now it is here&quot;}
+irb&gt; a.delete(&quot;nothere&quot;)
+=&gt; &quot;now it is here&quot;
+irb&gt; a
+=&gt; {&quot;first&quot;=&gt;&quot;Jane&quot;, &quot;last&quot;=&gt;&quot;Doe&quot;}</code></pre>
+<p>Any object can be a value in a Hash. Any object can be a key in a
+Hash. In the above example, all keys were Strings. Consider this example
+with symbols as keys:</p>
+<pre class="none"><code>irb&gt; a = { :first =&gt; &quot;John&quot;, :last =&gt; &quot;Doe&quot; }
+=&gt; {:first=&gt;&quot;John&quot;, :last=&gt;&quot;Doe&quot;}
+irb&gt; a[:first]
+=&gt; &quot;John&quot;</code></pre>
+<p>The example used symbols <code>:first</code> and <code>:last</code>
+as keys. If you use symbols as keys, you can party as wild as JSON on a
+Friday night:</p>
+<pre class="none"><code>irb&gt; a = { first: &quot;John&quot;, last: &quot;Doe&quot; }
+=&gt; {:first=&gt;&quot;John&quot;, :last=&gt;&quot;Doe&quot;}</code></pre>
+<p>I said you can use any object as a hash key. This relies on properly
+overriding <code>hash</code> and <code>eql?</code> (the latter is what
+<a href="https://docs.ruby-lang.org/en/2.6.0/Hash.html">Hash</a> uses
+for testing equality of keys. <a
+href="https://docs.ruby-lang.org/en/2.6.0/Hash.html#class-Hash-label-Hash+Keys">Two
+objects will then refer to the same key when their <code>hash</code>
+value is identical and the 2 objects <code>eql?</code> each
+other</a>.</p>
+<p>Elemental? Probably not. Moving on.</p>
+<h2 id="looping-through-arrays-and-hashes">Looping through Arrays and
+Hashes</h2>
+<p>You will spend half of your life looping through arrays and hashes.
+Given an array:</p>
+<pre class="none"><code>a = [100, 200, 300]</code></pre>
+<p>Print each element:</p>
+<pre class="none"><code>a.each { |el| puts el }</code></pre>
+<p>No <code>for</code> in sight. Use <code>each</code> when you can.
+<code>each</code> iterates through the elements of the array and binds
+each of those elements to <em>el</em> in the block
+<code>{ |el| puts el }</code>, and then executes the
+<code>puts el</code>. If you need more than a one-liner, do use
+<code>do...end</code>:</p>
+<div class="sourceCode" id="cb44"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>a<span class="at">.each</span> <span class="cf">do</span> <span class="kw">|</span>el<span class="kw">|</span></span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">puts</span> el</span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">puts</span> el</span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
+<p>Sometimes you want the index as well as the element (mostly in
+interviews, in real life not so much). So similar to the trickery we saw
+before you could do:</p>
+<div class="sourceCode" id="cb45"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>a<span class="at">.length.times</span> <span class="kw">{</span> <span class="kw">|</span>i<span class="kw">|</span> <span class="fu">puts</span> a<span class="kw">[</span>i<span class="kw">]</span> <span class="kw">}</span></span></code></pre></div>
+<p>However, the thought police favors <code>each_with_index</code>:</p>
+<pre class="none"><code>irb&gt; a.each_with_index { |el, i| puts &quot;#{i}: #{el}&quot; }
+0: 100
+1: 200
+2: 300</code></pre>
+<p>Get those <a href="https://apps.ankiweb.net/">Anki flashcards</a> out
+to memorize the order of <code>|el, i|</code>. You did not ask for it,
+but here’s a tip: in Ruby, it often works to ask “how would I say this
+out loud?”.</p>
+<p>!!! In the array <code>a</code>, for <em>each</em> <code>el</code> at
+index <code>i</code>, do something.</p>
+<p>If your intuition is <em>for each index <code>i</code> which has
+element <code>el</code></em>, change your intuition.</p>
+<p>You can loop over a hash with <code>each</code>:</p>
+<pre class="none"><code>irb&gt; a = { first: &quot;John&quot;, last: &quot;Doe&quot; }
+=&gt; {:first=&gt;&quot;John&quot;, :last=&gt;&quot;Doe&quot;}
+irb&gt; a.each { |key, value|  puts &quot;#{key} -&gt; #{value}&quot; }
+first -&gt; John
+last -&gt; Doe</code></pre>
+<p>Sometimes you only want to loop through the keys or values of a hash.
+You can use <code>keys</code> and <code>values</code>:</p>
+<pre class="none"><code>irb&gt; a.keys
+=&gt; [:first, :last]
+irb&gt; a.values
+=&gt; [&quot;John&quot;, &quot;Doe&quot;]</code></pre>
+<p>In contrast to hashes in other languages (e.g. <code>HashMap</code>
+in Java), you <em>can</em> assume an order on key-value pairs. They will
+be in the order they were inserted:</p>
+<pre class="none"><code>irb&gt; a = {}
+=&gt; {}
+irb&gt; a[&quot;first&quot;] = 1
+=&gt; 1
+irb&gt; a[&quot;second&quot;] = 2
+=&gt; 2
+irb&gt; a.each { |key, value|  puts &quot;#{key} -&gt; #{value}&quot; }
+first -&gt; 1
+second -&gt; 2</code></pre>
+<p>Sometimes you can benefit from going one abstraction higher than pure
+looping, and use a <a
+href="https://docs.ruby-lang.org/en/2.6.0/Array.html#method-i-map"><code>map</code></a>:</p>
+<pre class="none"><code>irb&gt; a = [1, 2, 3]
+=&gt; [1, 2, 3]
+irb&gt; b = a.map { |x| x * 2 }
+=&gt; [2, 4, 6]
+irb&gt; a
+=&gt; [1, 2, 3]</code></pre>
+<p>If you do not want a new array, you can use the <a
+href="https://docs.ruby-lang.org/en/2.6.0/Array.html#method-i-map-21">destructive
+variant <code>map!</code></a>:</p>
+<pre class="none"><code>irb&gt; a.map! { |x| x * 2 }
+=&gt; [2, 4, 6]
+irb&gt; a
+=&gt; [2, 4, 6]</code></pre>
+<p>The convention in Ruby is to append <code>!</code> to function names
+if those functions are destructive. The exclamation mark is a regular
+part of the function name.</p>
+<p>We can also map hashes. For example, collect all keys of a map, but
+uppercased:</p>
+<pre class="none"><code>irb&gt; a = { first: &quot;John&quot;, last: &quot;Doe&quot; }
+=&gt; {:first=&gt;&quot;John&quot;, :last=&gt;&quot;Doe&quot;}
+irb&gt; a.map { |key, value| key.upcase }
+=&gt; [:FIRST, :LAST]</code></pre>
+<p>What if you want to map a <code>Hash</code> to a <code>Hash</code>,
+and you want to keep the keys but uppercase the values?</p>
+<pre class="none"><code>irb&gt; a.map { |key, value| [key, value.upcase] }.to_h
+=&gt; {:first=&gt;&quot;JOHN&quot;, :last=&gt;&quot;DOE&quot;}</code></pre>
+<p>The <code>map</code> returns an array of
+<code>[key, value.upcase]</code> arrays. So I use <code>to_h</code> to
+convert that array to a hash. Generally:</p>
+<pre class="none"><code>irb&gt; [[1, 2], [3, 4]].to_h
+=&gt; {1=&gt;2, 3=&gt;4}</code></pre>
+<p>This is no longer elemental.</p>
+<h1 id="functions">Functions</h1>
+<p>Functions (or <em>methods</em>, when appearing in classes) have this
+shape:</p>
+<div class="sourceCode" id="cb55"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="cf">def</span> function_name(arg1, arg2,<span class="kw">...</span>)</span>
+<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># do stuff</span></span>
+<span id="cb55-3"><a href="#cb55-3" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
+<p>Functions start with <code>def</code> and end with <code>end</code>.
+A function that doubles every element in an array <code>a</code>:</p>
+<div class="sourceCode" id="cb56"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="cf">def</span> double_all(a)</span>
+<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a>  a<span class="at">.map</span> <span class="kw">{</span> <span class="kw">|</span>x<span class="kw">|</span> x <span class="kw">*</span> <span class="dv">2</span> <span class="kw">}</span></span>
+<span id="cb56-3"><a href="#cb56-3" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
+<p>“Oh no,” you say. “They forgot to type the arguments.” Yes. That
+<code>a</code> can be anything as long as it understands
+<code>map</code>.</p>
+<p>Call <code>double_all</code>:</p>
+<pre class="none"><code>irb&gt; a = [1, 2, 3]
+irb&gt; puts double_all(a)
+2
+4
+6</code></pre>
+<p>If you miss types, or you work in a large code base with many
+developers and you prefer sanity over insanity, check out <a
+href="https://sorbet.org/">sorbet</a>. Sorbet allows you to annotate
+functions with type information. For example, add a signature to
+<code>double_all</code> with the sorbet <code>sig</code> annotation:</p>
+<div class="sourceCode" id="cb58"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a>sig <span class="kw">{</span> params(<span class="wa">a: </span>T<span class="kw">::</span><span class="dt">Array</span><span class="kw">[</span><span class="dt">Integer</span><span class="kw">]</span>)<span class="at">.returns</span>(T<span class="kw">::</span><span class="dt">Array</span><span class="kw">[</span><span class="dt">Integer</span><span class="kw">]</span>) <span class="kw">}</span></span>
+<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a><span class="cf">def</span> double_all(a)</span>
+<span id="cb58-3"><a href="#cb58-3" aria-hidden="true" tabindex="-1"></a>  a<span class="at">.map</span> <span class="kw">{</span> <span class="kw">|</span>x<span class="kw">|</span> x <span class="kw">*</span> <span class="dv">2</span> <span class="kw">}</span></span>
+<span id="cb58-4"><a href="#cb58-4" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
+<p>This indicates that <code>double_all</code> takes in an array of
+integers <code>a</code> and returns an array of integers.</p>
+<p>You can have defaults for your arguments:</p>
+<div class="sourceCode" id="cb59"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a><span class="cf">def</span> double_all(a <span class="kw">=</span> <span class="kw">[</span><span class="dv">1</span>, <span class="dv">2</span><span class="kw">]</span>)</span>
+<span id="cb59-2"><a href="#cb59-2" aria-hidden="true" tabindex="-1"></a>  a<span class="at">.map</span> <span class="kw">{</span> <span class="kw">|</span>x<span class="kw">|</span> x <span class="kw">*</span> <span class="dv">2</span> <span class="kw">}</span></span>
+<span id="cb59-3"><a href="#cb59-3" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
+<p>After which, you can leave off the argument to
+<code>double_all</code>:</p>
+<pre class="none"><code>irb&gt; puts double_all
+2
+4</code></pre>
+<p>A function with a <code>Hash</code> as an argument:</p>
+<div class="sourceCode" id="cb61"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a><span class="cf">def</span> hash_keys(h)</span>
+<span id="cb61-2"><a href="#cb61-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">puts</span> <span class="st">&quot;a: </span><span class="sc">#{</span>h<span class="kw">[</span><span class="wa">:a</span><span class="kw">]</span><span class="sc">}</span><span class="st">&quot;</span></span>
+<span id="cb61-3"><a href="#cb61-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">puts</span> <span class="st">&quot;b: </span><span class="sc">#{</span>h<span class="kw">[</span><span class="wa">:b</span><span class="kw">]</span><span class="sc">}</span><span class="st">&quot;</span></span>
+<span id="cb61-4"><a href="#cb61-4" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
+<p>And then:</p>
+<pre class="none"><code>irb&gt; puts hash_keys({ a: 1, b: 2 })
+a: 1
+b: 2</code></pre>
+<p>If a <code>Hash</code> is the last argument of the function call, you
+can leave off the curly braces:</p>
+<pre class="none"><code>irb&gt; puts hash_keys(a: 1, b: 2)
+a: 1
+b: 2</code></pre>
+<p>That reminds of <em>keyword arguments</em>. Indeed, you can now
+change the calling order:</p>
+<pre class="none"><code>irb&gt; puts hash_keys(b: 2, a: 1)
+a: 1
+b: 2</code></pre>
+<h1 id="classes-and-methods">Classes and Methods</h1>
+<h2 id="defining-classes">Defining classes</h2>
+<p>Define a minimal class with the <code>class</code> keyword, a name,
+and <code>end</code>:</p>
+<div class="sourceCode" id="cb65"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> A</span>
+<span id="cb65-2"><a href="#cb65-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb65-3"><a href="#cb65-3" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
+<p>This introduces <code>A</code> into the world. Here’s how to create a
+new <code>A</code> object <code>a</code>, how to ask its
+<code>object_id</code>, how to get its String representation with
+<code>to_s</code>, and how to get its class:</p>
+<pre class="none"><code>irb&gt; a = A.new
+=&gt; #&lt;A:0x00007f913a9bb5e0&gt;
+irb&gt; a.to_s
+=&gt; &quot;#&lt;A:0x00007f913a9bb5e0&gt;&quot;
+irb&gt; a.object_id
+=&gt; 70130865134320
+irb&gt; a.class
+=&gt; A</code></pre>
+<p>Not bad for a minute of work. You wonder why our minimal
+<code>A</code> object can do all of this. Poke at the class
+hierarchy:</p>
+<pre class="none"><code>irb&gt; a.class.ancestors
+=&gt; [A, Object, Kernel, BasicObject]</code></pre>
+<p>So <code>a</code> is an <code>A</code>, which is an
+<code>Object</code>, which is a <code>Kernel</code>, which is a
+<code>BasicObject</code>. We’re tapping into <em>inherited</em>
+methods:</p>
+<pre class="none"><code>irb&gt; o = Object.new
+=&gt; #&lt;Object:0x00007f913a82f898&gt;
+irb&gt; o.to_s
+=&gt; &quot;#&lt;Object:0x00007f913a82f898&gt;&quot;
+irb&gt; o.object_id
+=&gt; 70130864323660
+irb&gt; o.class
+=&gt; Object
+irb&gt; o.class.ancestors
+=&gt; [Object, Kernel, BasicObject]</code></pre>
+<p>You may have expected to see the definition of a <em>constructor</em>
+when you saw <code>A.new</code> used to create a new object. For a
+minimal class like <code>A</code> we use the <code>initialize</code> of
+<code>Object</code>. If you want to use your own <em>constructor</em>
+you can need to define your own <code>initialize</code>:</p>
+<div class="sourceCode" id="cb69"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb69-1"><a href="#cb69-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> A</span>
+<span id="cb69-2"><a href="#cb69-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb69-3"><a href="#cb69-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">def</span> initialize</span>
+<span id="cb69-4"><a href="#cb69-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">puts</span> <span class="st">&quot;you called new!&quot;</span></span>
+<span id="cb69-5"><a href="#cb69-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
+<span id="cb69-6"><a href="#cb69-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb69-7"><a href="#cb69-7" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
+<p>Creating a new <code>A</code>:</p>
+<pre class="none"><code>irb&gt; a = A.new
+you called new!
+=&gt; #&lt;A:0x00007fc4eb1b8bd8&gt;</code></pre>
+<p>The class <code>A</code> is useless. Usually classes carry some
+<em>state</em> (cars have doors and color, some cars have 4 doors, some
+5, some cars are blue, some cars are yellow). <em>Instance
+variables</em> capture that state.</p>
+<p>In Ruby, instance variables start with an <code>@</code>. Give
+<code>A</code> state:</p>
+<div class="sourceCode" id="cb71"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb71-1"><a href="#cb71-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> A</span>
+<span id="cb71-2"><a href="#cb71-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-3"><a href="#cb71-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">def</span> initialize</span>
+<span id="cb71-4"><a href="#cb71-4" aria-hidden="true" tabindex="-1"></a>    <span class="ot">@a</span> <span class="kw">=</span> <span class="dv">10</span></span>
+<span id="cb71-5"><a href="#cb71-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
+<span id="cb71-6"><a href="#cb71-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-7"><a href="#cb71-7" aria-hidden="true" tabindex="-1"></a>  <span class="cf">def</span> print_your_state</span>
+<span id="cb71-8"><a href="#cb71-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">puts</span> <span class="st">&quot;my state is </span><span class="sc">#{</span><span class="ot">@a</span><span class="sc">}</span><span class="st">&quot;</span></span>
+<span id="cb71-9"><a href="#cb71-9" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
+<span id="cb71-10"><a href="#cb71-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-11"><a href="#cb71-11" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
+<p>Note:</p>
+<ul>
+<li><p>I’ve set the value of <code>@a</code> in the
+<code>initialize</code>. When you create a new <code>A</code> object,
+the <code>@a = 10</code> line gets executed.</p></li>
+<li><p>I’ve introduced an <em>instance method</em>
+<code>print_your_state</code>. If you have an <code>A</code> object
+<code>x</code> you can do <code>x.print_your_state</code>. This executes
+the <code>puts</code> line for your object <code>x</code>.</p></li>
+</ul>
+<pre class="none"><code>irb&gt; x = A.new
+=&gt; #&lt;A:0x00007fc4ea1190c0 @a=10&gt;
+irb&gt; x.print_your_state
+my state is 10</code></pre>
+<p>Every object has <code>@a</code> equal to 10. Useless as far as state
+goes for objects. You want to create objects with different states. Give
+<code>initialize</code> arguments that indicate the initial state you
+want for the object:</p>
+<div class="sourceCode" id="cb73"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb73-1"><a href="#cb73-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> A</span>
+<span id="cb73-2"><a href="#cb73-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb73-3"><a href="#cb73-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">def</span> initialize(a)</span>
+<span id="cb73-4"><a href="#cb73-4" aria-hidden="true" tabindex="-1"></a>    <span class="ot">@a</span> <span class="kw">=</span> a</span>
+<span id="cb73-5"><a href="#cb73-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
+<span id="cb73-6"><a href="#cb73-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb73-7"><a href="#cb73-7" aria-hidden="true" tabindex="-1"></a>  <span class="cf">def</span> print_your_state</span>
+<span id="cb73-8"><a href="#cb73-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">puts</span> <span class="st">&quot;my state is </span><span class="sc">#{</span><span class="ot">@a</span><span class="sc">}</span><span class="st">&quot;</span></span>
+<span id="cb73-9"><a href="#cb73-9" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
+<span id="cb73-10"><a href="#cb73-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb73-11"><a href="#cb73-11" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
+<pre class="none"><code>irb&gt; x = A.new(10)
+=&gt; #&lt;A:0x00007fc4eb1c1f80 @a=10&gt;
+irb&gt; y = A.new(11)
+=&gt; #&lt;A:0x00007fc4e9832c40 @a=11&gt;
+irb&gt; x.print_your_state
+my state is 10
+irb(main):014:0&gt; y.print_your_state
+my state is 11</code></pre>
+<p>You can also give instance methods arguments:</p>
+<div class="sourceCode" id="cb75"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb75-1"><a href="#cb75-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> A</span>
+<span id="cb75-2"><a href="#cb75-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb75-3"><a href="#cb75-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">def</span> initialize(a)</span>
+<span id="cb75-4"><a href="#cb75-4" aria-hidden="true" tabindex="-1"></a>    <span class="ot">@a</span> <span class="kw">=</span> a</span>
+<span id="cb75-5"><a href="#cb75-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
+<span id="cb75-6"><a href="#cb75-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb75-7"><a href="#cb75-7" aria-hidden="true" tabindex="-1"></a>  <span class="cf">def</span> print_your_state_with_a_factor(x)</span>
+<span id="cb75-8"><a href="#cb75-8" aria-hidden="true" tabindex="-1"></a>    result <span class="kw">=</span> <span class="ot">@a</span> <span class="kw">*</span> x</span>
+<span id="cb75-9"><a href="#cb75-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">puts</span> <span class="st">&quot;my state is </span><span class="sc">#{</span>result<span class="sc">}</span><span class="st">&quot;</span></span>
+<span id="cb75-10"><a href="#cb75-10" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span></code></pre></div>
+<p>And then:</p>
+<pre class="none"><code>irb&gt; x = A.new(10)
+=&gt; #&lt;A:0x00007fc4eb145778 @a=10&gt;
+irb&gt; x.print_your_state_with_a_factor(3)
+my state is 30</code></pre>
+<p>Note that <code>result</code> is a <em>local</em> variable to the
+instance method <code>print_your_state_with_a_factor</code>.</p>
+<h2 id="getters-and-setters-and-bouviers">Getters and Setters and
+Bouviers</h2>
+<p>Instance variables are <em>encapsulated</em>. You cannot get to their
+value from outside the class:</p>
+<pre class="none"><code>irb&gt; x = A.new(3)
+=&gt; #&lt;A:0x00007fc8cc180280 @a=3&gt;
+irb&gt; x.a
+Traceback (most recent call last):
+        4: from /usr/bin/irb:23:in `&lt;main&gt;&#39;
+        3: from /usr/bin/irb:23:in `load&#39;
+        2: from /Library/Ruby/Gems/2.6.0/gems/irb-1.0.0/exe/irb:11:in `&lt;top (required)&gt;&#39;
+        1: from (irb):4
+NoMethodError (undefined method `a&#39; for #&lt;A:0x00007fc8cc180280 @a=3&gt;)</code></pre>
+<p>Ruby’s instance variables are thus by default like private instance
+variables in Java. If you want direct access to the instance variable,
+you need a getter:</p>
+<div class="sourceCode" id="cb78"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb78-1"><a href="#cb78-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> A</span>
+<span id="cb78-2"><a href="#cb78-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb78-3"><a href="#cb78-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">def</span> initialize(a)</span>
+<span id="cb78-4"><a href="#cb78-4" aria-hidden="true" tabindex="-1"></a>    <span class="ot">@a</span> <span class="kw">=</span> a</span>
+<span id="cb78-5"><a href="#cb78-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
+<span id="cb78-6"><a href="#cb78-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb78-7"><a href="#cb78-7" aria-hidden="true" tabindex="-1"></a>  <span class="cf">def</span> a</span>
+<span id="cb78-8"><a href="#cb78-8" aria-hidden="true" tabindex="-1"></a>    <span class="ot">@a</span></span>
+<span id="cb78-9"><a href="#cb78-9" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
+<span id="cb78-10"><a href="#cb78-10" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
+<p>And then:</p>
+<pre class="none"><code>irb&gt; x = A.new(3)
+=&gt; #&lt;A:0x00007f913a943c70 @a=3&gt;
+irb&gt; x.a
+=&gt; 3</code></pre>
+<p>You can still not write to <code>@a</code> from outside the class as
+that requires a <em>setter</em>:</p>
+<pre class="none"><code>irb&gt; x.a = 5
+Traceback (most recent call last):
+        4: from /usr/bin/irb:23:in `&lt;main&gt;&#39;
+        3: from /usr/bin/irb:23:in `load&#39;
+        2: from /Library/Ruby/Gems/2.6.0/gems/irb-1.0.0/exe/irb:11:in `&lt;top (required)&gt;&#39;
+        1: from (irb):20
+NoMethodError (undefined method `a=&#39; for #&lt;A:0x00007f913a943c70 @a=3&gt;)
+Did you mean?  a</code></pre>
+<p>Write a setter:</p>
+<div class="sourceCode" id="cb81"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb81-1"><a href="#cb81-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> A</span>
+<span id="cb81-2"><a href="#cb81-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb81-3"><a href="#cb81-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">def</span> initialize(a)</span>
+<span id="cb81-4"><a href="#cb81-4" aria-hidden="true" tabindex="-1"></a>    <span class="ot">@a</span> <span class="kw">=</span> a</span>
+<span id="cb81-5"><a href="#cb81-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
+<span id="cb81-6"><a href="#cb81-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb81-7"><a href="#cb81-7" aria-hidden="true" tabindex="-1"></a>  <span class="cf">def</span> a</span>
+<span id="cb81-8"><a href="#cb81-8" aria-hidden="true" tabindex="-1"></a>    <span class="ot">@a</span></span>
+<span id="cb81-9"><a href="#cb81-9" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
+<span id="cb81-10"><a href="#cb81-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb81-11"><a href="#cb81-11" aria-hidden="true" tabindex="-1"></a>  <span class="cf">def</span> a<span class="kw">=</span>(a)</span>
+<span id="cb81-12"><a href="#cb81-12" aria-hidden="true" tabindex="-1"></a>    <span class="ot">@a</span> <span class="kw">=</span> a</span>
+<span id="cb81-13"><a href="#cb81-13" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
+<span id="cb81-14"><a href="#cb81-14" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
+<p>and then:</p>
+<pre class="none"><code>irb&gt; x = A.new(3)
+=&gt; #&lt;A:0x00007fb09b838558 @a=3&gt;
+irb&gt; x.a
+=&gt; 3
+irb&gt; x.a = 5
+=&gt; 5
+irb&gt; x.a
+=&gt; 5</code></pre>
+<p>I’ll pause, so you can enjoy the view.</p>
+<div class="sourceCode" id="cb83"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb83-1"><a href="#cb83-1" aria-hidden="true" tabindex="-1"></a><span class="cf">def</span> a<span class="kw">=</span>(a)</span>
+<span id="cb83-2"><a href="#cb83-2" aria-hidden="true" tabindex="-1"></a>  <span class="ot">@a</span> <span class="kw">=</span> a</span>
+<span id="cb83-3"><a href="#cb83-3" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
+<p>That <code>a=</code> is an <a
+href="https://docs.ruby-lang.org/en/2.6.0/doc/syntax/assignment_rdoc.html#label-Assignment+Methods">assignment
+method</a>. This is an ordeal. As fortune has it, there is shorthand for
+getting and setting a getter and setter:</p>
+<div class="sourceCode" id="cb84"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb84-1"><a href="#cb84-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> A</span>
+<span id="cb84-2"><a href="#cb84-2" aria-hidden="true" tabindex="-1"></a>  <span class="ot">attr_accessor</span> <span class="wa">:a</span></span>
+<span id="cb84-3"><a href="#cb84-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb84-4"><a href="#cb84-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">def</span> initialize(a)</span>
+<span id="cb84-5"><a href="#cb84-5" aria-hidden="true" tabindex="-1"></a>    <span class="ot">@a</span> <span class="kw">=</span> a</span>
+<span id="cb84-6"><a href="#cb84-6" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
+<span id="cb84-7"><a href="#cb84-7" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
+<p>Yes, you write <code>:a</code> there.</p>
+<pre class="none"><code>irb&gt; x = A.new(3)
+=&gt; #&lt;A:0x00007fc5ab109988 @a=3&gt;
+irb&gt; x.a
+=&gt; 3
+irb&gt; x.a = 6
+=&gt; 6</code></pre>
+<p>If you only want the getter, you can use <code>attr_reader</code>. If
+you only want a setter, you probably also put pineapple on your pizza.
+Anyhow, you can use <code>attr_writer</code>.</p>
+<h2 id="equality">Equality</h2>
+<p>What is <code>x == y</code> in the below?</p>
+<pre class="none"><code>irb&gt; x = A.new(3)
+=&gt; #&lt;A:0x00007fa3d6194778 @a=3&gt;
+irb&gt; y = A.new(3)
+=&gt; #&lt;A:0x00007fa3d58ed458 @a=3&gt;
+irb&gt; x == y</code></pre>
+<p>False. <code>x</code> and <code>y</code> are different objects and
+<code>==</code> is <code>Object</code> equality. Sometimes you want
+<code>x</code> and <code>y</code> to be equal as they represent the same
+data, they are both <code>A</code> objects with the same state
+<code>3</code>. For example, it makes sense to most that
+<code>"I am right" == "I am right"</code> is <code>true</code>.</p>
+<p>You can override <code>==</code> in <code>A</code> to get equality
+based on state, rather than on object identity:</p>
+<div class="sourceCode" id="cb87"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb87-1"><a href="#cb87-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> A</span>
+<span id="cb87-2"><a href="#cb87-2" aria-hidden="true" tabindex="-1"></a>  <span class="ot">attr_accessor</span> <span class="wa">:a</span></span>
+<span id="cb87-3"><a href="#cb87-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb87-4"><a href="#cb87-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">def</span> initialize(a)</span>
+<span id="cb87-5"><a href="#cb87-5" aria-hidden="true" tabindex="-1"></a>    <span class="ot">@a</span> <span class="kw">=</span> a</span>
+<span id="cb87-6"><a href="#cb87-6" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
+<span id="cb87-7"><a href="#cb87-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb87-8"><a href="#cb87-8" aria-hidden="true" tabindex="-1"></a>  <span class="cf">def</span> <span class="kw">==</span>(other)</span>
+<span id="cb87-9"><a href="#cb87-9" aria-hidden="true" tabindex="-1"></a>    <span class="dv">self</span><span class="at">.a</span> <span class="kw">==</span> other<span class="at">.a</span></span>
+<span id="cb87-10"><a href="#cb87-10" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
+<span id="cb87-11"><a href="#cb87-11" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
+<p>And then:</p>
+<pre class="none"><code>irb&gt; x = A.new(3)
+=&gt; #&lt;A:0x00007fb47c1805a0 @a=3&gt;
+irb&gt; y = A.new(3)
+=&gt; #&lt;A:0x00007fb47c189268 @a=3&gt;
+irb&gt; x == y
+=&gt; true</code></pre>
+<p>Observe:</p>
+<ul>
+<li><p><code>==</code> is an instance method defined as any other
+method: <code>x == y</code> is really just <code>x.==(y)</code> as if
+<code>==</code> is any other method name.</p></li>
+<li><p>I used <code>self</code> which is similar to Java’s
+<code>this</code> at least in <em>this</em> <a
+href="https://airbrake.io/blog/ruby/self-ruby-overview">context</a>.
+Here it’s an instance of this object itself. So when doing
+<code>x == y</code>, we execute <code>==</code> for the object
+<code>x</code>, and <code>self</code> refers to <code>x</code>. Caveat
+emptor: <code>self</code> may mean other things. We will see how to use
+<code>self</code> to define <em>class methods</em>.</p></li>
+<li><p>I did not actually have to use <code>self</code> here. There is
+no ambiguity if I would do <code>a == other.a</code>. The first
+<code>a</code> refers to the method <code>a</code> defined in
+<code>A</code> (by way of the <code>attr_accessor</code>) and allows me
+to check equality of the instance variable <code>@a</code> with
+<code>other.a</code> (aka the <code>@a</code> of the <code>other</code>
+object). You are right: I can do <code>@a == other.a</code> <a
+href="https://www.merriam-webster.com/dictionary/pedantic">directly</a>.</p></li>
+</ul>
+<h2 id="class-methods-and-variables">Class Methods and Variables</h2>
+<p>If you know <code>Java</code>, you must have met <code>static</code>.
+<em>static variables or methods</em> in Java classes indicate that they
+belong to the class rather than the instance.</p>
+<p>In Ruby <em>class variables</em> start with <code>@@</code> (recall
+that instance variables start with <code>@</code>). <em>Class
+methods</em> have their name preceded with <code>self</code>. The body
+is not yet cold and here we are: <code>self</code> in this context
+refers to the class rather than the object. An example:</p>
+<div class="sourceCode" id="cb89"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb89-1"><a href="#cb89-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> A</span>
+<span id="cb89-2"><a href="#cb89-2" aria-hidden="true" tabindex="-1"></a>  <span class="ot">@@counter</span> <span class="kw">=</span> <span class="dv">0</span></span>
+<span id="cb89-3"><a href="#cb89-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb89-4"><a href="#cb89-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">def</span> initialize</span>
+<span id="cb89-5"><a href="#cb89-5" aria-hidden="true" tabindex="-1"></a>    <span class="ot">@@counter</span> <span class="kw">+=</span> <span class="dv">1</span></span>
+<span id="cb89-6"><a href="#cb89-6" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
+<span id="cb89-7"><a href="#cb89-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb89-8"><a href="#cb89-8" aria-hidden="true" tabindex="-1"></a>  <span class="cf">def</span> <span class="dv">self</span><span class="at">.counter</span></span>
+<span id="cb89-9"><a href="#cb89-9" aria-hidden="true" tabindex="-1"></a>    <span class="ot">@@counter</span></span>
+<span id="cb89-10"><a href="#cb89-10" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
+<span id="cb89-11"><a href="#cb89-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb89-12"><a href="#cb89-12" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
+<p>And then:</p>
+<pre class="none"><code>irb&gt; x = A.new
+=&gt; #&lt;A:0x00007fc82595ce60&gt;
+irb&gt; A.counter
+=&gt; 1
+irb&gt; y = A.new
+=&gt; #&lt;A:0x00007fc8259642a0&gt;
+irb&gt; A.counter
+=&gt; 2</code></pre>
+<p>Note that I asked <code>A</code> for the <code>counter</code> (not
+<code>x</code>, nor <code>y</code>). In fact, doing
+<code>x.counter</code> leads to an <code>undefined method</code>
+error.</p>
+<h2 id="inheritance">Inheritance</h2>
+<p>Make <code>B</code> a subclass of <code>A</code>:</p>
+<div class="sourceCode" id="cb91"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb91-1"><a href="#cb91-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> A</span>
+<span id="cb91-2"><a href="#cb91-2" aria-hidden="true" tabindex="-1"></a>  <span class="ot">attr_accessor</span> <span class="wa">:a</span></span>
+<span id="cb91-3"><a href="#cb91-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb91-4"><a href="#cb91-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">def</span> initialize(a)</span>
+<span id="cb91-5"><a href="#cb91-5" aria-hidden="true" tabindex="-1"></a>    <span class="ot">@a</span> <span class="kw">=</span> a</span>
+<span id="cb91-6"><a href="#cb91-6" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
+<span id="cb91-7"><a href="#cb91-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb91-8"><a href="#cb91-8" aria-hidden="true" tabindex="-1"></a>  <span class="cf">def</span> double</span>
+<span id="cb91-9"><a href="#cb91-9" aria-hidden="true" tabindex="-1"></a>    <span class="dv">2</span> <span class="kw">*</span> <span class="ot">@a</span></span>
+<span id="cb91-10"><a href="#cb91-10" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
+<span id="cb91-11"><a href="#cb91-11" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span>
+<span id="cb91-12"><a href="#cb91-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb91-13"><a href="#cb91-13" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> B <span class="kw">&lt;</span> A</span>
+<span id="cb91-14"><a href="#cb91-14" aria-hidden="true" tabindex="-1"></a>  <span class="cf">def</span> triple</span>
+<span id="cb91-15"><a href="#cb91-15" aria-hidden="true" tabindex="-1"></a>    <span class="dv">3</span> <span class="kw">*</span> <span class="ot">@a</span></span>
+<span id="cb91-16"><a href="#cb91-16" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
+<span id="cb91-17"><a href="#cb91-17" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
+<p>Poke around:</p>
+<pre class="none"><code>irb&gt; x = A.new(3)
+=&gt; #&lt;A:0x00007fa19e02dd10 @a=3&gt;
+irb&gt; x.double
+=&gt; 6
+irb&gt; y = B.new
+Traceback (most recent call last):
+        6: from /usr/bin/irb:23:in `&lt;main&gt;&#39;
+        5: from /usr/bin/irb:23:in `load&#39;
+        4: from /Library/Ruby/Gems/2.6.0/gems/irb-1.0.0/exe/irb:11:in `&lt;top (required)&gt;&#39;
+        3: from (irb):13
+        2: from (irb):13:in `new&#39;
+        1: from /Users/sheymans/Workspaces/ruby_playground/src/ruby_playground.rb:7:in `initialize&#39;
+ArgumentError (wrong number of arguments (given 0, expected 1))
+irb&gt; y = B.new(5)
+=&gt; #&lt;B:0x00007fa19f2184a8 @a=5&gt;
+irb&gt; y.double
+=&gt; 10
+irb&gt; y.triple
+=&gt; 15</code></pre>
+<p>If you’re familiar with inheritance, this looks encouraging.
+Observe:</p>
+<ul>
+<li><p>I did not define an <code>initialize</code> for <code>B</code> so
+we’re forced to use the one of <code>A</code> which requires 1 argument
+<code>a</code></p></li>
+<li><p>I accessed the instance variable <code>@a</code> in `B. This
+sometimes leads to surprises, but I hope you have a good <a
+href="https://www.jetbrains.com/idea/">IDE</a></p></li>
+</ul>
+<h1 id="modules">Modules</h1>
+<p>To define a module, start with keyword <code>module</code>, give it a
+name, do your thing, and end with <code>end</code>:</p>
+<div class="sourceCode" id="cb93"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb93-1"><a href="#cb93-1" aria-hidden="true" tabindex="-1"></a><span class="cf">module</span> <span class="dt">HomeMade</span></span>
+<span id="cb93-2"><a href="#cb93-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">class</span> A</span>
+<span id="cb93-3"><a href="#cb93-3" aria-hidden="true" tabindex="-1"></a>    <span class="ot">attr_accessor</span> <span class="wa">:a</span></span>
+<span id="cb93-4"><a href="#cb93-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb93-5"><a href="#cb93-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">def</span> initialize(a)</span>
+<span id="cb93-6"><a href="#cb93-6" aria-hidden="true" tabindex="-1"></a>      <span class="ot">@a</span> <span class="kw">=</span> a</span>
+<span id="cb93-7"><a href="#cb93-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb93-8"><a href="#cb93-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb93-9"><a href="#cb93-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">def</span> double</span>
+<span id="cb93-10"><a href="#cb93-10" aria-hidden="true" tabindex="-1"></a>      <span class="dv">2</span> <span class="kw">*</span> <span class="ot">@a</span></span>
+<span id="cb93-11"><a href="#cb93-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb93-12"><a href="#cb93-12" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
+<span id="cb93-13"><a href="#cb93-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb93-14"><a href="#cb93-14" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
+<p>Prepend <code>HomeMade::</code> to your class name <code>A</code> if
+you want an instance of the <code>A</code> in the <code>HomeMade</code>
+module:</p>
+<pre class="none"><code>irb&gt; a = HomeMade::A.new(3)
+=&gt; #&lt;HomeMade::A:0x00007fdf07147448 @a=3&gt;
+irb&gt; a.double
+=&gt; 6</code></pre>
+<h2 id="as-namespaces">As Namespaces</h2>
+<p>Why modules? Because your neighbor also wants a class with name
+<code>A</code>. Modules are name islands of peace and quiet:</p>
+<div class="sourceCode" id="cb95"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb95-1"><a href="#cb95-1" aria-hidden="true" tabindex="-1"></a><span class="cf">module</span> <span class="dt">HomeMade</span></span>
+<span id="cb95-2"><a href="#cb95-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">class</span> A</span>
+<span id="cb95-3"><a href="#cb95-3" aria-hidden="true" tabindex="-1"></a>    <span class="ot">attr_accessor</span> <span class="wa">:a</span></span>
+<span id="cb95-4"><a href="#cb95-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb95-5"><a href="#cb95-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">def</span> initialize(a)</span>
+<span id="cb95-6"><a href="#cb95-6" aria-hidden="true" tabindex="-1"></a>      <span class="ot">@a</span> <span class="kw">=</span> a</span>
+<span id="cb95-7"><a href="#cb95-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb95-8"><a href="#cb95-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb95-9"><a href="#cb95-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">def</span> double</span>
+<span id="cb95-10"><a href="#cb95-10" aria-hidden="true" tabindex="-1"></a>      <span class="dv">2</span> <span class="kw">*</span> <span class="ot">@a</span></span>
+<span id="cb95-11"><a href="#cb95-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb95-12"><a href="#cb95-12" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
+<span id="cb95-13"><a href="#cb95-13" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span>
+<span id="cb95-14"><a href="#cb95-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb95-15"><a href="#cb95-15" aria-hidden="true" tabindex="-1"></a><span class="cf">module</span> <span class="dt">NeighborMade</span></span>
+<span id="cb95-16"><a href="#cb95-16" aria-hidden="true" tabindex="-1"></a>  <span class="cf">class</span> A</span>
+<span id="cb95-17"><a href="#cb95-17" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Same name A, yet worse</span></span>
+<span id="cb95-18"><a href="#cb95-18" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
+<span id="cb95-19"><a href="#cb95-19" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
+<p>You can then pick your <code>A</code> without conflict:</p>
+<pre class="none"><code>irb&gt; a = HomeMade::A.new(3)
+=&gt; #&lt;HomeMade::A:0x00007f95eb03f0b0 @a=3&gt;
+irb&gt; b = NeighborMade::A.new
+=&gt; #&lt;NeighborMade::A:0x00007f95ef0ef998&gt;</code></pre>
+<p>Modules organize code within your application.</p>
+<h2 id="as-mixins">As Mixins</h2>
+<p>Imagine (imagine!) you have 2 modules, 1 for logging and 1 for
+long-term analytics:</p>
+<div class="sourceCode" id="cb97"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb97-1"><a href="#cb97-1" aria-hidden="true" tabindex="-1"></a><span class="cf">module</span> <span class="dt">Logger</span></span>
+<span id="cb97-2"><a href="#cb97-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">def</span> log_it(what)</span>
+<span id="cb97-3"><a href="#cb97-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">puts</span> what</span>
+<span id="cb97-4"><a href="#cb97-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
+<span id="cb97-5"><a href="#cb97-5" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span>
+<span id="cb97-6"><a href="#cb97-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb97-7"><a href="#cb97-7" aria-hidden="true" tabindex="-1"></a><span class="cf">module</span> <span class="dt">Analytics</span></span>
+<span id="cb97-8"><a href="#cb97-8" aria-hidden="true" tabindex="-1"></a>  <span class="cf">def</span> send_event(event)</span>
+<span id="cb97-9"><a href="#cb97-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">puts</span> event</span>
+<span id="cb97-10"><a href="#cb97-10" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
+<span id="cb97-11"><a href="#cb97-11" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
+<p>Imagine (imagine!) you have a class <code>A</code> that wants to use
+the methods from the <code>Logger</code> and <code>Analytics</code>
+modules:</p>
+<div class="sourceCode" id="cb98"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb98-1"><a href="#cb98-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> A</span>
+<span id="cb98-2"><a href="#cb98-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb98-3"><a href="#cb98-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">def</span> do_something</span>
+<span id="cb98-4"><a href="#cb98-4" aria-hidden="true" tabindex="-1"></a>    log_it(<span class="st">&quot;we&#39;re logging this&quot;</span>)</span>
+<span id="cb98-5"><a href="#cb98-5" aria-hidden="true" tabindex="-1"></a>    send_event(<span class="vs">&#39;for long term analytics we send this&#39;</span>)</span>
+<span id="cb98-6"><a href="#cb98-6" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
+<span id="cb98-7"><a href="#cb98-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb98-8"><a href="#cb98-8" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
+<p>If you try <code>a.do_something</code> for an object <code>a</code>
+of type <code>A</code>, you get a <code>NoMethodError</code> for
+<code>log_it</code> and <code>send_event</code>. You are smart (your
+grandmother told you so), and you say, “let <code>A</code> inherit from
+<code>Logger</code>.” Yes, more of that smartness. What a joy. And “also
+let <code>A</code> inherit from <code>Analytics</code>.” Wonderful.</p>
+<p>Ruby does not allow for multiple inheritance. You can only inherit
+from 1 class (ignoring for a minute that <code>Logger</code> and
+<code>Analytics</code> are not actually classes, they are modules).</p>
+<p>We (I say <em>We</em> but I really mean <em>I</em>; you have turned
+out to be a bit of a disappointment in these last 2 paragraphs; you also
+thought the semi-colon is dead; it’s not) can solve this by <em>mixing
+in</em> the 2 modules in the class <code>A</code> by using
+<code>include</code>:</p>
+<div class="sourceCode" id="cb99"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb99-1"><a href="#cb99-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> A</span>
+<span id="cb99-2"><a href="#cb99-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">include</span> <span class="dt">Logger</span></span>
+<span id="cb99-3"><a href="#cb99-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">include</span> <span class="dt">Analytics</span></span>
+<span id="cb99-4"><a href="#cb99-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb99-5"><a href="#cb99-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">def</span> do_something</span>
+<span id="cb99-6"><a href="#cb99-6" aria-hidden="true" tabindex="-1"></a>    log_it(<span class="st">&quot;we&#39;re logging this&quot;</span>)</span>
+<span id="cb99-7"><a href="#cb99-7" aria-hidden="true" tabindex="-1"></a>    send_event(<span class="vs">&#39;for long term analytics we send this&#39;</span>)</span>
+<span id="cb99-8"><a href="#cb99-8" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
+<span id="cb99-9"><a href="#cb99-9" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
+<p><code>include</code> makes all methods of the modules available as
+<em>instance</em> methods in your class. Those familiar with the Java
+world, and maybe other worlds as well, are reminded of the Utility
+class. You long for a better life.</p>
+<h1 id="testing">Testing</h1>
+<p>Define a class <code>A</code> in some file
+<code>ruby_playground.rb</code>:</p>
+<div class="sourceCode" id="cb100"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb100-1"><a href="#cb100-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> A</span>
+<span id="cb100-2"><a href="#cb100-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">def</span> initialize(a)</span>
+<span id="cb100-3"><a href="#cb100-3" aria-hidden="true" tabindex="-1"></a>    <span class="ot">@a</span> <span class="kw">=</span> a</span>
+<span id="cb100-4"><a href="#cb100-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
+<span id="cb100-5"><a href="#cb100-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb100-6"><a href="#cb100-6" aria-hidden="true" tabindex="-1"></a>  <span class="cf">def</span> double</span>
+<span id="cb100-7"><a href="#cb100-7" aria-hidden="true" tabindex="-1"></a>    <span class="ot">@a</span> <span class="kw">*</span> <span class="dv">2</span></span>
+<span id="cb100-8"><a href="#cb100-8" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
+<span id="cb100-9"><a href="#cb100-9" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
+<p>How to unit test <code>double</code>? Create a file
+<code>test_ruby_playground.rb</code>:</p>
+<div class="sourceCode" id="cb101"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb101-1"><a href="#cb101-1" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span> <span class="vs">&#39;test/unit&#39;</span></span>
+<span id="cb101-2"><a href="#cb101-2" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span> <span class="vs">&#39;./ruby_playground&#39;</span></span>
+<span id="cb101-3"><a href="#cb101-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb101-4"><a href="#cb101-4" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="dt">RubyPlayGroundTest</span> <span class="kw">&lt;</span> <span class="dt">Test</span><span class="kw">::</span><span class="dt">Unit</span><span class="kw">::</span><span class="dt">TestCase</span></span>
+<span id="cb101-5"><a href="#cb101-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">def</span> test_double</span>
+<span id="cb101-6"><a href="#cb101-6" aria-hidden="true" tabindex="-1"></a>    a <span class="kw">=</span> A<span class="at">.new</span>(<span class="dv">3</span>)</span>
+<span id="cb101-7"><a href="#cb101-7" aria-hidden="true" tabindex="-1"></a>    assert_equal <span class="dv">6</span>, a<span class="at">.double</span></span>
+<span id="cb101-8"><a href="#cb101-8" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
+<span id="cb101-9"><a href="#cb101-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb101-10"><a href="#cb101-10" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
+<p>Note:</p>
+<ul>
+<li><code>require</code> the <code>test/unit</code> Ruby <a
+href="https://en.wikipedia.org/wiki/RubyGems">gem</a> which defines the
+class <a
+href="https://www.rubydoc.info/github/test-unit/test-unit/Test/Unit/TestCase"><code>Test::Unit::TestCase</code></a></li>
+<li><code>require</code> the file that contains the class
+<code>A</code></li>
+<li>create a new class <code>RubyPlayGroundTest</code> that inherits
+from <code>Test::Unit::TestCase</code></li>
+<li>write a method that starts with <code>test_</code> and use
+<code>assert_equal</code> to test whether <code>6</code> is the result
+of <code>a.double</code></li>
+</ul>
+<p>Running that test file should result in success with statistics:</p>
+<pre class="none"><code>$ ruby test_ruby_playground.rb
+Loaded suite test_ruby_playground
+Started
+.
+Finished in 0.000298 seconds.
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+1 tests, 1 assertions, 0 failures, 0 errors, 0 pendings, 0 omissions, 0 notifications
+100% passed
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+3355.70 tests/s, 3355.70 assertions/s</code></pre>
+<p>Change <code>double</code> to do <code>@a * 4</code>. Run the test
+again. It fails.</p>
+<h1 id="blocks">Blocks</h1>
+<p>You already saw <em>blocks</em>:</p>
+<pre class="none"><code>irb&gt; a = [1, 2, 3]
+=&gt; [1, 2, 3]
+irb&gt; a.map { |el| el * 2 }
+=&gt; [2, 4, 6]</code></pre>
+<p>The part <code>{|el| el * 2 }</code> is a <em>block</em>. It has
+<em>parameters</em> <code>|el|</code> and a <em>body</em>
+<code>el * 2</code>. For multi-line blocks, use the
+<code>do...end</code> form.</p>
+<div class="sourceCode" id="cb104"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb104-1"><a href="#cb104-1" aria-hidden="true" tabindex="-1"></a>a<span class="at">.map</span> <span class="cf">do</span> <span class="kw">|</span>el<span class="kw">|</span></span>
+<span id="cb104-2"><a href="#cb104-2" aria-hidden="true" tabindex="-1"></a> double <span class="kw">=</span> el <span class="kw">*</span> <span class="dv">2</span></span>
+<span id="cb104-3"><a href="#cb104-3" aria-hidden="true" tabindex="-1"></a> double <span class="kw">+</span> <span class="dv">1</span></span>
+<span id="cb104-4"><a href="#cb104-4" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
+<p>In this example, <code>map</code> has as its argument another
+function (the block) and is thus a <em>higher-order function</em>. How
+do you define your own higher-order functions? Define a function that
+prints “here we are now”, calls <em>some</em> function, and prints
+“entertain us”. For example, take a function <code>lost</code>:</p>
+<div class="sourceCode" id="cb105"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb105-1"><a href="#cb105-1" aria-hidden="true" tabindex="-1"></a><span class="cf">def</span> lost</span>
+<span id="cb105-2"><a href="#cb105-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">puts</span> <span class="vs">&#39;a lost generation&#39;</span></span>
+<span id="cb105-3"><a href="#cb105-3" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
+<p>Print your two lines “here we are now” and “entertain us” around a
+call to <code>lost</code>:</p>
+<div class="sourceCode" id="cb106"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb106-1"><a href="#cb106-1" aria-hidden="true" tabindex="-1"></a><span class="fu">puts</span> <span class="vs">&#39;here we are now&#39;</span></span>
+<span id="cb106-2"><a href="#cb106-2" aria-hidden="true" tabindex="-1"></a>lost</span>
+<span id="cb106-3"><a href="#cb106-3" aria-hidden="true" tabindex="-1"></a><span class="fu">puts</span> <span class="vs">&#39;entertain us&#39;</span></span></code></pre></div>
+<p>If you want to do the same to another function than <code>lost</code>
+you have to repeat that pattern. Instead, define a higher-function:</p>
+<div class="sourceCode" id="cb107"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb107-1"><a href="#cb107-1" aria-hidden="true" tabindex="-1"></a><span class="cf">def</span> smells_like</span>
+<span id="cb107-2"><a href="#cb107-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">puts</span> <span class="vs">&#39;here we are now&#39;</span></span>
+<span id="cb107-3"><a href="#cb107-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">yield</span></span>
+<span id="cb107-4"><a href="#cb107-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">puts</span> <span class="vs">&#39;entertain us&#39;</span></span>
+<span id="cb107-5"><a href="#cb107-5" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
+<p>Note the <code>yield</code> keyword. That keyword tells the function
+<code>smells_like</code> <em>and now execute the block that was given to
+your call my friend</em>. So if we do <code>smells_like { lost }</code>,
+you see:</p>
+<pre class="none"><code>here we are now
+a lost generation
+entertain us</code></pre>
+<p>You could also just do
+<code>smells_like { puts 'a broken generation' }</code> and see:</p>
+<pre class="none"><code>here we are now
+a broken generation
+entertain us</code></pre>
+<p>What about blocks with parameters? For example, what if I want to be
+able to do
+<code>smells_like('broken') { |x| puts "a #{x} generation" }</code>?
+<code>yield</code> can take arguments, and <code>yield</code>’s
+arguments get shuttled into the block’s parameters:</p>
+<div class="sourceCode" id="cb110"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb110-1"><a href="#cb110-1" aria-hidden="true" tabindex="-1"></a><span class="cf">def</span> smells_like(something)</span>
+<span id="cb110-2"><a href="#cb110-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">puts</span> <span class="vs">&#39;here we are now&#39;</span></span>
+<span id="cb110-3"><a href="#cb110-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">yield</span>(something)</span>
+<span id="cb110-4"><a href="#cb110-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">puts</span> <span class="vs">&#39;entertain us&#39;</span></span>
+<span id="cb110-5"><a href="#cb110-5" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
+<p>And then:</p>
+<pre class="none"><code>irb&gt; smells_like(&#39;lost&#39;) { |x| puts &quot;a #{x} generation&quot; }
+here we are now
+a lost generation
+entertain us
+irb&gt; smells_like(&#39;broken&#39;) { |x| puts &quot;a #{x} generation&quot; }
+here we are now
+a broken generation
+entertain us</code></pre>
+<p>Good times.</p>
+</body>
+</html>

@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Stijn Heymans" />
+  <meta name="dcterms.date" content="2020-12-17" />
+  <title>Elements of Kubernetes</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <link rel="stylesheet" href="../elements_of.css" />
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Elements of Kubernetes</h1>
+<p class="author">Stijn Heymans</p>
+<p class="date">17 December 2020</p>
+</header>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#introduction" id="toc-introduction">Introduction</a></li>
+<li><a href="#instances-of-your-application"
+id="toc-instances-of-your-application">Instances of your Application</a>
+<ul>
+<li><a href="#a-containerized-application"
+id="toc-a-containerized-application">A Containerized
+Application</a></li>
+<li><a href="#multiple-instances-of-your-application"
+id="toc-multiple-instances-of-your-application">Multiple Instances of
+your Application</a>
+<ul>
+<li><a href="#pod" id="toc-pod">Pod</a></li>
+<li><a href="#deployment" id="toc-deployment">Deployment</a></li>
+</ul></li>
+</ul></li>
+<li><a href="#clients-of-your-application"
+id="toc-clients-of-your-application">Clients of your Application</a>
+<ul>
+<li><a href="#internal-clients-on-the-same-cluster"
+id="toc-internal-clients-on-the-same-cluster">(Internal) Clients on the
+Same Cluster</a></li>
+<li><a href="#external-clients" id="toc-external-clients">(External)
+Clients</a></li>
+</ul></li>
+<li><a href="#push-changes" id="toc-push-changes">Push Changes</a></li>
+<li><a href="#warm-up-of-your-application"
+id="toc-warm-up-of-your-application">Warm-up Of Your
+Application</a></li>
+<li><a href="#are-you-alive" id="toc-are-you-alive">Are you
+alive?</a></li>
+<li><a href="#horizontal-autoscaling"
+id="toc-horizontal-autoscaling">Horizontal Autoscaling</a></li>
+<li><a href="#autoscale-the-cluster"
+id="toc-autoscale-the-cluster">Autoscale the cluster</a></li>
+<li><a href="#endnotes" id="toc-endnotes">Endnotes</a></li>
+</ul>
+</nav>
+<h1 id="introduction">Introduction</h1>
+<p>In this article, I lay out the elements of Kubernetes <em>from an
+application developer’s perspective</em>. Familiarity with deploying
+applications in a production environment is expected<a href="#fn1"
+class="footnote-ref" id="fnref1"
+role="doc-noteref"><sup>1</sup></a>.</p>
+<p>Rather than explaining Kubernetes from the ground-up and building a
+pie in the sky that no-one will eat because it has strawberries and
+whipped cream and who likes that, I introduce Kubernetes as a solution
+for problems you are encountering in high-traffic production
+environments right now:</p>
+<ul>
+<li>Your application needs to serve 1000s of requests per second so you
+need many instances of the application running</li>
+<li>Clients of your application need to connect to one IP address and
+requests will be routed to the different application instances
+automatically</li>
+<li>You need to be able to push changes to your application without
+downtime</li>
+<li>You need to be able to rollback changes to your application</li>
+<li>Your application needs to be <em>warmed up</em>: things need to
+happen before your application can start serving up requests. For
+example, the application instance needs to sync its data with the data
+of other instances</li>
+<li>When an instance of your application dies (and is thus no longer
+able to serve requests), that instance needs to become invisible to
+clients of your application. Traffic should be guided to
+still-functioning instances of your application</li>
+<li>To save costs during the night, when you need less capability for
+your main application, you want to reuse some of the available
+capability to run batch jobs</li>
+<li>There will be times when there will not be enough machines to serve
+your traffic (during a promotion, or, say, the holiday period), so you
+want to increase, <em>scale up</em>, the amount of physical machines you
+have available. After the busy period, you want to get back to normal
+and scale down</li>
+</ul>
+<p>It will come as no surprise (if you <em>are</em> surprised:
+Sinterklaas does indeed exist <em>and</em> the world is a beautiful
+place where no-one drags themselves through wondering <em>where and when
+in the name it all went wrong</em>) that <em>Kubernetes</em> is
+<em>a</em> solution for those problems. I’ll refer to
+<em>Kubernetes</em> by its common abbreviation of <em>k8s</em> –
+pronounced <em>kates</em>, because that’s what all the cool kids do and
+I’ll do the same even though it’s aeons since I was a kid. Even though
+Kubernetes is a large hammer, it does hammer the above problems squarely
+away. I disparagingly say <em>hammer</em> as I say almost everything
+disparagingly but also because k8s is able to do more than what you’d
+need to solve the above stated problems. Blame that on its historic
+origin as used by a Cloud Provider in which many different applications
+need to run on the same cluster of machines in a desperate capitalistic
+attempt to optimize usage of infrastructure. Given the problems I laid
+out, I’m not <em>that</em> interested in running different applications
+on the same infrastructure, although the particular requirement to save
+cost during the night and run some batch jobs on the same machine that
+your machine runs on during the day, is designed to hint at that
+use.</p>
+<p>The requirements as laid out above come from my personal experience,
+and my limited knowledge I have on k8s comes from <a
+href="https://www.goodreads.com/book/show/34013922-kubernetes-in-action">Kubernetes
+in Action</a> by Marko Lukša. A book that, like all good books, gave me
+all the misplaced confidence to play an expert on the Internet. The book
+goes in depth and is useful for infrastructure administrators (which is
+a whole world of joy on itself that I will barely touch on here). In
+this article, I mostly stick to what I know, application development,
+and I’ll go over every single one of the above problems/requirements and
+discuss how k8s helps solving them.</p>
+<h1 id="instances-of-your-application">Instances of your
+Application</h1>
+<p>!!! Your application needs to serve 1000s of requests per second so
+you need many instances of the application running</p>
+<h2 id="a-containerized-application">A Containerized Application</h2>
+<p>As an example application, I’ll run a web server that serves up the
+sentence</p>
+<pre><code>Hi from HOST</code></pre>
+<p>where <code>HOST</code> will be the host the application is running
+on. We’re in a brave new world, so this application is packed up so it
+can run as a Docker container. I posted the source of this application
+on <a
+href="https://github.com/sheymans/elementsOf/tree/master/kubernetes/demo/hi_app">github</a>
+and I pushed the container image to the <a
+href="https://hub.docker.com/">Docker Hub</a> with name <a
+href="https://hub.docker.com/r/stijnh/hi">stijnh/hi_app</a>.</p>
+<p>If at this point you feel slightly lost and it’s related to this
+article, this may be a good time to take a break to read up on the <a
+href="http://www.stijnheymans.net/elements_of_docker_containers.html">Elements
+of Docker Containers</a>, or have a Snickers, what do I know.</p>
+<p>The container image is public so you can try out the app on your
+laptop right now with:</p>
+<pre><code>docker container run -d -p 8111:8111 -t stijnh/hi</code></pre>
+<p>Recall that <code>docker container run</code> indicates you’re asking
+to run a container image; <code>-d</code> indicates you’re going to do
+that in the background as a daemon (rather than interactive),
+<code>-p 8111:8111</code> means you’re mapping your
+<code>localhost</code> port 8111 (on your laptop) to port
+<code>8111</code> on your docker container behind which your app is
+running, <code>-t stijnh/hi</code> indicates the image you’re using to
+get the container from.</p>
+<p>Open your browser and navigate to <code>localhost:8111</code>. You
+will see</p>
+<pre><code>Hi from fbd698569ec5</code></pre>
+<p>where <code>fbd698569ec5</code> will be different for you as this is
+the container’s hostname.</p>
+<p>At this point you have <em>1 instance of your application
+running</em>. It does so as a container on your laptop. Your laptop is
+the <em>machine</em> (or for people that like their engineering terms
+like their sunsets, with drama, your <em>bare metal machine</em>).</p>
+<h2 id="multiple-instances-of-your-application">Multiple Instances of
+your Application</h2>
+<h3 id="pod">Pod</h3>
+<p>You have 1 instance of our app running, but you’ll have thousands of
+users that you need to say hi to, so you can’t have only 1 instance –
+you have dreams, megalomaniac dreams! More instances! At least 3!</p>
+<p>But first I need to define tad more precise what we need 3 of. If I
+need 3 instances of the application, I need 3 containers (each container
+runs the app). As this example is focused on a particular set of
+requirements that k8s solves, I’ve not mentioned other real-world
+requirements like logging. Typically, your application will be writing
+logs, and you’ll need something to <em>rotate</em> these logs away to
+more permanent storage (to <a href="https://aws.amazon.com/s3/">AWS’s
+S3</a> for example, where you could query it using <a
+href="https://aws.amazon.com/athena/">Athena</a>). I want this process
+of log rotating in a separate container (other apps could use it as well
+so it’s not specific to this app). I want these 2 containers always
+running together<a href="#fn2" class="footnote-ref" id="fnref2"
+role="doc-noteref"><sup>2</sup></a>, so if I say I want 3 instances of
+my app, I actually want 3 instances of my app with the logging
+container. Hence, the first level of abstraction – the base unit k8s
+deals with – is <em>not</em> a container, it’s something called a
+<em>pod</em>. So let’s do some more wrapping, and wrap that container
+into a <em>Pod</em> manifest[^manifest] that describes what the pod
+should look like. If you recall <code>Dockerfile</code>s, then this is
+similar in philosophy: in a <code>Dockerfile</code> you describe your
+app so that <code>docker</code> knows how to build an image, in a
+<em>Pod</em> manifest you describe what all goes in your <em>Pod</em>,
+most importantly what container images to use such k8s knows how to
+create a Pod out of several containers.</p>
+<p>Pods can be defined in <a
+href="https://en.wikipedia.org/wiki/YAML">YAML</a> files, so I’ll have a
+file <code>hi-pod.yaml</code>:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">apiVersion</span><span class="kw">:</span><span class="at"> v1</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">kind</span><span class="kw">:</span><span class="at"> Pod</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">metadata</span><span class="kw">:</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">name</span><span class="kw">:</span><span class="at"> hi-pod</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="fu">spec</span><span class="kw">:</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">containers</span><span class="kw">:</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="at"> </span><span class="fu">image</span><span class="kw">:</span><span class="at"> stijnh/hi</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">name</span><span class="kw">:</span><span class="at"> hi</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">ports</span><span class="kw">:</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="kw">-</span><span class="at"> </span><span class="fu">containerPort</span><span class="kw">:</span><span class="at"> </span><span class="dv">8111</span></span></code></pre></div>
+<p>which is not doing much more than naming my pod <code>hi-pod</code>
+and indicating that it’s running the container <a
+href="https://hub.docker.com/r/stijnh/hi"><code>stijnh/hi</code></a>.</p>
+<p>Let’s go over the pod definition, line by line:</p>
+<pre><code>apiVersion: v1</code></pre>
+<p>indicates what API version of k8s this k8s <em>resource</em> is
+defined for (<em>Pods</em>, together with a whole lot of other things,
+are named <em>resources</em> in k8s), in this case <code>v1</code>. I
+have no memory, nor patience, for remembering API versions, but there
+are <a
+href="https://matthewpalmer.net/kubernetes-app-developer/articles/kubernetes-apiversion-definition-guide.html">explanations
+of what version to use</a>.</p>
+<pre><code>kind: Pod</code></pre>
+<p>indicates the type of resource you’re defining, a
+<code>Pod</code>.</p>
+<pre><code>metadata:
+  name: hi-pod</code></pre>
+<p>indicates metadata about the pod, in this case its name
+<code>hi-pod</code>.</p>
+<pre><code>spec:
+  containers:
+    - image: stijnh/hi
+      name: hi
+      ports:
+        - containerPort: 8111</code></pre>
+<p>indicates the pod’s specification, in this case a list of 1
+container, where the container is described by its image tag
+<code>stijnh/hi</code>, given a name <code>hi</code>, and indicates that
+the container exposes the port <code>8111</code>. A pattern worth
+remembering are the 4 sections that you will see with other types of
+resources as well: the <code>apiVersion</code>, the <code>kind</code>,
+the <code>metadata</code>, and the <code>spec</code>.</p>
+<p>To deploy this pod, I assume you’re on your laptop and have something
+like <a href="https://github.com/kubernetes/minikube">minikube</a>
+installed. As I’m tackling k8s from the perspective of an application
+developer, I do not tackle setting up more than a toy cluster using
+<code>minikube</code>. If you want to sing-along, go check out <a
+href="https://github.com/kubernetes/minikube">minikube</a> and install
+it.</p>
+<p>While installing <code>minikube</code>, you might have read that
+minikube will give you a <em>single-node cluster</em>. You have only
+ever heard cluster in the context of “What a cluster…! Who ate the last
+Oreos??!!!” Your feeling for the English language tells you that
+clusters may be related to that exclamation of frustration, but not
+exactly the same. My working definition of a <em>cluster</em> is that
+it’s a set of nodes. What’s a <em>node</em>? Again, my working
+definition is <em>that’s a machine, an EC2 instance, a laptop, some kind
+of thing with a CPU and memory, an old Pentium tower in a dusty
+basement, …</em> A typical mapping in my head would be <em>if I have 40
+<a href="https://aws.amazon.com/ec2/">EC2</a> instances in the EU region
+to serve traffic</em>, that’s a <em>cluster</em> of <em>40</em>
+nodes.</p>
+<p>With <code>minikube</code> running, try this:</p>
+<pre class="shell"><code>$ kubectl get nodes
+NAME       STATUS   ROLES    AGE   VERSION
+minikube   Ready    master   0d   v1.18.3</code></pre>
+<p><code>kubectl</code> is the command-line tool for interacting with
+your cluster (asking it about nodes, pods, …) The output of the command
+shows that 1 node, called <code>minikube</code>. All later examples
+involve that 1 node. In your real life, you’ll work with clusters that
+have many more nodes.</p>
+<p>We have a cluster with 1 node. We have our <code>hi</code> app,
+tucked away in a container, and we defined a pod that is supposed to run
+that container. Let’s deploy that pod using <code>kubectl</code>:</p>
+<pre class="shell"><code>$ kubectl create -f hi_pod.yaml
+pod/hi-pod created</code></pre>
+<p>Verify that your pod is created:</p>
+<pre class="shell"><code>$ kubectl get pods
+NAME     READY   STATUS    RESTARTS   AGE
+hi-pod   1/1     Running   0          54s</code></pre>
+<p>This shows that the pod is <code>Running</code> and has been doing so
+for <code>54s</code>. Note the levels of indirection:</p>
+<ul>
+<li>when you ran the app <code>hi.js</code> on our laptop, you could
+navigate to <code>localhost:8111</code> and see the
+<code>Hi from...</code></li>
+<li>when you ran the app in a container, you needed to forward the
+localhost’s port <code>8111</code> <em>into</em> the container using
+<code>docker container run -d -p 8111:8111 -t stijnh/hi</code></li>
+<li>when you run the app in a container in a pod, you need to do
+what?</li>
+</ul>
+<p>You could forward the port via <code>kubectl</code>, but that is
+mostly for debugging. I’ll answer this question in the next section
+where I’ll talk about how to make your pod visible to other pods. For
+now, I’ll just show how to check your logs on the pod with name
+<code>hi-pod</code>:</p>
+<pre class="shell"><code>$ kubectl logs hi-pod
+hi: listening on port 8111 of host hi-pod</code></pre>
+<p>That’s indeed what the app logs when you start it. Note that the host
+is listed as <code>hi-pod</code> which corresponds to the name we gave
+the pod in <code>hi-pod.yaml</code>.</p>
+<p>See more details for your pod by doing a <code>describe</code>:</p>
+<pre class="shell"><code>$ kubectl describe pod hi-pod</code></pre>
+<p>Scroll down to the last section:</p>
+<pre class="shell"><code>Events:
+  Type    Reason     Age        From               Message
+  ----    ------     ----       ----               -------
+  Normal  Scheduled  &lt;unknown&gt;  default-scheduler  Successfully assigned default/hi-pod to minikube
+  Normal  Pulling    23h        kubelet, minikube  Pulling image &quot;stijnh/hi&quot;
+  Normal  Pulled     23h        kubelet, minikube  Successfully pulled image &quot;stijnh/hi&quot;
+  Normal  Created    23h        kubelet, minikube  Created container hi
+  Normal  Started    23h        kubelet, minikube  Started container hi</code></pre>
+<p>The container image <code>stijnh/hi</code> is pulled, the container
+is created, and finally, the container is started.</p>
+<p>This picture summarizes the current state – the container image
+<code>stijnh/hi</code>, deployed on a pod <code>hi-pod</code> on 1 node
+(your laptop):</p>
+<figure>
+<img src="./diagrams/pod.svg" alt="Running 1 pod on your laptop" />
+<figcaption aria-hidden="true">Running 1 pod on your laptop</figcaption>
+</figure>
+<h3 id="deployment">Deployment</h3>
+<p>One instance of your application is up and running, in 1 container,
+on 1 pod. I indicated that <em>your application needs to serve 1000s of
+requests per second</em> and, humor me, it turns out 1 instance of your
+application is not able to do that. For more good humor, assume that
+each application can serve 250 requests per second. If you do that math,
+as I’m sure you do without hesitation and with elegance, you see that we
+need 4 instances of the application.</p>
+<p>“OK, let me run 4 containers of my application,” you say.<br/> “Yes,
+but no,” I say. “The unit of operation when your application is managed
+by k8s is a pod, so we want 4 pods, each in turn running 1
+container.”<br/> “So I <em>was</em> right,” you say.<br/> “Stop being
+pedantic and pay attention.”</p>
+<p>There’s a k8s resource type (the first one we met was a
+<code>Pod</code>) that allows to specify how many pods k8s to keep
+around: a <a
+href="https://kubernetes.io/docs/concepts/workloads/controllers/deployment/"><code>Deployment</code></a>.
+The word on the street is that you should specify more than 1 pod, to
+ward off loneliness.</p>
+<p>As with pods, you specify a deployment using a YAML manifests. The
+line that gets me my 4 pods is:</p>
+<div class="sourceCode" id="cb15"><pre
+class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">spec</span><span class="kw">:</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">replicas</span><span class="kw">:</span><span class="at"> </span><span class="dv">3</span></span></code></pre></div>
+<p>Glad to see you’re awake Grasshopper. Four of course:</p>
+<div class="sourceCode" id="cb16"><pre
+class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">spec</span><span class="kw">:</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">replicas</span><span class="kw">:</span><span class="at"> </span><span class="dv">4</span></span></code></pre></div>
+<p>How will you describe <em>which</em> pod you want 4 replicas of?
+Kubernetes uses <em>labels</em> to determine which replicas you’re
+talking about.</p>
+<p>On the <em>Pod</em> side, you have to make sure your pods are
+labeled, and then you indicate in your <code>Deployment</code> what
+labels you’re describing. An example of a label is <code>app=hi</code>.
+Another label could be <code>tier=dev</code>, or
+<code>color=blue</code>. The latter is obviously no good,
+<code>color=yellow</code> is be better. Labels are <em>key/value
+pairs</em>, and you can have multiple different labels on a pod (but you
+cannot have 2 labels with the same <em>key</em>: so
+<code>color=blue</code> and <code>color=yellow</code> does not
+work).</p>
+<p>On the <code>Deployment</code> side, you then indicate that you want
+3 replicas of all pods matching <em>these labels</em>. For example, you
+indicate that you are describing pods with label
+<code>app=hi</code>:</p>
+<div class="sourceCode" id="cb17"><pre
+class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">spec</span><span class="kw">:</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">selector</span><span class="kw">:</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">matchLabels</span><span class="kw">:</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">app</span><span class="kw">:</span><span class="at"> hi</span></span></code></pre></div>
+<p>Easy enough. <br/> “But but, we did not give our pod this label, so
+there’s nothing to find.” <br/> Yes, The final piece of such a
+<code>Deployment</code> is to describe what kind of pods you want to
+create, a so-called <em>pod template</em>:</p>
+<div class="sourceCode" id="cb18"><pre
+class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">spec</span><span class="kw">:</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">template</span><span class="kw">:</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">metadata</span><span class="kw">:</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">labels</span><span class="kw">:</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">app</span><span class="kw">:</span><span class="at"> hi</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">spec</span><span class="kw">:</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">containers</span><span class="kw">:</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">image</span><span class="kw">:</span><span class="at"> stijnh/hi</span></span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">name</span><span class="kw">:</span><span class="at"> hi</span></span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">ports</span><span class="kw">:</span></span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="kw">-</span><span class="at"> </span><span class="fu">containerPort</span><span class="kw">:</span><span class="at"> </span><span class="dv">8111</span></span></code></pre></div>
+<p>The latter looks like the pod definition earlier, except that it also
+specifies that the pod needs to have a label <code>app=hi</code> as
+metadata. In fact, now that we have a deployment you can forget all
+about that initial pod definition. This <code>Deployment</code> knows
+all it needs to know to create your 3 pods (<em>4! pay attention!</em>).
+Put it all together:</p>
+<pre><code>apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hi-deployment
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: hi
+  template:
+    metadata:
+      labels:
+        app: hi
+    spec:
+      containers:
+        - image: stijnh/hi
+          name: hi
+          ports:
+            - containerPort: 8111</code></pre>
+<p>This specification describes a <code>Deployment</code> with name
+<code>hi-deployment</code>. It specifies that at all times there need to
+be 4 replicas of a <code>Pod</code> matching <code>app=hi</code>. The
+<code>template</code> indicates how the <code>Deployment</code> will go
+about creating new pods: it will run the container
+<code>stijnh/hi</code> and it will label the pod with
+<code>app=hi</code>. The latter is important as this ensures that the
+just created Pod is managed by the <code>Deployment</code>. Imagine if
+we create a <code>Pod</code> with label <code>app=yo</code>. The
+<code>Deployment</code> would never conclude it reached 4 replicas of
+pods with label <code>app=hi</code> so pods would keep on getting
+created.</p>
+<p>Before you try this <code>Deployment</code>, delete all resources you
+have so far, and then check that you have 0 pods running:</p>
+<pre class="shell"><code>$ kubectl delete all --all
+$ kubectl get pods</code></pre>
+<p>Now, create a deployment using the usual <code>create</code> based on
+the above YAML (<code>hi-deployment.yaml</code>):</p>
+<pre class="shell"><code>$ kubectl create -f hi-deployment.yaml</code></pre>
+<p>And then watch the magic:</p>
+<pre class="shell"><code>$ kubectl get pods
+NAME                             READY   STATUS              RESTARTS   AGE
+hi-deployment-5f7b895fd9-5hb5h   0/1     ContainerCreating   0          3s
+hi-deployment-5f7b895fd9-dt8kf   0/1     ContainerCreating   0          3s
+hi-deployment-5f7b895fd9-r58kc   0/1     ContainerCreating   0          3s
+hi-deployment-5f7b895fd9-wgwpp   0/1     ContainerCreating   0          3s</code></pre>
+<p>Note the <code>STATUS</code> <code>ContainerCreating</code>, and then
+a couple of seconds later:</p>
+<pre class="shell"><code>$ kubectl get pods
+NAME                             READY   STATUS    RESTARTS   AGE
+hi-deployment-5f7b895fd9-5hb5h   1/1     Running   0          8s
+hi-deployment-5f7b895fd9-dt8kf   1/1     Running   0          8s
+hi-deployment-5f7b895fd9-r58kc   1/1     Running   0          8s
+hi-deployment-5f7b895fd9-wgwpp   1/1     Running   0          8s</code></pre>
+<p>Verify that the pods have the label <code>app=hi</code> so they’re
+under management of the <code>Deployment</code>:</p>
+<pre class="shell"><code>$ kubectl get pods --show-labels
+NAME                             READY   STATUS    RESTARTS   AGE     LABELS
+hi-deployment-5f7b895fd9-5hb5h   1/1     Running   0          2m40s   app=hi,pod-template-hash=5f7b895fd9
+hi-deployment-5f7b895fd9-dt8kf   1/1     Running   0          2m40s   app=hi,pod-template-hash=5f7b895fd9
+hi-deployment-5f7b895fd9-r58kc   1/1     Running   0          2m40s   app=hi,pod-template-hash=5f7b895fd9
+hi-deployment-5f7b895fd9-wgwpp   1/1     Running   0          2m40s   app=hi,pod-template-hash=5f7b895fd9</code></pre>
+<p>Yep, there we have it, <code>app=hi</code>. I promised that the
+Deployment specifies that at all times there need to be 4 replicas. So
+what if you delete one? For example, delete the first pod:</p>
+<pre class="shell"><code>$ kubectl delete pod hi-deployment-5f7b895fd9-5hb5h</code></pre>
+<p>Then check your pods with label <code>app=hi</code> – you can use the
+<code>-l</code> flag to specify to only see pods with that label:</p>
+<pre class="shell"><code>$ kubectl get pods -l app=hi
+NAME                             READY   STATUS    RESTARTS   AGE
+hi-deployment-5f7b895fd9-dt8kf   1/1     Running   0          6m6s
+hi-deployment-5f7b895fd9-h7mz7   1/1     Running   0          82s
+hi-deployment-5f7b895fd9-r58kc   1/1     Running   0          6m6s
+hi-deployment-5f7b895fd9-wgwpp   1/1     Running   0          6m6s</code></pre>
+<p>Still 4 pods, shucks! But if you look at the <code>NAME</code>s you
+see that <code>hi-deployment-5f7b895fd9-5hb5h</code> is gone and
+replaced by the new pod <code>hi-deployment-5f7b895fd9-dt8kf</code>. The
+<code>Deployment</code> guaranteed that 4 replicas are running at all
+times. The Zombie Apocalypse is nigh.</p>
+<p>We checked the 4 pods using <code>kubectl get pods</code>. You can
+also get more info on the <code>Deployment</code> resources:</p>
+<pre class="shell"><code>$ kubectl get deployment
+NAME            READY   UP-TO-DATE   AVAILABLE   AGE
+hi-deployment   4/4     4            4           8m48s</code></pre>
+<p>Note that it indicates that <code>4</code> out <code>4</code> pods
+are ready. In this article, I’ll stay at the abstraction of
+<code>Deployment</code> and <code>Pods</code> but if you do the
+following, you’ll see that there’s something called a <a
+href="https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/"><code>ReplicaSet</code></a>
+created as well.</p>
+<pre class="shell"><code>$ kubectl get replicaset
+NAME                       DESIRED   CURRENT   READY   AGE
+hi-deployment-5f7b895fd9   4         4         4       10m</code></pre>
+<p>It’s actually this <code>ReplicaSet</code> that is created by the
+<code>Deployment</code> that makes sure that the replicas are kept at
+<code>4</code> (see the <code>DESIRED</code> column). The
+<code>Deployment</code> does not create the pods directly. I’ll not go
+into more detail around <code>ReplicaSet</code>s as you’ll usually not
+deal with them directly.</p>
+<figure>
+<img src="./diagrams/deployment.svg" alt="A Deployment" />
+<figcaption aria-hidden="true">A Deployment</figcaption>
+</figure>
+<p>In the previous, I kept referring to 4 instances of the application
+or 4 pods, not 4 nodes. The 4 pods running the containers are all
+running on the same node on your laptop. In reality, you’ll have more
+than 1 node to run your application, and your application instances may
+have been scheduled on different nodes to accommodate for, for example,
+CPU requirements of your application.</p>
+<h1 id="clients-of-your-application">Clients of your Application</h1>
+<p>Recall the 2nd requirement I listed in the
+<a href="#introduction">Introduction</a>:</p>
+<p>!!! Clients of your application need to connect to one IP address and
+requests will be routed to the different application instances
+automatically</p>
+<h2 id="internal-clients-on-the-same-cluster">(Internal) Clients on the
+Same Cluster</h2>
+<p>First consider clients on the same cluster. Why is it tricky for
+clients to connect to your application?</p>
+<ul>
+<li>Your application runs on several pods. Each pod has its own IP. For
+a client to connect to a pod, it needs to know the IP of the pod, but
+since pods are <em>ephemeral</em> (they could be removed when a node
+fails etc), that IP may change, so even if your client has the IP of the
+pod, that IP may become invalid over time</li>
+<li>There are multiple instances of your application running (4 in our
+case), so the client needs to know all 4 IPs and then select one to
+connect to</li>
+</ul>
+<p>How to avoid that a client needs to know that list of ever-changing
+IPs? Another k8s resource to the rescue : a <em>Service</em>.</p>
+<p>A <em>Service</em> gives you 1 IP and <a
+    href="https://en.wikipedia.org/wiki/Load_balancing_(computing)">load-balances</a>
+requests to that IP by redirecting requests to the pods that are able to
+serve the request. As with <em>Deployments</em> before, one question is
+how will the Service know what Pods it controls? Labels! Remember that
+all of the pods in our current deployment have label
+<code>app=hi</code>. We can define a <em>Service</em> that provides the
+IP and load-balancing for exactly those pods. Create a file
+<code>hi_service.yaml</code>:</p>
+<pre><code>apiVersion: v1
+kind: Service
+metadata:
+  name: hi-service
+spec:
+  ports:
+    - port: 80
+      targetPort: 8111
+  selector:
+    app: hi</code></pre>
+<p>I defined a service (<code>kind: Service</code>), a name for the
+service (<code>hi-service</code>), and I specified that port
+<code>80</code> of the service forwards to port <code>8111</code> of the
+container (if you scroll up, you can see that <code>8111</code> is
+indeed the port our <code>hi</code> app is listening on). Finally, by
+using a <code>selector</code>, I specified that this service is a
+service fronting pods with label <code>app=hi</code>.</p>
+<p>Create the service as usual:</p>
+<pre class="shell"><code>$ kubectl create -f hi_service.yaml</code></pre>
+<p>And verify it’s there:</p>
+<pre class="shell"><code>$ kubectl get services
+NAME         TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)   AGE
+hi-service   ClusterIP   10.105.43.171   &lt;none&gt;        80/TCP    7s</code></pre>
+<p>Note the <code>CLUSTER-IP</code>: the service received an IP local to
+your cluster. All requests to this IP (port 80, as specified) route to 1
+of the pods with label <code>app=hi</code> on port <code>8111</code>.
+Note also that the <code>EXTERNAL-IP</code> is
+<code>&lt;none&gt;</code>: this IP is only available to clients within
+the cluster. I’ll show in the next section how to make the service
+available outside the cluster.</p>
+<figure>
+<img src="./diagrams/service.svg" alt="A Service" />
+<figcaption aria-hidden="true">A Service</figcaption>
+</figure>
+<p>From that picture, note that the deployment serves a different
+function than the service. The deployment regulates the number of
+replicas of the pods, whereas the service’s purpose is to provide 1
+interfacing IP for clients that routes to the IPs of the pods. In fact,
+you can see the latter by doing:</p>
+<pre class="shell"><code>$ kubectl describe service hi-service
+Name:              hi-service
+Namespace:         default
+Labels:            &lt;none&gt;
+Annotations:       &lt;none&gt;
+Selector:          app=hi
+Type:              ClusterIP
+IP:                10.105.43.171
+Port:              &lt;unset&gt;  80/TCP
+TargetPort:        8111/TCP
+Endpoints:         172.18.0.6:8111,172.18.0.7:8111,172.18.0.8:8111 + 1 more...
+Session Affinity:  None
+Events:            &lt;none&gt;</code></pre>
+<p>Note the <code>Endpoints</code>: those are the IPs of your pods
+(including the port <code>8111</code> on which your container runs).</p>
+<p>I’ve highlighted that this allows clients <em>from within the
+cluster</em> to hit your service at the IP <code>10.105.43.171</code> so
+they are routed to the different pods. How do I test this? How do I get
+a client <em>from within the cluster</em>?</p>
+<p>One way to get <em>in the cluster</em> is using <code>exec</code>
+which makes it possible to execute a command of your choice on a pod of
+your choice – assuming the pod is <em>in the cluster</em> you’d like to
+be <em>in</em>. What command do you want to execute to test your cluster
+IP?</p>
+<p>You probably want something like <code>curl 10.105.43.171</code>, so
+you do:</p>
+<pre class="shell"><code>$ kubectl exec hi-deployment-5f7b895fd9-dt8kf -- curl 10.105.43.171</code></pre>
+<p>Note that you picked a pod
+<code>hi-deployment-5f7b895fd9-dt8kf</code> by looking at
+<code>kubectl get pods</code>. The <code>--</code> separates your
+<code>kubectl</code> command-line arguments from the command you’re
+executing (which starts with <code>curl..</code>). If you execute this
+command, you’ll get an error:</p>
+<pre><code>\&quot;curl\&quot;: executable file not found in $PATH&quot;</code></pre>
+<p>Stepping back you then notice that you based your container image on
+the small Linux image <code>alpine</code> and <code>curl</code> does not
+come installed with that Linux (check out the <a
+href="https://github.com/sheymans/elementsOf/blob/master/kubernetes/demo/hi_app/Dockerfile#L1">Dockerfile</a>
+for the image <a
+href="https://hub.docker.com/r/stijnh/hi">stijnh/hi_app</a>). What does
+come installed that you could use? <a
+href="https://en.wikipedia.org/wiki/Wget"><code>wget</code></a>.</p>
+<pre class="shell"><code>$ kubectl exec hi-deployment-5f7b895fd9-dt8kf -- wget -q -O - 10.105.43.171</code></pre>
+<p>Execute that a few times and see subsequent outputs:</p>
+<pre><code>Hi from hi-deployment-5f7b895fd9-r58kc
+Hi from hi-deployment-5f7b895fd9-wgwpp
+Hi from hi-deployment-5f7b895fd9-h7mz7</code></pre>
+<p>You’re hitting 1 IP <code>10.105.43.171</code> but you see that
+different instances of your application (on different pods) answer the
+call with those different hostnames. Magic!</p>
+<h2 id="external-clients">(External) Clients</h2>
+<p>In the previous section, you maneuvered yourself on a pod in the
+cluster to access the app via the service’s cluster-local IP. In the
+real world, you want <em>external</em> clients, such as your user’s
+browser, to have access to your application.</p>
+<p>There are several ways you can accomplish this. I’ll focus on one:
+<em>creating an <a
+href="https://kubernetes.io/docs/concepts/services-networking/ingress/">Ingress</a>
+resource</em>. If someone vomits up the word <em><a
+href="https://www.thefreedictionary.com/ingress">ingress</a></em>, there
+better be a reason. There’s not of course: someone started calling an
+<em>entrance</em> an <em>ingress</em> and should be punished for it. But
+I digress.</p>
+<p>To specify the ingress resource, create a YAML
+<code>hi-ingress.yaml</code>:</p>
+<div class="sourceCode" id="cb37"><pre
+class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">apiVersion</span><span class="kw">:</span><span class="at"> extensions/v1beta1</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="fu">kind</span><span class="kw">:</span><span class="at"> Ingress</span></span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a><span class="fu">metadata</span><span class="kw">:</span></span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">name</span><span class="kw">:</span><span class="at"> hi-ingress</span></span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a><span class="fu">spec</span><span class="kw">:</span></span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">rules</span><span class="kw">:</span></span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="at"> </span><span class="fu">host</span><span class="kw">:</span><span class="at"> hi.stijnheymans.net</span></span>
+<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">http</span><span class="kw">:</span></span>
+<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">paths</span><span class="kw">:</span></span>
+<span id="cb37-10"><a href="#cb37-10" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="kw">-</span><span class="at"> </span><span class="fu">path</span><span class="kw">:</span><span class="at"> /</span></span>
+<span id="cb37-11"><a href="#cb37-11" aria-hidden="true" tabindex="-1"></a><span class="at">            </span><span class="fu">backend</span><span class="kw">:</span></span>
+<span id="cb37-12"><a href="#cb37-12" aria-hidden="true" tabindex="-1"></a><span class="at">              </span><span class="fu">serviceName</span><span class="kw">:</span><span class="at"> hi-service</span></span>
+<span id="cb37-13"><a href="#cb37-13" aria-hidden="true" tabindex="-1"></a><span class="at">              </span><span class="fu">servicePort</span><span class="kw">:</span><span class="at"> </span><span class="dv">80</span></span></code></pre></div>
+<p>As they do on Wall Street, line by line:</p>
+<pre><code>kind: Ingress</code></pre>
+<p>indicates that this describes an <code>Ingress</code> k8s resource.
+Give it a name:</p>
+<pre><code>name: hi-ingress</code></pre>
+<p>And now for the interesting part. I specify a rule that indicates
+that I want to route the URL <code>hi.stijnheymans.net/</code> to the
+service <code>hi-service</code> at port <code>80</code>. Recall from the
+above that I defined such a service <code>hi-ingress</code> (and recall
+that that service in itself routes requests to any of the pods that it
+serves).</p>
+<pre><code>  rules:
+    - host: hi.stijnheymans.net
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: hi-service
+              servicePort: 80</code></pre>
+<p>Put the <code>Ingress</code> in play:</p>
+<pre class="shell"><code>$ kubectl create -f hi-ingress.yaml</code></pre>
+<p>Check that it’s there:</p>
+<pre class="shell"><code>$ kubectl get ingresses
+NAME         CLASS    HOSTS                 ADDRESS        PORTS   AGE
+hi-ingress   &lt;none&gt;   hi.stijnheymans.net   192.168.64.2   80      10s</code></pre>
+<p>It’s there and it’s indicating an IP address that you can hit (on
+your laptop, so an <em>external</em> IP – not a cluster IP):
+<code>192.168.64.2</code>.</p>
+<p>As you’ve most likely not registered
+<code>hi.stijnheymans.net</code>, let’s trick <a
+href="https://en.wikipedia.org/wiki/Domain_Name_System">DNS</a>
+resolution to think <code>hi.stijnheymans.net</code> resolves to the IP
+<code>192.168.64.2</code>. On your laptop, edit <code>/etc/hosts</code>
+by adding the following line:</p>
+<pre><code>192.168.64.2 hi.stijnheymans.net</code></pre>
+<p>Now let’s see the magic at work: navigate to <a
+href="http://stijnheymans.net">http://hi.stijnheymans.net</a>. You
+should see <code>Hi from hi-deployment-5f7b895fd9-zfb4m</code> (or
+something similar). Refresh like the crazy Flower Child you are and feel
+the glorious greetings from different hosts be extended to you. This is
+the smell of success you hoped for when you opened this page on <span
+id="datetime"></span>.</p>
+<p>In summary, this is how things flow:</p>
+<figure>
+<img src="./diagrams/ingress.svg" alt="External Client" />
+<figcaption aria-hidden="true">External Client</figcaption>
+</figure>
+<p>I made a simplification to this diagram and left out the <a
+href="https://kubernetes.io/docs/concepts/services-networking/ingress-controllers/">Ingress
+controller</a>: I don’t want to know, I don’t need to know, and
+<code>Ingress</code> as a name was worse enough, making it also a
+<code>Controller</code> is just that one step too far.</p>
+<h1 id="push-changes">Push Changes</h1>
+<p>Recall the 2 requirements around pushing changes to your app:</p>
+<p>!!! You need to be able to push changes to your application without
+downtime</p>
+<p>!!! You need to be able to rollback changes to your application</p>
+<p>This was the YAML describing our <code>Deployment</code>:</p>
+<pre><code>apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hi-deployment
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: hi
+  template:
+    metadata:
+      labels:
+        app: hi
+    spec:
+      containers:
+        - image: stijnh/hi
+          name: hi
+          ports:
+            - containerPort: 8111</code></pre>
+<p>You’re eternally unsatisfied so you have a second version of your
+application ready: a new image <code>stijnh/hi:v2</code>, to replace the
+original <code>stijnh/hi</code>. How can you make sure that all
+application instances are running <code>stijnh/hi:v2</code> instead of
+<code>stijnh/hi</code>?</p>
+<p>The naive answer is the correct one: replace <code>stijnh/hi</code>
+in the <code>Deployment</code> by <code>stijnh/hi:v2</code>:</p>
+<pre><code>        - image: stijnh/hi:v2</code></pre>
+<p>That’s it. The default strategy for roll-outs that k8s
+<code>Deployment</code>s use is the <code>RollingUpdate</code> strategy.
+With that strategy, k8s scales down the number of pods that run the old
+image from 4 to 0 and scales up the number of pods with the new image
+from 0 to 4. This guarantees that there’s no downtime, but it would
+force you to make sure that <code>v2</code> is compatible with the first
+version of your app. Indeed, the service will start routing requests to
+new <em>and</em> old pods while we are in the intermediate state. This
+may cause problems if you, for example, did database changes and
+<code>v2</code> of your app is writing data in a different format than
+before and <code>v1</code> and <code>v2</code> are both reading from
+that data but <code>v1</code> expects the old format so crashes on that
+newly written data. Some programmatic care is usually warranted to avoid
+situations like that, often leading to an intermediate <code>v2</code>
+with the end state in a <code>v3</code>. I leave this as an exercise to
+reader. Yeah. That’s right. Move on.</p>
+<p>If you see no such programmatic way out, but you are willing to
+tolerate downtime, you can use the <code>Recreate</code> strategy. Your
+deployment is then as follows:</p>
+<pre><code>apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hi-deployment
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: hi
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: hi
+    spec:
+      containers:
+        - image: stijnh/hi:v2
+          name: hi
+          ports:
+            - containerPort: 8111</code></pre>
+<p>This will cause k8s to take out all of your <code>stijnh/hi</code>
+pods and immediately scale up all of the new <code>stijnh/hi:v2</code>
+pods. This causes a small downtime when old the old pods are gone and
+none of the new ones are there yet, or may result in a situation where
+while <code>v2</code> is scaling up, you do not have enough pods to
+serve production traffic.</p>
+<p>To finish this section, some quick commands that allow you to check
+the deployment rollouts/rollbacks.</p>
+<pre class="shell"><code>$ kubectl rollout status deployment hi-deployment</code></pre>
+<p>If something went wrong you can execute a rollback immediately as
+follows:</p>
+<pre class="shell"><code>$ kubectl rollout undo deployment hi-deployment</code></pre>
+<p>You may be of the controlling kind, and you wonder how to control the
+rolling update: how much percentage of the old pods can you take out
+while bringing in new pods with the latest version? Go checkout out <a
+href="https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#proportional-scaling">proportional
+scaling</a>.</p>
+<h1 id="warm-up-of-your-application">Warm-up Of Your Application</h1>
+<p>!!! Your application needs to be <em>warmed up</em>: certain things
+need to happen before your application can start serving up requests.
+For example, the application instance needs to sync its data with the
+data of other instances</p>
+<p>When a pod gets deployed on a cluster (as part of a
+<code>Deployment</code> for example), it might not immediately be ready
+for serving traffic. The app may need to pull configuration data from <a
+href="https://aws.amazon.com/s3/">S3</a> into memory, or in a
+distributed setting, the app may need to reach consensus with other
+instances. These are situations where a service should not immediately
+route traffic to that new pod. Only when the new pod is <em>ready</em>
+it gets included as one of the pods that a service routes traffic
+to.</p>
+<p>How to get an indicator of whether a pod is ready to serve traffic?
+Use a <em>readiness probe</em>. There are several ways to define
+readiness probes, but I’ll focus on a <code>HTTP GET</code> readiness
+probe: doing a <code>GET</code> to the pod will indicate, based on the
+returned status of that <code>GET</code>, whether the pod is ready for
+serving traffic or not – <em>you probe the pod for readiness</em>.</p>
+<p>You can specify the <code>readinessProbe</code> in the pod
+specification. Change the following pod:</p>
+<pre><code>apiVersion: v1
+kind: Pod
+metadata:
+  name: hi-pod
+spec:
+  containers:
+    - image: stijnh/hi
+      name: hi
+      ports:
+        - containerPort: 8111</code></pre>
+<p>to include the <code>readinessProbe</code>:</p>
+<pre><code>apiVersion: v1
+kind: Pod
+metadata:
+  name: hi-pod
+spec:
+  containers:
+    - image: stijnh/hi
+      name: hi
+      ports:
+        - containerPort: 8111
+      readinessProbe:
+        httpGet:
+          path: /readiness
+          port: 8888
+        initialDelaySeconds: 300
+        periodSeconds: 30</code></pre>
+<p>Once the pod is deployed, k8s waits 300 seconds
+(<code>initialDelaySeconds</code>), and then every 30 seconds
+(<code>periodSeconds</code>) it does a <code>GET</code> on port 8888 of
+the container at path <code>/readiness</code>. If that <code>GET</code>
+returns a <a
+href="https://en.wikipedia.org/wiki/List_of_HTTP_status_codes#2xx_success"><code>200</code></a>
+your pod is ready and will be included for routing traffic to.</p>
+<p>This set-up requires that the app defines a path
+<code>/readiness</code> and that it only returns <code>200</code> if it
+is truly ready. For a web app, this naturally follows when the web app
+is up and running. If there’s more complex start-up going on (like the
+reaching of consensus in a distributed setting), you should guarantee
+that the <code>/readiness</code> path only returns a <code>200</code>
+when the application has reached consensus.</p>
+<h1 id="are-you-alive">Are you alive?</h1>
+<p>!!! When an instance of your application dies (and is thus no longer
+able to serve requests), that instance needs to become invisible to
+clients of your application. Traffic should be guided to
+still-functioning instances of your application</p>
+<p>Well, that requirement sounds related to the readiness requirement,
+doesn’t it? In this case, one or more instances of your application died
+(or started spewing errors and only Leonardo DiCaprio knows why but he
+won’t tell). If that happens, we want to take the pod with the dead
+application out of rotation (the service should stop routing traffic to
+the pod). Similar to the above <code>readinessProbe</code>, there’s a
+concept called <code>livenessProbe</code>. You define (for the HTTP
+case) a path on your app that indicates whether your app is alive on a
+<code>GET</code> on that path. If that <code>GET</code> indicates it’s
+not alive (for example, no <code>200</code> was returned), the pod gets
+taken out of rotation and a new pod is restarted.</p>
+<p>Liveness probes are specified similarly to readiness probes.</p>
+<h1 id="horizontal-autoscaling">Horizontal Autoscaling</h1>
+<p>!!! To save costs during the night when you need less capability for
+your main application, you want to reuse some of the available
+capability to run batch jobs</p>
+<p>Note that this does not talk about getting rid of actual
+machines/nodes: the requirement indicates that there are periods that
+you want to downscale the number of pods of your main application to
+make room on the nodes for other jobs.</p>
+<p>You can schedule jobs during the night using k8s resources like <a
+href="https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/">CronJobs</a>
+so that’s not the interesting part of this requirement. The core of what
+I’m interested in is:</p>
+<p>!!! Can I minimize the amount of pods while still being able to serve
+traffic?</p>
+<p>Simplified, during the day I may need 4 replicas of my application,
+but during the night I may only need 1. Rather than having all 4
+replicas run all the time and incur costs, can I scale down to the
+amount of replicas <em>I need</em> during the night and scale back up
+during the day?</p>
+<p>This question leads first to another question: what does <em>I
+need</em> mean? When should I scale up or down? Well, you can specify
+that based on different metrics. One such metric is <em>CPU usage</em>:
+if average CPU usage goes above a threshold, say 80% for a certain
+amount of time, spin up extra pods so that that average will go down
+again. Another commonly used metric is <em>transactions per second
+(TPS)</em>.</p>
+<p>Start with the snippet that indicates that each pod can handle about
+200 transactions per second:</p>
+<pre><code>metric:
+  name: transactions-per-second
+describedObject:
+  apiVersion: networking.k8s.io/v1beta1
+  kind: Ingress
+  name: hi-ingress
+target:
+  type: AverageValue
+  value: 200</code></pre>
+<p>Analyzing this line-by-line:</p>
+<pre><code>metric:
+  name: transactions-per-second</code></pre>
+<p>gives the metric the name <code>transactions-per-second</code> (the
+name does not do anything but being a name, a bit like
+<code>Brad Pitt</code>).</p>
+<pre><code>describedObject:
+  apiVersion: networking.k8s.io/v1beta1
+  kind: Ingress
+  name: hi-ingress</code></pre>
+<p>indicates the object I’m describing. I’m describing our
+<code>Ingress</code> <code>hi-ingress</code>. Recall that the Ingress is
+the resource that makes our service available externally. Indeed, rather
+than describing the traffic on the Pod directly, I refer to the
+externally facing part of our service.</p>
+<pre><code>target:
+  type: AverageValue
+  value: 200</code></pre>
+<p>indicates that the <code>Ingress</code> should <em>on average</em> be
+sending 200 requests to each of the pods.</p>
+<p>Now that I went over the metric specification, I can put it in
+context of the k8s resource that will have such a metric specification:
+a <a
+href="https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/"><code>HorizontalPodAutoscaler</code></a>
+(HPA). The HPA will indicate what should happen when we go over those
+<code>200</code> average requests to the pods. We should scale up the
+amount of pods according to a linked <code>Deployment</code>. Is there a
+limit to scaling up the pods? Yes, there is and the HPA indicates that
+as well. Let’s write it all up in a YAML <code>hi-hpa.yaml</code>:</p>
+<div class="sourceCode" id="cb55"><pre
+class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="fu">apiVersion</span><span class="kw">:</span><span class="at"> autoscaling/v2beta2</span></span>
+<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a><span class="fu">kind</span><span class="kw">:</span><span class="at"> HorizontalPodAutoscaler</span></span>
+<span id="cb55-3"><a href="#cb55-3" aria-hidden="true" tabindex="-1"></a><span class="fu">metadata</span><span class="kw">:</span></span>
+<span id="cb55-4"><a href="#cb55-4" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">name</span><span class="kw">:</span><span class="at"> hi-hpa</span></span>
+<span id="cb55-5"><a href="#cb55-5" aria-hidden="true" tabindex="-1"></a><span class="fu">spec</span><span class="kw">:</span></span>
+<span id="cb55-6"><a href="#cb55-6" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">scaleTargetRef</span><span class="kw">:</span></span>
+<span id="cb55-7"><a href="#cb55-7" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">apiVersion</span><span class="kw">:</span><span class="at"> apps/v1</span></span>
+<span id="cb55-8"><a href="#cb55-8" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">kind</span><span class="kw">:</span><span class="at"> Deployment</span></span>
+<span id="cb55-9"><a href="#cb55-9" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">name</span><span class="kw">:</span><span class="at"> hi-deployment</span></span>
+<span id="cb55-10"><a href="#cb55-10" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">minReplicas</span><span class="kw">:</span><span class="at"> </span><span class="dv">1</span></span>
+<span id="cb55-11"><a href="#cb55-11" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">maxReplicas</span><span class="kw">:</span><span class="at"> </span><span class="dv">5</span></span>
+<span id="cb55-12"><a href="#cb55-12" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">metrics</span><span class="kw">:</span></span>
+<span id="cb55-13"><a href="#cb55-13" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="at"> </span><span class="fu">type</span><span class="kw">:</span><span class="at"> Object</span></span>
+<span id="cb55-14"><a href="#cb55-14" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">object</span><span class="kw">:</span></span>
+<span id="cb55-15"><a href="#cb55-15" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">metric</span><span class="kw">:</span></span>
+<span id="cb55-16"><a href="#cb55-16" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">name</span><span class="kw">:</span><span class="at"> transactions-per-second</span></span>
+<span id="cb55-17"><a href="#cb55-17" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">describedObject</span><span class="kw">:</span></span>
+<span id="cb55-18"><a href="#cb55-18" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">apiVersion</span><span class="kw">:</span><span class="at"> networking.k8s.io/v1beta1</span></span>
+<span id="cb55-19"><a href="#cb55-19" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">kind</span><span class="kw">:</span><span class="at"> Ingress</span></span>
+<span id="cb55-20"><a href="#cb55-20" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">name</span><span class="kw">:</span><span class="at"> hi-ingress</span></span>
+<span id="cb55-21"><a href="#cb55-21" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">target</span><span class="kw">:</span></span>
+<span id="cb55-22"><a href="#cb55-22" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">type</span><span class="kw">:</span><span class="at"> AverageValue</span></span>
+<span id="cb55-23"><a href="#cb55-23" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">value</span><span class="kw">:</span><span class="at"> </span><span class="dv">200</span></span></code></pre></div>
+<p>In addition to the metric <code>transactions-per-second</code> I
+defined earlier, you also see:</p>
+<pre><code>  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: hi-deployment</code></pre>
+<p>which refers to our <code>hi-deployment</code>. Recall that it is
+this deployment that tells k8s what pods look like (and by default makes
+sure there are 4 pods with the right labels). You also see</p>
+<pre><code>  minReplicas: 1
+  maxReplicas: 5</code></pre>
+<p>Whereas the default is <code>4</code> pods, the HPA may scale you
+down to 1 pod or scale you up to 5 pods until we hit the target of
+<code>200</code> transactions on average on the
+<code>Ingress</code>.</p>
+<p>Re-read that previous paragraph and cherish the road you’ve traveled
+since starting to read this article. At the minimum, I wore you
+down.</p>
+<p>Try it out as usual with:</p>
+<pre class="shell"><code>$ kubectl create -f hi-hpa.yaml</code></pre>
+<h1 id="autoscale-the-cluster">Autoscale the cluster</h1>
+<p>!!! There will be times when there will not be enough machines to
+serve your traffic (during a promotion, or, say, the holiday period), so
+you want to increase, <em>scale up</em>, the amount of physical machines
+you have available. After the busy period, you want to get back to
+normal and scale down</p>
+<p>The HPA I defined helps increase and decrease pods on your cluster,
+making up space for other applications/batch processes to run, and thus
+helps save costs. However, the HPA does nothing about the actual
+physical nodes in your cluster. You could have a cluster of 100 nodes
+with 1 pod running on one of them. Hardly efficient. Or vice versa, say
+your traffic is exploding (or <em>blowing up</em>, if you prefer your
+hyperboles not originating from Latin): trying to scale up from 1 to 100
+pods on 1 available node in your cluster, will lead to nothing but
+disaster. Speaking in relative terms of disaster, so not comparing to
+real disasters such as not having croissants on a Spring Sunday
+morning.</p>
+<p>In both scenarios (1 pod on 100 nodes, 100 pods on 1 node), you want
+to decrease or increase the actual nodes in your cluster. We’re now
+solidly in the realm of someone more knowledgeable than me (we’ve
+wandered longer in this realm than you’d like to know, but I’m keeping
+the spirits high). I’ll throw in a final desperate attempt. Kubernetes
+has the concept of a <a
+href="https://github.com/kubernetes/autoscaler/tree/master/cluster-autoscaler">Cluster
+Autoscaler</a>. When configured for your cluster, it’ll make sure nodes
+are spun up or down given the requirements of the pods running on it.
+For example, if the HPA determines, I need 1000 more pods to be able to
+meet this <code>200</code> average transactions-per-second requirement,
+your cluster can spin up the right amount of nodes so you can meet that
+1000 pods requirement. Configuration of the cluster depends on the
+cluster provider, see <a
+href="https://github.com/kubernetes/autoscaler/tree/master/cluster-autoscaler">here</a>
+for details.</p>
+<p>Note that <a
+href="https://www.cncf.io/blog/2019/10/29/kubernetes-autoscaling-101-cluster-autoscaler-horizontal-autoscaler-and-vertical-pod-autoscaler/">scaling
+up the cluster will take more time</a> than scaling up the pods as
+scaling up the cluster will require k8s asking your cluster provider for
+actual physical instances/nodes. # Conclusion</p>
+<p>I gave an elemental overview of a subset of problems k8s is solving
+for you. As usual, I’ve not talked about a thousand and one other
+topics, such as <a
+href="https://kubernetes.io/docs/concepts/storage/volumes/">volumes</a>,
+<a
+href="https://kubernetes.io/docs/concepts/configuration/secret/">secrets</a>,
+<a
+href="https://kubernetes.io/docs/concepts/workloads/controllers/job/">jobs</a>,
+<a
+href="https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/">cron
+jobs</a>, <a
+href="https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/">namespaces</a>,…
+As mentioned in the introduction, the book <a
+href="https://www.goodreads.com/book/show/34013922-kubernetes-in-action">Kubernetes
+in Action</a> by Marko Lukša, or the internet itself, if it obliges,
+will answer all of your further questions. One of those questions I can
+answer for you right now: if you saw a dog today, yes, you had a good
+day.</p>
+<h1 id="endnotes">Endnotes</h1>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-12447521-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+
+  function gtag() {
+    dataLayer.push(arguments);
+  }
+
+  gtag('js', new Date());
+
+  gtag('config', 'UA-12447521-1');
+</script>
+<script>
+var dt = new Date();
+document.getElementById("datetime").innerHTML = dt.toLocaleString();
+</script>
+<section class="footnotes footnotes-end-of-document"
+role="doc-endnotes">
+<hr />
+<ol>
+<li id="fn1" role="doc-endnote"><p>If you can imagine what things like
+<em>downtime</em>, <em>rollback</em>, <em>production</em>,
+<em>client</em>, and <em>IP address</em> mean, you’re OK.<a
+href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2" role="doc-endnote"><p>We refer to containers that run
+alongside your <em>main</em> container as <em>sidecars</em> for obvious
+non-inspired reasons.<a href="#fnref2" class="footnote-back"
+role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section>
+</body>
+</html>

@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Stijn Heymans" />
+  <meta name="dcterms.date" content="2020-01-30" />
+  <title>Elements of OAuth 2.0</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <link rel="stylesheet" href="../elements_of.css" />
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Elements of OAuth 2.0</h1>
+<p class="author">Stijn Heymans</p>
+<p class="date">30 January 2020</p>
+</header>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#introduction" id="toc-introduction">Introduction</a></li>
+<li><a href="#login-at-bank-of-america"
+id="toc-login-at-bank-of-america">Login at Bank of America</a></li>
+<li><a href="#use-mint-to-see-your-bank-of-america-data"
+id="toc-use-mint-to-see-your-bank-of-america-data">Use Mint to see your
+Bank of America Data</a></li>
+<li><a href="#oauth-2.0" id="toc-oauth-2.0">OAuth 2.0</a>
+<ul>
+<li><a href="#the-players" id="toc-the-players">The Players</a></li>
+<li><a href="#the-dance" id="toc-the-dance">The Dance</a></li>
+</ul></li>
+<li><a href="#conclusion" id="toc-conclusion">Conclusion</a></li>
+</ul>
+</nav>
+<pre><code>                        last updated: 23 February 2020</code></pre>
+<h1 id="introduction">Introduction</h1>
+<p>Existing OAuth 2.0 protocol explanations are riddled with terminology
+or tied to specific implementations of the protocol. I’m mainly
+interested in understanding what problem OAuth 2.0 solves and what the
+elements of its solution are. In this article, I start with the scenario
+that you want to give a budgeting tool like <a href="mint.com">mint</a>
+access to your transaction data at <a href="bankofamerica.com">Bank of
+America</a>. I’ll show the problems with the naive approach and will
+gradually move toward explaining why OAuth 2.0 solves these problems and
+how.</p>
+<p>I gained my intuition from the book <a
+href="https://www.goodreads.com/book/show/30102872-oauth-2-in-action">OAuth
+2 in Action</a> which has code-along examples if you want to see the
+OAuth 2.0 flow at work.</p>
+<h1 id="login-at-bank-of-america">Login at Bank of America</h1>
+<p>On Mondays you check your transactions at <a
+href="https://bankofamerica.com">Bank of America</a> to see the
+weekend’s damages. You open up your browser and you navigate to said
+site. You click <em>Sign-in</em> and are presented with the classical
+login form. Full of anticipation, you enter your username and password
+and get to see your poor monetary decision making. This is the flow:</p>
+<p>(insert ./images/simple_auth.atxt.html here)</p>
+<p>While a sense of dread sets in, we’ll agree that I will refer to your
+username/password combo as your <em>credentials</em>. To add to your
+existential crisis, I’ll shout at you:</p>
+<p>!!! Tip OAuth 2 is not about credentials.</p>
+<p>As if things did not start off bad enough, I will also identify you
+(aka the human) with your browser, and will refer to you and your
+browser as one (in my defense, at this point in human history, a fair
+assumption) and officially name you and your browser, the
+<em>User</em>.</p>
+<p>I’ll call <a href="bankofamerica.com">Bank of America</a>, the
+<em>Resource Owner</em>: they own your transactions (the resources).
+This how this story looks after dehumanizing it:</p>
+<p>(insert ./images/simple_auth2.atxt.html here)</p>
+<h1 id="use-mint-to-see-your-bank-of-america-data">Use Mint to see your
+Bank of America Data</h1>
+<p>As you live in the illusion that life can be better, you want to
+start using a budgeting tool like <a href="mint.com">mint</a>. <a
+href="mint.com">mint</a> allows you to pull in your transaction data
+from a variety of resources. <a href="bankofamerica.com">Bank of
+America</a> may be one of them, as could be your retirement accounts at
+Vanguard, or your stocks at Morgan Stanley. In this scenario, <a
+href="mint.com">mint</a> needs access to the <em>Resource Owner</em> (<a
+href="bankofamerica.com">Bank of America</a>, Vanguard, …) on behalf of
+you, the <em>User</em>.</p>
+<p>The first approach that comes to mind to make this access possible is
+to let <a href="mint.com">mint</a> ask you for your credentials and pass
+them straight through to <a href="bankofamerica.com">Bank of America</a>
+whenever <a href="mint.com">mint</a> needs transaction data:</p>
+<p>(insert ./images/mint_first_version.atxt.html here)</p>
+<p>I’ll call <a href="mint.com">mint</a> the <em>Client</em> in this
+scenario, such that the general scheme looks like this:</p>
+<p>(insert ./images/mint_first_version_abstracted.atxt.html here)</p>
+<p>Of course, <a href="mint.com">mint</a> asking you each time for your
+credentials is unpleasant. So <a href="mint.com">mint</a> might be
+tempted to think <em>we’ll ask you once, and then we’ll store it so we
+don’t have to ask you again</em>. The flow looks exactly like above,
+except that now <a href="mint.com">mint</a> asks you for credentials
+once and then stops asking you as they now store them.</p>
+<p>What are the problems with this approach?</p>
+<ul>
+<li><p><em>the client stores your credentials</em>. If <a
+href="mint.com">mint</a> gets compromised and your credentials get
+stolen, someone else now can access your <a
+href="bankofamerica.com">Bank of America</a> account. You have the same
+problem with Bank of America itself getting compromised, but this
+scenario increases your risk with a factor of 2 (from 1 place that has
+your credentials, to 2 places that have your credentials). With each
+additional client, your risk goes up.</p></li>
+<li><p><em>anyone with your credentials has the same access you
+have</em>. Depending on what you can do as a user, someone having your
+credentials can do exactly what you can do. Whereas you want <a
+href="mint.com">mint</a> to <em>see</em> your transactions and
+categorize them, you would not want <a href="mint.com">mint</a> to able
+to transfer money. However, someone with your credentials from <a
+href="mint.com">mint</a> could exactly do that.</p></li>
+</ul>
+<p>We’re thus looking for a solution where:</p>
+<ul>
+<li>the client gets read-only access to your transaction data without
+having to ask you each time for your credentials, aka the client can get
+the data <em>on your behalf</em></li>
+<li>the client does not store your credentials directly as this is
+unacceptable risk</li>
+</ul>
+<h1 id="oauth-2.0">OAuth 2.0</h1>
+<p>OAuth 2.0, a delegation protocol, solves exactly the above. It’s
+named a <em>delegation protocol</em> as it concerns itself with the
+<em>on your behalf</em> part in the above: how can you, the
+<em>User</em>, delegate <em>Resource</em> access to the <em>Client</em>
+without that it exposes you to unacceptable risk? We leave it as an
+exercise to the reader why the name is <em>OAuth</em> and not
+<em>ODel</em>.</p>
+<h2 id="the-players">The Players</h2>
+<p>So far we identified 3 players in the OAuth 2.0 delegation
+protocol:</p>
+<ul>
+<li>the <em>User</em>: you, or a proxy for you, like your browser</li>
+<li>the <em>Client</em>: the application you’re interacting with and you
+want to delegate your access rights to, for example <a
+href="mint.com">mint</a></li>
+<li>the <em>Resource Owner</em>: the origin of your data, for example <a
+href="bankofamerica.com">Bank of America</a></li>
+</ul>
+<p>OAuth 2.0 introduces a 4th player for the actual authorization:</p>
+<ul>
+<li>the <em>Authorization Server</em>.</li>
+</ul>
+<p>In our running example, I’ll assume the authorization server is owned
+by <a href="bankofamerica.com">Bank of America</a>, a logical choice as
+<a href="bankofamerica.com">Bank of America</a> is the one that can
+verify your credentials directly.</p>
+<h2 id="the-dance">The Dance</h2>
+<p>Given such an authorization server, can we instruct the client to
+delegate authorizing you to the authorization server? If yes, the
+authorization server can then verify your credentials and inform the
+client that <em>yes, you can give that user access to the transaction
+data</em>.</p>
+<p>What are the elements of such a delegation? Let’s see:</p>
+<ul>
+<li>the client (<a href="mint.com">mint</a>) needs to send you, the user
+(or your browser), to <a href="bankofamerica.com">Bank of America</a>’s
+authorization server</li>
+<li>the authorization server needs to verify your credentials and needs
+to conclude <em>yes, you have access</em></li>
+<li>the authorization server needs to tell the client that <em>the
+particular user has access and can get the data from the Resource
+Owner</em>.</li>
+<li>the client needs to take that authorization to the <em>Resource
+Owner</em> to ask for the user’s data</li>
+</ul>
+<p>Each of those elements can be accomplished as follows:</p>
+<ul>
+<li>sending the browser to the authorization server can happen using an
+<a href="https://moz.com/learn/seo/redirection">HTTP redirect (code
+301)</a>. The user wants to access the data from the client, but the
+client instead sends the user’s browser a redirect to the authorization
+server. The browser subsequently follows that redirect and lands at the
+authorization server.</li>
+<li>the authorization server then starts an interaction with the user’s
+browser to get and check the user’s credentials</li>
+<li>the authorization server can tell the client that the user’s
+credentials are OK by similarly redirecting the user’s browser back to
+the client by including in the redirect URL something called an
+<em>access token</em>.</li>
+<li>the client would then use that <em>access token</em> (which it keeps
+associated with the user) to go and ask the <em>Resource Owner</em> for
+the user’s data. Since the <em>Resource Owner</em> is presumably able to
+interpret the access token (both the <em>Resource Owner</em> as well as
+the Authorization Server are <a href="bankofamerica.com">Bank of
+America</a>), the <em>Resource Owner</em> can verify that the access
+token is indeed valid.</li>
+</ul>
+<p>That flow looks like this:</p>
+<p>(insert ./images/access_token_only_mint.atxt.html here)</p>
+<p>Or abstractly:</p>
+<p>(insert ./images/access_token_only_abstract.atxt.html here)</p>
+<p>Recall that we had the following problems with the naive
+approach:</p>
+<ul>
+<li><em>the client stores your credentials</em></li>
+<li><em>anyone with your credentials has the same access you
+have</em></li>
+</ul>
+<p>Let’s see whether this new flow solves those problems:</p>
+<ul>
+<li><p>The client indeed no longer stores your credentials. The client
+stores the access token, not the credentials. How is that different from
+storing credentials? The access token has been provided by the
+authorization server and is assumed to be unique for the client. Thus,
+when your access token is stolen from the client and used by someone
+else, the <em>Resource Owner</em> can verify that the access token does
+not belong to the right client. Furthermore, once access tokens are
+stolen, the <em>Resource Owner</em> could disable all access tokens for
+the client and ask all users to authenticate again. A client being
+compromised would not affect you, the User, to get data from the
+<em>Resource Owner</em> directly (i.e., by logging into <a
+href="bankofamerica.com">Bank of America</a> directly).</p></li>
+<li><p>Someone with the access token does not have the same privileges
+as you have at the <em>Resource Owner</em>. We left that out of the
+above discussion but clients would redirect you to the authorization
+server specifically asking for a certain <em>scope</em> of access
+(read-only access to certain parts of your data for example). So even if
+someone can use your access token, they would be able to do only what
+the scope for that access token allows them to do (which would
+presumably not be to transfer money or change your original credentials
+at <a href="bankofamerica.com">Bank of America</a>, but just use your
+transaction data, which is bad, but not as bad as having the full access
+you have).</p></li>
+</ul>
+<p>That was not too complicated. However, there is one problem with this
+access token flow as it is right now. Can you spot it?</p>
+<p>Let’s zoom in on the interaction between you, mint, and the Bank of
+America authorization server:</p>
+<p>(insert ./images/access_token_only_mint_zoom.atxt.html here)</p>
+<p>As we explained above, this interaction happens mostly via HTTP
+redirects over your browser:</p>
+<ul>
+<li>the authorization server sends your browser a redirect with the
+access token in the URL or body</li>
+<li>the browser hits mint with that access token in the URL where mint
+stores it and uses it to gain access to the resource (Bank of
+America)</li>
+</ul>
+<p>The problematic part here is the <em>browser</em>. This part of the
+communication, the back-and-forth using redirects, is called the
+<em>front-channel</em> communication and since it goes via your browser
+it is vulnerable to having the access token intercepted. The
+<em>back-channel</em> communication (for example, from mint to the
+<em>Resource Owner</em>) is much more secure in that respect; there is
+no user browser involved, just service to service communication.</p>
+<p>The way OAuth 2.0 deals with this is to have the Authorization Server
+not redirect you to the client with the magical access token, but with
+an authorization code grant instead:</p>
+<p>(insert ./images/authorization_token_abstract.atxt.html here)</p>
+<p>The front-channel no longer sees the access token. It does see the
+authorization code grant. What if that authorization code grant gets
+stolen? Can the thief access our data at the <em>Resource Owner</em>
+with that information?</p>
+<p>The authorization code grant does not give you access to the data at
+the <em>Resource Owner</em> as the <em>Resource Owner</em> needs an
+access token. Can the thief get an access token from the
+<em>Authorization Server</em> given the authorization code grant?</p>
+<p>The getting of the access token happens on the back-channel from the
+<em>Client</em> to the <em>Authorization Server</em> and as such can be
+protected (no <em>User</em> involved) by requiring the <em>Client</em>
+to send a <em>client id</em> and <em>client secret</em> which the
+<em>Authorization Server</em> can verify.</p>
+<h1 id="conclusion">Conclusion</h1>
+<p>We illustrated two problems with giving your credentials to a client
+such as <a href="mint.com">mint</a> directly:</p>
+<ul>
+<li>the client stores your credentials</li>
+<li>someone that steals your credentials has the same access you
+have</li>
+</ul>
+<p>We gradually introduced the OAuth 2.0 flow (<em>The Dance</em>) that
+solves these problems, moving from an incomplete solution with just an
+access token to a solution with both access token and authorization code
+grant.</p>
+<p>In order to convey the basic intuition (the <em>why</em> of OAuth
+2.0) we left out many parts such as the different types of authorization
+code grants, the particular format of access tokens, what refresh tokens
+are and where they come into play. If you’re interested in learning more
+check out <a
+href="https://www.goodreads.com/book/show/30102872-oauth-2-in-action">OAuth
+2 in Action</a> or, better, implement OAuth 2.0 yourself to secure your
+service.</p>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-12447521-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+
+  function gtag() {
+    dataLayer.push(arguments);
+  }
+
+  gtag('js', new Date());
+
+  gtag('config', 'UA-12447521-1');
+</script>
+</body>
+</html>

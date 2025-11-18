@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Stijn Heymans" />
+  <meta name="dcterms.date" content="2020-04-23" />
+  <title>Elements of Docker Containers</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <link rel="stylesheet" href="../elements_of.css" />
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Elements of Docker Containers</h1>
+<p class="author">Stijn Heymans</p>
+<p class="date">23 April 2020</p>
+</header>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#introduction" id="toc-introduction">Introduction</a></li>
+<li><a href="#the-demo-app" id="toc-the-demo-app">The Demo App</a></li>
+<li><a href="#containerizing-the-app"
+id="toc-containerizing-the-app">Containerizing the App</a></li>
+<li><a href="#publishing-the-image"
+id="toc-publishing-the-image">Publishing the Image</a></li>
+<li><a href="#running-the-container"
+id="toc-running-the-container">Running the Container</a></li>
+<li><a href="#persistence" id="toc-persistence">Persistence</a></li>
+<li><a href="#conclusion" id="toc-conclusion">Conclusion</a></li>
+<li><a href="#endnotes" id="toc-endnotes">Endnotes</a></li>
+</ul>
+</nav>
+<h1 id="introduction">Introduction</h1>
+<p>Docker containers are often presented as magic – <em>“don’t you dare
+persisting anything in a container, it will be lost forever!”</em>. In
+this article, I will show that containers are not magic by going through
+the lifecycle of an app running on your laptop to an app running in a
+container on your laptop (the so-called <em>containerizing</em> of an
+app). I will build an image from the app, publish the image, and run
+that image in a container, all the while showing you the basic commands
+of manipulating images, containers, and volumes.</p>
+<p>You can download the demo code I wrote for this article on <a
+href="https://github.com/sheymans/elementsOf/tree/master/docker/demo">github</a>.
+The demo is a Javascript app, but there’s so little code it should not
+cause too many side effects when consumed in moderation.</p>
+<p>Finally, I used the book <a
+href="https://www.goodreads.com/book/show/39933970-docker-deep-dive">Docker
+Deep Dive</a>by Nigel Poulton as a reference.</p>
+<h1 id="the-demo-app">The Demo App</h1>
+<p>There’s nothing quite like a toy example that is absolutely nothing
+like you will ever encounter in the real world, and I did my utter best
+to not disappoint. I’ll use the web framework <a
+href="expressjs.com">Express</a> for <a href="nodejs.org">node</a> to
+write an app that says <code>Hi</code>, clearly a step down from
+<code>Hello World</code>.</p>
+<p>This is the Javascript file <code>hi.js</code>:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Initialize your express app</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> express <span class="op">=</span> <span class="pp">require</span>(<span class="st">&#39;express&#39;</span>)<span class="op">;</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> app <span class="op">=</span> <span class="fu">express</span>()<span class="op">;</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co">// Tell your app that any GET should be resulting in a `Hi` returned to the user</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>app<span class="op">.</span><span class="fu">get</span>(<span class="st">&#39;/&#39;</span><span class="op">,</span> (request<span class="op">,</span> result) <span class="kw">=&gt;</span> result<span class="op">.</span><span class="fu">send</span>(<span class="st">&#39;Hi&#39;</span>))<span class="op">;</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co">// Your app will be listening on port 8111 and it</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co">// will announce this on the console when you start it</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>app<span class="op">.</span><span class="fu">listen</span>(<span class="dv">8111</span><span class="op">,</span> () <span class="kw">=&gt;</span> <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="st">&#39;hi: listening on port 8111&#39;</span>))<span class="op">;</span></span></code></pre></div>
+<p>As I’m using <code>express</code>, I have a
+<code>package.json</code><a href="#fn1" class="footnote-ref" id="fnref1"
+role="doc-noteref"><sup>1</sup></a> file that contains
+<code>express</code> as a dependency:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode json"><code class="sourceCode json"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;name&quot;</span><span class="fu">:</span> <span class="st">&quot;hi&quot;</span><span class="fu">,</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;version&quot;</span><span class="fu">:</span> <span class="st">&quot;1.0.0&quot;</span><span class="fu">,</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;author&quot;</span><span class="fu">:</span> <span class="st">&quot;Stijn Heymans&quot;</span><span class="fu">,</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;dependencies&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;express&quot;</span><span class="fu">:</span> <span class="st">&quot;^4.17.1&quot;</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">}</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+<p>To make sure I can run this app, I install that <code>express</code>
+dependency as follows:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> install</span></code></pre></div>
+<p>I use the node package manager <a
+href="https://www.npmjs.com/">npm</a> to do that. <code>npm</code> looks
+at the <code>package.json</code> file, it sees that there’s a dependency
+<code>express</code> and installs <code>express</code> into the
+directory <code>node_modules/</code>.</p>
+<p>To start the app, type:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">node</span> hi.js</span></code></pre></div>
+<p>You can navigate to http://localhost:8111 to be said <code>Hi</code>
+to. Isn’t it wonderful to have friends like that?</p>
+<p>These were some of the assumptions I made and the steps I took to run
+this app on a laptop<a href="#fn2" class="footnote-ref" id="fnref2"
+role="doc-noteref"><sup>2</sup></a> :</p>
+<ul>
+<li>the laptop allows for installing and running software such as
+<code>npm</code> and <code>node</code>. For example, its Operating
+System (OS) is Linux or Mac OS X</li>
+<li><code>npm</code> is installed, to, in turn, install the required
+dependencies of your app (<code>express</code>)</li>
+<li><code>npm install</code> was run from the command-line to install
+dependencies such as <code>express</code></li>
+<li><code>node</code> was installed to actually run the application</li>
+<li><code>node hi.js</code> was run from the command-line</li>
+</ul>
+<p>If you want to install and run your app on another laptop (or, on an
+<a href="https://en.wikipedia.org/wiki/Amazon_Elastic_Compute_Cloud">EC2
+instance</a>), similar assumptions hold and you need to install the same
+packages as well as execute similar commands. <em>“Well, of course, I
+would not repeat these steps, I’d put them all in a little script so I
+just have to run the script”</em>. You would. But you’d be forgetting
+that a laptop and an EC2 instance are very different things. You’d
+probably want scripts per different OS at the minimum. For example,
+installing <code>npm</code> and <code>node</code> requires different
+steps, depending on the OS you’re installing them on.</p>
+<p>What if instead of doing these steps manually (and the steps being
+different depending on your OS), you could package your app while
+specifying:</p>
+<ul>
+<li>a small OS System to install the app on, for example <a
+href="https://alpinelinux.org/">alpine</a></li>
+<li>an installation of <code>npm</code> and <code>node</code> layered on
+that</li>
+<li>instructions to install your application
+(<code>npm install</code>)</li>
+<li>instructions to run your application (<code>node hi.js</code>)</li>
+</ul>
+<p>In other words, what if you could define a small container based on
+the above specification that you can run anywhere where such containers
+can run?</p>
+<p>!!! WARNING: Obligatory Container on a Ship Reference A container is
+a standard packaging solution that you can fill with any stuff, you can
+put it on a ship and send it off anywhere in the world.</p>
+<h1 id="containerizing-the-app">Containerizing the App</h1>
+<p>To containerize the app, I use <a href="docker.com">docker</a>. In
+this article, I’ll refer to a <em>Docker container</em> as a synonym of
+a <em>container</em>. Before I can run the app in a container, I need an
+<em>image</em>. Explaining in precise terms what an <em>image</em> is,
+is beyond my abilities. My mental definition is that an image is an
+abstract specification of the OS as well as anything needed to run the
+app. The image can be <em>understood</em> by <code>docker</code> when it
+needs to run your application. Compare this to other abstractions in
+Computer Science:</p>
+<ul>
+<li>a <em>Java class</em> specifies the behavior of an instance of that
+class</li>
+<li>a <em><code>jar</code> file</em> packages up your Java application
+and can then be run by the Java runtime.</li>
+<li>a Linux ISO image packages up the Linux OS: you can download the
+image, install the image, and run the Linux OS on your laptop once it’s
+installed</li>
+<li>a Python script specifies which instructions to run for the Python
+interpreter</li>
+</ul>
+<p>These comparisons are imperfect, but all have the aspect of a
+specification of all its resources (the <code>image</code>) that can
+then be run/executed on a machine.</p>
+<p>In the previous section, I summarized the aspects that I want to
+specify for the demo app:</p>
+<ul>
+<li>a small OS to start from, for example <a
+href="https://alpinelinux.org/">alpine</a></li>
+<li>an installation of <code>npm</code> and <code>node</code> layered on
+that so we can install our app (<code>npm</code>) and run our app
+(<code>node</code>)</li>
+<li>instructions to install the application
+(<code>npm install</code>)</li>
+<li>instructions to run the application (<code>node hi.js</code>)</li>
+</ul>
+<p>I can write up that informal specification in a format that
+<code>docker</code> understands so it can build an <code>image</code>
+based on it. Specifications to build docker images are in a file named
+<code>Dockerfile</code>. Conceptually, they are similar to
+<code>package.json</code> files: <code>package.json</code> files specify
+your application’s dependencies, and a <code>Dockerfile</code> specifies
+the dependencies the app has from an OS perspective (what OS does the
+app assume, what should be installed on the OS to be able to run the
+app).</p>
+<p>!!! Tip The directory on your laptop where your
+<code>Dockerfile</code> exists is called the <em>build-context</em>.</p>
+<p>I want the app to be layered on the <a
+href="https://alpinelinux.org/">Linux alpine OS system</a> – a small
+Linux, about 4MB, compared to Ubuntu which is more than 100MB – so the
+first line of the <code>Dockerfile</code> is:</p>
+<pre><code>FROM alpine</code></pre>
+<p>Next, I need an installation of <code>npm</code> and
+<code>node</code> layered over that:</p>
+<pre><code>RUN apk add --update nodejs nodejs-npm</code></pre>
+<p><code>apk add --update nodejs nodejs-npm</code> is the command you
+run on alpine to install <code>node</code> and <code>npm</code> (see <a
+href="https://wiki.alpinelinux.org/wiki/Alpine_Linux_package_management">apk</a>).
+If I would have picked a different image to start from, I might have
+needed a different install command. The important part of this line is
+<code>RUN</code>. <code>RUN</code> runs whatever comes after it and will
+build a new layer in the image. In this case, the new layer will have an
+installation of <code>node</code> and <code>npm</code>.</p>
+<p>I then specify that I want to copy all the files from the
+build-context (the directory on your laptop that has your
+<code>Dockerfile</code>) into a root directory <code>/src</code> of the
+new image I’m creating. Thus, <code>docker</code> will copy over
+<code>hi.js</code> and <code>package.json</code> into a root directory
+<code>/src</code>. Intuitively, our image of course needs the source
+files for our demo app in order to be able to run it.</p>
+<pre><code>COPY . /src</code></pre>
+<p>The <code>.</code> is the current directory (i.e., where the
+<code>Dockerfile</code> lives, the <em>build-context</em>). This
+<code>COPY</code> command will create a new layer in the resulting
+image.</p>
+<p>To summarize, at this point I have specified that I need an image
+consisting of a Linux OS (<code>alpine</code>), that I need to install
+<code>node</code> and <code>npm</code> into that image, and that I want
+to copy the app’s source code into the directory <code>/src</code> on
+the image. Next, I want to use <code>npm</code> to install the app. For
+this, I’ll specify that the <code>/src</code> directory needs to be the
+<em>current</em> working directory and that I want to execute
+<code>npm install</code>:</p>
+<pre><code>WORKDIR /src
+RUN npm install</code></pre>
+<p><code>WORKDIR</code> changes the working directory to
+<code>/src</code> and you already know the <code>RUN</code> command: it
+just executes <code>npm install</code> . The latter will like it did on
+your laptop, look for <code>package.json</code>, find your dependencies
+(<code>express</code>) and install those.</p>
+<p>Almost there. Indicate how to run the application:</p>
+<pre><code>ENTRYPOINT [&quot;node&quot;, &quot;./hi.js&quot;]</code></pre>
+<p>This command determines which application to run when we
+<code>run</code> the container. Note that I did not use <code>RUN</code>
+for this; <code>RUN</code> adds a new image layer, whereas
+<code>ENTRYPOINT</code> just adds metadata and appears only once in the
+<code>Dockerfile</code> to indicate <em>this is what you run once the
+container is ready to be run</em>.</p>
+<p>We indicate with <code>EXPOSE</code> that our app is running on port
+<code>8111</code>:</p>
+<pre><code>EXPOSE 8111</code></pre>
+<p>To round it off, we add some more metadata to the image:</p>
+<pre><code>LABEL maintainer=&quot;ben@ny.com&quot;</code></pre>
+<p>This is the whole <code>Dockerfile</code>:</p>
+<pre><code>FROM alpine
+RUN apk add --update nodejs nodejs-npm
+COPY . /src
+WORKDIR /src
+RUN npm install
+ENTRYPOINT [&quot;node&quot;, &quot;./hi.js&quot;]
+EXPOSE 8111
+LABEL maintainer=&quot;ben@ny.com&quot;</code></pre>
+<p>I can then use this <code>Dockerfile</code> to build an image:</p>
+<div class="sourceCode" id="cb13"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a> <span class="ex">docker</span> image build <span class="at">-t</span> hi:latest .</span></code></pre></div>
+<p>Dissecting this command:</p>
+<ul>
+<li><code>docker</code>: the <code>docker</code> program that we use to
+build images, run images, etc</li>
+<li><code>image</code>: tell <code>docker</code> that what we’re doing
+involves images (there’s also <code>docker container</code> to indicate
+that you’re working with containers)</li>
+<li><code>build</code>: build an image</li>
+<li><code>-t hi:latest</code>: we’re <em>t</em>agging an image with name
+<code>hi</code> and with tag <code>latest</code>. A tag can be used to
+identify different versions of your software (tag <code>v1</code> for
+example)</li>
+<li><code>.</code>: don’t forget the <code>.</code>. The <code>.</code>
+stands for <em>look into your current directory for the
+Dockerfile</em>.</li>
+</ul>
+<p>!!! Tip <code>-t</code> indeed stands for <em>tag</em> and not
+<em>target</em> (there’s a <code>--target</code> option as well)</p>
+<p>After running that command, I can check whether there’s now an image
+available using <code>ls</code>:</p>
+<pre><code>docker image ls</code></pre>
+<p>Dissecting that command:</p>
+<ul>
+<li><code>docker</code>: the <code>docker</code> program</li>
+<li><code>image</code>: we’re dealing with images</li>
+<li><code>ls</code>: the listing command</li>
+</ul>
+<p>This will give as output something like:</p>
+<pre><code>REPOSITORY     TAG       IMAGE ID            CREATED             SIZE
+hi             latest    5d3095b79194        5 minutes ago       57.2MB</code></pre>
+<p>This shows our created image with repository name <code>hi</code>,
+tag <code>latest</code>, and image id <code>5d3095b79194</code> – the
+image id will be different on your machine.</p>
+<p>Sometimes you’d just want the <code>IMAGE ID</code>s, for example, to
+pipe them to another command. For that situation, you can use
+<code>--format</code>. The <code>--format</code> option uses <a
+href="https://golang.org/pkg/text/template/">Go templates</a> to extract
+the data you want to see formatted. For example, let’s say I want to see
+the size:</p>
+<pre><code>docker image ls --format &quot;{{.Size}}&quot;</code></pre>
+<p>This will show:</p>
+<pre><code>57.2MB</code></pre>
+<p>To see the image ids, you might try:</p>
+<pre><code>docker image ls --format &quot;{{.ImageId}}&quot;</code></pre>
+<p>This unfortunately gives you the error:</p>
+<pre><code>Template parsing error: template: :1:2: executing &quot;&quot; at &lt;.ImageId&gt;: can&#39;t evaluate field ImageId in type formatter.imageContext</code></pre>
+<p>While <code>docker image ls</code> shows <code>IMAGE ID</code> as a
+column name, that’s not how you can access this field. There’s a <a
+href="https://docs.docker.com/config/formatting/">hint</a> on how you
+can see the attributes that you can actually use in
+<code>--format</code>:</p>
+<pre><code>docker image ls --format &quot;{{json .}}&quot;</code></pre>
+<p>This will make a json out of <em>everything</em> and will show:</p>
+<pre><code>{&quot;Containers&quot;:&quot;N/A&quot;,&quot;CreatedAt&quot;:&quot;2020-03-25 08:11:44 -0700 PDT&quot;,&quot;CreatedSince&quot;:&quot;2 days ago&quot;,&quot;Digest&quot;:&quot;\u003cnone\u003e&quot;,&quot;ID&quot;:&quot;5d3095b79194&quot;,&quot;Repository&quot;:&quot;hi&quot;,&quot;SharedSize&quot;:&quot;N/A&quot;,&quot;Size&quot;:&quot;57.2MB&quot;,&quot;Tag&quot;:&quot;latest&quot;,&quot;UniqueSize&quot;:&quot;N/A&quot;,&quot;VirtualSize&quot;:&quot;57.23MB&quot;}</code></pre>
+<p>From that you can see that the <code>IMAGE ID</code> is actually the
+value of an attribute <code>ID</code>. Trying that,</p>
+<pre><code>docker image ls --format &quot;{{.ID}}&quot;</code></pre>
+<p>will give you <code>5d3095b79194</code>.</p>
+<p>Finally, have a closer look at the created image:</p>
+<pre><code>docker image inspect 5d3095b79194</code></pre>
+<p>You’ll see the label <code>maintainer</code>, the entrypoint
+<code>node ./hi.js</code>, and the different layers with different ids
+that were created as part of this image (recall that each
+<code>RUN</code> created a different layer). I encourage you to spend
+some quality time with that <code>docker image inspect</code> output. I
+did not spend time explaining layers in an image, but you can <a
+href="https://medium.com/@jessgreb01/digging-into-docker-layers-c22f948ed612">dig
+in more here if you’d like</a>.</p>
+<h1 id="publishing-the-image">Publishing the Image</h1>
+<p>I created an image locally on my laptop. Usually, if you want other
+users to be able to use your image, you can upload it to the <a
+href="https://hub.docker.com/">Docker Hub</a>. After you uploaded your
+image to a Docker Hub repository, other developers can then
+<em>pull</em> it. Have a look at this <a
+href="https://ropenscilabs.github.io/r-docker-tutorial/04-Dockerhub.html">tutorial</a>
+if you’d like to see some of the steps involved, because that’s all I’ll
+say about publishing your image.</p>
+<h1 id="running-the-container">Running the Container</h1>
+<p>With that image <code>hi:latest</code>, I can create a running
+instance (aka container). Where before my commands started with
+<code>docker image</code> for image manipulation, I’ll in this section
+mostly use <code>docker container</code> to manipulate containers:</p>
+<pre><code>docker container run -d hi:latest</code></pre>
+<p>This command starts the container in detached/background mode (hence
+the <code>-d</code>) and uses the image <code>hi:latest</code> to
+instantiate the container. Since I specified that this container should
+be running <code>node ./hi.js</code> using the <code>ENTRYPOINT</code>
+statement in the <code>Dockerfile</code>, I expect to see this app
+running when I <em>jump into</em> the container.</p>
+<p>Before getting into detail of the prosaic <em>jumping into</em>
+containers, I need to know what the ID or name of the freshly started
+container is:</p>
+<pre><code>docker container ls</code></pre>
+<p>This is the output of that command:</p>
+<pre><code>CONTAINER ID      IMAGE      COMMAND         CREATED        STATUS        PORTS     NAMES
+885288159d28      hi:latest  &quot;node ./hi.js&quot;  2 minutes ago  Up 2 minutes  8111/tcp  boring_dijkstra</code></pre>
+<p>The running container has ID <code>885288159d28</code> and name
+<code>boring_dijkstra</code>. I did not specify a name when running the
+container, so I got a random <code>boring_dijkstra</code>. You can
+define your own container name using the <code>--name</code> option:
+<code>docker container run --name exciting_dijkstra -d hi:latest</code>.
+The output further shows that my container is executing the command
+<code>node ./hi.js</code> which is exactly what I specified in
+<code>Dockerfile</code>.</p>
+<p>Now that I have the name of the running container, I can do some
+<em>jumping into</em>:</p>
+<pre><code>docker container exec -it boring_dijkstra sh</code></pre>
+<p>!!! Tip I used the the container’s name,
+<code>boring_dijkstra</code>, but I can also use its ID
+<code>885288159d28</code></p>
+<p>After executing that command, I see a shell prompt appear ( on a blue
+Monday, maybe even a 🐚<a href="#fn3" class="footnote-ref" id="fnref3"
+role="doc-noteref"><sup>3</sup></a> ) and if I check what processes are
+running in this container using
+<a href="https://en.wikipedia.org/wiki/Ps_(Unix)"><code>ps</code></a>, I
+indeed see the <code>node</code> app:</p>
+<pre><code>/src # ps
+PID   USER     TIME  COMMAND
+  1   root     0:00  node ./hi.js
+ 32   root     0:00  sh
+ 37   root     0:00  ps</code></pre>
+<p>I also see the shell <code>sh</code> running which is the command we
+executed as part of
+<code>docker container exec -it boring_dijkstra sh</code> and of course
+<code>ps</code> which is the command we just ran in that shell.</p>
+<p>Let’s analyze the command
+<code>docker container exec -it boring_dijkstra sh</code>:</p>
+<ul>
+<li><code>docker container</code>: you’re executing docker and it
+involves containers (in contrast to <code>image</code> or
+<code>volume</code>, see later for <code>volume</code>)</li>
+<li><code>exec</code>: you’re going to execute a command in the
+container. What command? <code>sh</code>.</li>
+<li><code>boring_dijkstra</code>: the container you’re executing the
+command <code>sh</code> in</li>
+<li><code>-it</code>: <code>-t</code> is short for <code>--tty</code>
+and attaches you to a terminal in the container. <code>-i</code> is to
+make input and output from the container flow to your terminal on your
+docker host (your laptop). You almost always see <code>-i</code> and
+<code>-t</code> used together as <code>-it</code>. Try out
+<code>-t</code> on its own in the previous command and try pressing
+<code>return</code>. Nothing happens as the output of the container is
+not flowing to the output of your laptop terminal. I find it most useful
+to think of <code>-it</code> as <em>interactive</em> mode versus
+<code>-d</code> for <em>detached</em> mode (the container runs but
+you’re not <em>in it</em>).</li>
+<li><code>sh</code>: the command you’re executing on your container</li>
+</ul>
+<p>The documentation on <a
+href="https://docs.docker.com/engine/reference/commandline/exec/">exec</a>
+as well as this <a
+href="https://stackoverflow.com/questions/22272401/what-does-it-mean-to-attach-a-tty-std-in-out-to-dockers-or-lxc">stackoverflow
+article</a> on interactive mode have more details.</p>
+<p>By <em>jumping into</em> the container, I confirmed the app is
+running. As I wrote this app, I know that it runs on port
+<code>8111</code>. Indeed in <code>hi.js</code> I wrote:</p>
+<pre><code>app.listen(8111, () =&gt; console.log(&#39;hi: listening on port 8111&#39;));</code></pre>
+<p>In the <code>Dockerfile</code>, I also exposed that port:</p>
+<pre><code>EXPOSE 8111</code></pre>
+<p>In contrast to what the all-caps-look-at-me <code>EXPOSE</code> hints
+at, this does not make the port <code>8111</code> <em>reachable</em>. It
+is <em>documentation</em> for other engineers reading your
+<code>Dockerfile</code> indicating that your service listens to this
+port (<code>8111</code>). To make the port <code>8111</code> reachable
+from outside your container, say from your laptop, you have to publish
+it with the <code>-p</code> option.</p>
+<p>Before using the <code>-p</code> option, <code>stop</code> and
+<code>rm</code> the running container (which was not started with
+<code>-p</code>):</p>
+<div class="sourceCode" id="cb31"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> container stop boring_dijkstra</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> container rm boring_dijkstra</span></code></pre></div>
+<p>Then start a container based on the <code>hi:latest</code> image but
+this time map the Docker host’s port <code>8000</code> (your laptop) to
+<code>8111</code> port. For reading-left-to-right oriented cultures,
+this is roughly from outward to inward (left to right).</p>
+<pre><code>docker container run -d -p 8000:8111 hi:latest</code></pre>
+<p>After this you can navigate to <code>localhost:8000</code> on your
+browser and see <code>Hi</code>. Note that going to
+<code>localhost:8111</code> in your browser will give an error as
+<code>8111</code> is exposed in your container, but not your
+<code>localhost</code> (your laptop).</p>
+<p>Before diving into persistence, let’s look into these
+<code>stop</code> and <code>rm</code> commands we executed before
+starting a new container.</p>
+<p>What’s the difference between <code>stop</code> and <code>rm</code>?
+If you remove (<code>rm</code>) a container, you can no longer start it
+or refer to it using its name. Neither will a
+<code>docker container ls -a</code> show your container. Anything your
+application wrote (for example, to <code>/tmp</code>, any logs,
+anything) is gone. It’s gone.</p>
+<p>If you <code>stop</code> a container, you merely suspend it. After
+stopping a container, you can restart it with
+<code>docker container start your_container_name</code>. After starting
+it again, whatever you wrote to <code>/tmp</code> before stopping it, is
+still there. Your app will not be running if the container is stopped.
+For example, if you stop your container with
+<code>docker container stop your_container_name</code>, navigating to
+<code>localhost:8000</code> will give an error. Restarting the container
+on the other hand, brings <code>localhost:8000</code> back to life.</p>
+<h1 id="persistence">Persistence</h1>
+<p>Mention <em>persistence</em> in the context of docker or <a
+href="https://kubernetes.io/">kubernetes</a> and everyone gets
+upset.</p>
+<p>What is persistence? Persistence is the <em>ability for data to stay
+around</em>:</p>
+<ul>
+<li>if your app writes data to a database table, your data is persisted
+in the database even when your app is no longer running</li>
+<li>if you open a text editor write text in a file and save the file,
+your data is persisted in the file</li>
+</ul>
+<p>The database example is usually uncontroversial in the context of
+containers: your app can write data to a database table from within the
+container as long as the database table exists outside of your
+container. More controversial is writing to the container’s file system,
+for example when your app writes logs to a file. The key idea to
+remember is that if your data is written to a location (database table,
+disk location) that has a <em>lifecyle</em> independent of your
+container, you’re good: your data will persist as long as that location
+exists. Your pet rat is not going to die when your container dies. Their
+lives are not tied together (unless you keep your pet rat in a
+container).</p>
+<p><em>Volumes</em> are the <em>magic</em> that allows docker to write
+to the file-system in a persistent manner: the written word will persist
+long after the container is gone.</p>
+<p>Before I explain volumes, I’d like you to think of what type of
+persistence to a file-system we already have without using volumes. I
+can have my app that runs in a container write to <code>/tmp</code>
+without issues while the container is running. I can even
+<code>stop</code> the container (suspending it, as we saw above) and
+when I come back to this container, the data I wrote to
+<code>/tmp</code> is still there. Only when I <code>rm</code> the
+container, that data in <code>/tmp</code> would be gone as
+<code>rm</code> is wiping away the file-system of the container.</p>
+<p>The key to volumes is that they live and die outside of your
+container’s life cycle. They’re an abstraction of storage: I can write
+to a volume, I can read from a volume, so the app can write its logs to
+a volume. If I have these 2 independent entities: a volume that I can
+write to/read from and a container that potentially could be doing that
+writing and reading, how do I connect those? I’d mount the volume to a
+directory on the container. If the container has a directory
+<code>/logs</code>, I can mount the volume to the directory
+<code>/logs</code>. After that mounting, anything written to the
+<code>/logs</code> directory will be written to the volume, everything
+read from <code>/logs</code> will actually be read from the volume.</p>
+<p>This is how to create a volume:</p>
+<pre><code>docker volume create dramatic_vol</code></pre>
+<p>Similar to the above, where we had <code>docker image</code> for
+image manipulation and <code>docker container</code> for container
+manipulation, we have <code>docker volume</code> for volume
+manipulation. I can check whether the freshly created volume is indeed
+there with <code>ls</code>:</p>
+<pre><code>docker volume ls</code></pre>
+<p>I attach <code>dramatic_vol</code> to a container (based on the image
+<code>hi:latest</code> as before):</p>
+<pre><code>docker container run -d --mount target=/src,source=dramatic_vol hi:latest</code></pre>
+<p>The name of that container can be found as usual with
+<code>ls</code>:</p>
+<pre><code>$ docker container ls
+CONTAINER ID    IMAGE       COMMAND          CREATED          STATUS           PORTS      NAMES
+0abd6c82cee2    hi:latest   &quot;node ./hi.js&quot;   54 seconds ago   Up 52 seconds    8111/tcp   laughing_pike</code></pre>
+<p>Inspect that <code>laughing_pike</code> container:</p>
+<pre><code>docker container inspect laughing_pike</code></pre>
+<p>The output of that command contains this snippet:</p>
+<pre><code> &quot;Mounts&quot;: [
+            {
+                &quot;Type&quot;: &quot;volume&quot;,
+                &quot;Name&quot;: &quot;dramatic_vol&quot;,
+                &quot;Source&quot;: &quot;/var/lib/docker/volumes/dramatic_vol/_data&quot;,
+                &quot;Destination&quot;: &quot;/src&quot;,
+                &quot;Driver&quot;: &quot;local&quot;,
+                &quot;Mode&quot;: &quot;z&quot;,
+                &quot;RW&quot;: true,
+                &quot;Propagation&quot;: &quot;&quot;
+            }
+        ],</code></pre>
+<p>The volume <code>dramatic_vol</code> is part of the mounts. It
+indicates where the data for that volume actually lives on my laptop
+(<code>/var/lib/docker/volumes/dramatic_vol/_data</code>) and it
+indicates to what directory <em>in the container</em> it is tied:
+<code>/src</code>. Recall that anything written to <code>/src</code> by
+my app in the container is written to the volume (and you could check
+that out at
+<code>/var/lib/docker/volumes/dramatic_vol/_data</code>).</p>
+<p>If you <code>stop</code> and <code>rm</code> the container, none of
+the data on the volume is removed. It is persistent.</p>
+<h1 id="conclusion">Conclusion</h1>
+<p>I showed you how to build an image out of your app (how to
+<em>containerize</em> it), how to run a container based on that image,
+and how to use volumes to persist the data that your app writes beyond
+the life cycle of the container. I limited this article to what I
+consider the elements and I left out discussions on <a
+href="https://docs.docker.com/storage/storagedriver/select-storage-driver/">storage
+drivers</a>, <a
+href="https://docs.docker.com/engine/reference/commandline/tag/">tags</a>,
+<a href="https://docs.docker.com/engine/swarm/">docker swarm</a>, <a
+href="https://docs.docker.com/network/">docker networking</a>, <a
+href="https://docs.docker.com/compose/"><code>docker-compose</code></a>,
+and much, much more.</p>
+<h1 id="endnotes">Endnotes</h1>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-12447521-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+
+  function gtag() {
+    dataLayer.push(arguments);
+  }
+
+  gtag('js', new Date());
+
+  gtag('config', 'UA-12447521-1');
+</script>
+<section class="footnotes footnotes-end-of-document"
+role="doc-endnotes">
+<hr />
+<ol>
+<li id="fn1" role="doc-endnote"><p>A <code>package.json</code> file
+describes your application (for example, any package dependencies) so
+that <code>npm</code> (which can be used to build your application)
+knows <em>how</em> to build it. You can read about it <a
+href="https://nodejs.org/en/knowledge/getting-started/npm/what-is-the-file-package-json/">here</a>.<a
+href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2" role="doc-endnote"><p>In this article, I will mostly refer
+to your <em>laptop</em> but you could be working on a desktop computer,
+or be logged in into an EC2 instance.<a href="#fnref2"
+class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn3" role="doc-endnote"><p>Of course <a
+href="https://en.wikipedia.org/wiki/Unix_shell">not</a>, but I admire
+your outlook on life.<a href="#fnref3" class="footnote-back"
+role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section>
+</body>
+</html>

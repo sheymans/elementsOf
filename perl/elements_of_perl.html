@@ -1,0 +1,1140 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Stijn Heymans" />
+  <meta name="dcterms.date" content="2019-10-12" />
+  <title>Elements of Perl</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <link rel="stylesheet" href="../elements_of.css" />
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Elements of Perl</h1>
+<p class="author">Stijn Heymans</p>
+<p class="date">12 October 2019</p>
+</header>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#introduction" id="toc-introduction">Introduction</a></li>
+<li><a href="#scalars" id="toc-scalars">Scalars</a>
+<ul>
+<li><a href="#strings" id="toc-strings">Strings</a>
+<ul>
+<li><a href="#basics" id="toc-basics">Basics</a></li>
+<li><a href="#built-in-functions" id="toc-built-in-functions">Built-in
+Functions</a></li>
+</ul></li>
+<li><a href="#numbers" id="toc-numbers">Numbers</a>
+<ul>
+<li><a href="#basics-1" id="toc-basics-1">Basics</a></li>
+<li><a href="#built-in-functions-1"
+id="toc-built-in-functions-1">Built-in Functions</a></li>
+</ul></li>
+<li><a href="#undef" id="toc-undef"><code>undef</code></a></li>
+</ul></li>
+<li><a href="#array-variables" id="toc-array-variables">Array
+Variables</a>
+<ul>
+<li><a href="#basics-2" id="toc-basics-2">Basics</a></li>
+<li><a href="#built-in-functions-2"
+id="toc-built-in-functions-2">Built-in Functions</a>
+<ul>
+<li><a href="#adding-and-removing-from-back-of-an-array"
+id="toc-adding-and-removing-from-back-of-an-array">Adding and Removing
+from Back of an Array</a></li>
+<li><a href="#adding-and-removing-from-front-of-an-array"
+id="toc-adding-and-removing-from-front-of-an-array">Adding and Removing
+from Front of an Array</a></li>
+<li><a href="#length-of-an-array-with-a-detour-to-contexts"
+id="toc-length-of-an-array-with-a-detour-to-contexts">Length of an Array
+with a detour to contexts</a></li>
+<li><a href="#reverse"
+id="toc-reverse"><span><code>reverse</code></span></a></li>
+</ul></li>
+</ul></li>
+<li><a href="#hash-variables" id="toc-hash-variables">Hash Variables</a>
+<ul>
+<li><a href="#basics-3" id="toc-basics-3">Basics</a></li>
+<li><a href="#built-in-functions-3"
+id="toc-built-in-functions-3">Built-in Functions</a>
+<ul>
+<li><a href="#valueskeys"
+id="toc-valueskeys"><code>values</code>/<code>keys</code></a></li>
+</ul></li>
+</ul></li>
+<li><a href="#references" id="toc-references">References</a></li>
+<li><a href="#conditions" id="toc-conditions">Conditions</a></li>
+<li><a href="#looping" id="toc-looping">Looping</a></li>
+<li><a href="#subroutines" id="toc-subroutines">Subroutines</a></li>
+<li><a href="#matching-and-substituting"
+id="toc-matching-and-substituting">Matching and Substituting</a></li>
+<li><a href="#constants" id="toc-constants">Constants</a></li>
+<li><a href="#printing-anything" id="toc-printing-anything">Printing
+Anything</a></li>
+<li><a href="#acknowledgements"
+id="toc-acknowledgements">Acknowledgements</a></li>
+</ul>
+</nav>
+<pre><code>                        last updated: 3 March 2021</code></pre>
+<h1 id="introduction">Introduction</h1>
+<p>This article introduces the elements of <code>perl 5.x</code>. I’ll
+start with introducing what <code>perl</code> considers the smallest
+unit of things in the Scalars section. I’ll then show how to use those
+scalars in list-type data structures in the Array Variables section as
+well as in map-like data structures in the Hash Variables section. I’ll
+tie the concepts of scalars, arrays, and hashes together to be able
+construct arbitrary data structures in the References section.</p>
+<p>After introducing the basic data structures, I’ll show how to control
+flow in the Conditions section, and how to use such conditions when
+looping in the Looping section. Once I tackled basic data structures and
+control flow, I’ll show how to encapsulate logic into functions in the
+Subroutines section.</p>
+<p>We end the article with what <code>perl</code> got (in)famous for,
+regular expressions, in the Matching and Substituting section, as well
+as 2 more practical sections: a Constants section explaining how to
+define constants and a Printing Anything section that will be useful
+when you’re debugging.</p>
+<p>As this is the <em>elements</em> of <code>perl</code>, I made choices
+on what to leave out of this article (for example, I did not introduce
+objects). You can read more in those 3 books:</p>
+<ul>
+<li><a
+href="https://www.goodreads.com/book/show/30413201-learning-perl">Learning
+Perl: Making Easy Things Easy and Hard Things Possible</a> by Randal L.
+Schwartz, Brian D. Foy, Tom Phoenix,</li>
+<li><a
+href="https://www.goodreads.com/book/show/209276.Intermediate_Perl">Intermediate
+Perl</a> by Randal L. Schwartz, Brian D. Foy, Tom Phoenix,</li>
+<li><a
+href="https://www.goodreads.com/book/show/86379.Perl_Best_Practices">Perl
+Best Practices: Standards and Styles for Developing Maintainable
+Code</a> by Damian Conway.</li>
+</ul>
+<p>Reading the first 2 books in order and front-to-back works well to
+build deep knowledge, where the last one, <em>Perl Best Practices</em>,
+can be sampled from.</p>
+<h1 id="scalars">Scalars</h1>
+<h2 id="strings">Strings</h2>
+<h3 id="basics">Basics</h3>
+<p><em>Scalars</em> or <em>scalar values</em> are the smallest unit of
+data in perl, for example, numbers and strings. We store scalars in
+<em>scalar variables</em>. This is how you can store a string
+<code>'I am a string'</code> in a scalar variable <code>$var</code>:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">my</span> <span class="dt">$var</span> = <span class="ot">&#39;</span><span class="ss">I am a string</span><span class="ot">&#39;</span>;</span></code></pre></div>
+<p>!!! note <em>statements</em> in perl end with <code>;</code> as they
+do in Java or C++</p>
+<p>The <code>my</code> keyword <em>declares</em> the variable
+<code>$var</code> (similar to a <code>let</code> in Javascript) and
+<code>$var</code> consists of the symbol <code>$</code> and the name
+<code>var</code>. The symbol <code>$</code> hints that the variable is
+used or accessed as a scalar. In this case, it declares and initializes
+a string, which is indeed a scalar.</p>
+<p>You’ll later see a symbol <code>@</code> for array usage and
+<code>%</code> for hash usage (a <code>hash</code> is Python’s
+<code>dict</code> or generally a key-value structure such as a
+<code>Map</code> in Java).</p>
+<p>A common operation is concatenating 2 strings which you do using the
+dot-operator <code>.</code> :</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">my</span> <span class="dt">$concat</span> = <span class="dt">$var</span> . <span class="ot">&#39;</span><span class="ss"> and me too.</span><span class="ot">&#39;</span>;</span></code></pre></div>
+<p>If you want to change <code>$var</code> by concatenating something to
+it, instead of</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="dt">$var</span> = <span class="dt">$var</span> . <span class="ot">&#39;</span><span class="ss"> and me too.</span><span class="ot">&#39;</span>;</span></code></pre></div>
+<p>you can do:</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="dt">$var</span> .= <span class="ot">&#39;</span><span class="ss"> and me too.</span><span class="ot">&#39;</span>;</span></code></pre></div>
+<p>So far I used single quotes for strings. What about double quotes?
+You can use double quotes as well. Good practice is to use double quotes
+only when you want to <em>interpolate</em> variables appearing in such
+strings. For example:</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">my</span> <span class="dt">$name</span> = <span class="ot">&#39;</span><span class="ss">stijn</span><span class="ot">&#39;</span>;</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="kw">my</span> <span class="dt">$hello</span> = <span class="ot">&quot;</span><span class="st">my name is </span><span class="dt">$name</span><span class="ot">&quot;</span>;</span></code></pre></div>
+<p>Interpolation makes sure that <code>$name</code> in that
+<code>$hello</code> string is always <em>expanded</em> to its value. In
+this case, the string will be <code>my name is stijn</code>.
+Interpolation will usually lead to cleaner code than concatenation.
+Compare the above to:</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">my</span> <span class="dt">$name</span> = <span class="ot">&#39;</span><span class="ss">stijn</span><span class="ot">&#39;</span>;</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="kw">my</span> <span class="dt">$hello_conc</span> = <span class="ot">&#39;</span><span class="ss">my name is </span><span class="ot">&#39;</span> . <span class="dt">$name</span>;</span></code></pre></div>
+<h3 id="built-in-functions">Built-in Functions</h3>
+<h4 id="print"><a
+href="https://perldoc.perl.org/functions/print.html"><code>print</code></a></h4>
+<p>Printing to standard output is useful for debugging the odd
+statement:</p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span> <span class="ot">&quot;</span><span class="st">This is a printed string</span><span class="ch">\n</span><span class="ot">&quot;</span>;</span></code></pre></div>
+<p>!!! There’s an explicit <code>\n</code> in that statement; you might
+be used to a <code>println</code> from other languages that puts that
+<code>\n</code> there for you.</p>
+<h4 id="substr"><a
+href="https://perldoc.perl.org/functions/substr.html"><code>substr</code></a></h4>
+<p>Extract a substring out of a string. For example, to get
+<code>cat</code> out of the string <code>concatenate</code>:</p>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">my</span> <span class="dt">$cat</span> = <span class="fu">substr</span>(<span class="ot">&#39;</span><span class="ss">concatenate</span><span class="ot">&#39;</span>, <span class="dv">3</span>, <span class="dv">3</span>);</span></code></pre></div>
+<p>The first <code>3</code> is the offset from where to start the
+substring, the second <code>3</code> is the length of the substring you
+want (<em>cat</em> has 3 letters). You’ll see this pattern occur
+frequently: an <em>offset</em> followed by a <em>length</em>, in the
+arguments of a function.</p>
+<p>If you leave off the length, you can take the substring from the
+offset until the end of the string. For example to get
+<code>catenate</code> out <code>concatenate</code>:</p>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">my</span> <span class="dt">$nonsense_substring</span> = <span class="fu">substr</span>(<span class="ot">&#39;</span><span class="ss">concatenate</span><span class="ot">&#39;</span>, <span class="dv">3</span>);</span></code></pre></div>
+<h4 id="split"><a
+href="https://perldoc.perl.org/functions/split.html"><code>split</code></a></h4>
+<p><code>split</code> splits a string into parts based on a regular
+expression <code>/REGEXP/</code>. You’ll often spot this form in the
+wild:</p>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">split</span> //, <span class="ot">&#39;</span><span class="ss">yeah</span><span class="ot">&#39;</span>;</span></code></pre></div>
+<p>This will split the string <code>yeah</code> into a list of its
+individual characters because the pattern <code>//</code> matches
+<em>everything</em>. I will introduce lists/arrays as well as regular
+expressions later.</p>
+<p>!!! Note that <code>split //, 'yeah'</code> has no parentheses. Based
+on how I wrote <code>substr</code> you expected to see
+<code>split(//,'yeah')</code> and you’d been right as well!
+<code>perl</code> is playing loose with parentheses, so for built-in
+functions you’ll often see parentheses dropped. For functions you write
+yourself, I suggest to keep parentheses when invoking them. Life is
+complicated enough as it is.</p>
+<h2 id="numbers">Numbers</h2>
+<h3 id="basics-1">Basics</h3>
+<p>Let’s dive into numbers:</p>
+<div class="sourceCode" id="cb12"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="kw">my</span> <span class="dt">$numero</span> = <span class="dv">42</span>;</span></code></pre></div>
+<p>We can add numbers:</p>
+<div class="sourceCode" id="cb13"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="kw">my</span> <span class="dt">$sum</span> = <span class="dt">$numero</span> + <span class="dv">42</span>;</span></code></pre></div>
+<p>which is of course the same as:</p>
+<div class="sourceCode" id="cb14"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="kw">my</span> <span class="dt">$doubling</span> = <span class="dv">2</span> <span class="ot">*</span> <span class="dt">$numero</span>;</span></code></pre></div>
+<p>Similar like in other languages, there is a shorthand for
+<code>$numero = $numero + 42</code>:</p>
+<div class="sourceCode" id="cb15"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="dt">$numero</span> += <span class="dv">42</span>;</span></code></pre></div>
+<p>and for the other operations <em>la même chose</em>.</p>
+<h3 id="built-in-functions-1">Built-in Functions</h3>
+<p>This is where I am not going to write about <em>how to take the
+square root</em> using the built-in <code>sqrt</code> as you will never
+need it.</p>
+<p>You can <code>print</code> numbers and a good conversion (the
+<code>%d</code> in the below template string) is…<code>%d</code>:</p>
+<div class="sourceCode" id="cb16"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span> <span class="ot">&quot;</span><span class="st">The meaning of life is </span><span class="dt">%d</span><span class="ot">&quot;</span>, <span class="dv">42</span>;</span></code></pre></div>
+<h2 id="undef"><code>undef</code></h2>
+<p>I talked about scalars like strings and numbers. But what about the
+<code>null</code> we have come to hate from other languages? In
+<code>perl</code>, we have <code>undef</code>. And where you’ll see in
+other languages a lot of null-checks, in <code>perl</code> you’ll see a
+lot of:</p>
+<div class="sourceCode" id="cb17"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="kw">if</span> (<span class="fu">defined</span> <span class="dt">$x</span>) {</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># stuff</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<p>which checks whether <code>$x</code> is defined (so is
+<code>$x</code> <code>undef</code> or not).</p>
+<p>What’s with the</p>
+<div class="sourceCode" id="cb18"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># stuff</span></span></code></pre></div>
+<p>A <code>#</code> marks comments. Anything following it is ignored by
+the <code>perl</code> compiler.</p>
+<h1 id="array-variables">Array Variables</h1>
+<h2 id="basics-2">Basics</h2>
+<p>You can use array variables to store ordered lists of
+<em>things</em>. This is how you create an array with elements
+<code>here</code>, <code>I</code>, <code>am</code>:</p>
+<div class="sourceCode" id="cb19"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="kw">my</span> <span class="dt">@array</span> = (<span class="ot">&#39;</span><span class="ss">here</span><span class="ot">&#39;</span>, <span class="ot">&#39;</span><span class="ss">I</span><span class="ot">&#39;</span>, <span class="ot">&#39;</span><span class="ss">am</span><span class="ot">&#39;</span>);</span></code></pre></div>
+<p>Note the <code>@</code> symbol prefixing the variable name. In
+contrast to other languages like Python or Javascript, <code>perl</code>
+gives you a hint on what kind of variable something is. We already saw
+<em>scalar</em> variables in which you can store the smallest unit of
+<em>things</em> (for example, numbers or strings). The <code>@</code>
+signifies this is an <em>array</em> variable and stores a <em>list of
+such small-unit-things</em>. As a consequence, if a list contains a
+variable, that variable will be a <em>scalar variable</em>.</p>
+<p>Try to get the first element of the array <code>@array</code>:</p>
+<div class="sourceCode" id="cb20"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="kw">my</span> <span class="dt">$first_element</span> = <span class="dt">$array</span>[<span class="dv">0</span>];</span></code></pre></div>
+<p>The <code>[0]</code> part should look familiar, but note that it is
+<code>$array</code> when you use <code>@array</code> to <em>access</em>
+the scalar value at the first position (index <code>0</code>). Or
+differently put, while <code>@array</code> is an array,
+<code>$array[0]</code> is a scalar and hence I use <code>$</code> rather
+than <code>@</code>.</p>
+<p>The last element is usually easily retrieved using the
+<code>-1</code> index (similar to how we access the last character in a
+string):</p>
+<div class="sourceCode" id="cb21"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="kw">my</span> <span class="dt">$last_element</span> = <span class="dt">$array</span>[-<span class="dv">1</span>];</span></code></pre></div>
+<p>Changing the first element of an <code>@array</code> can be done as
+follows:</p>
+<div class="sourceCode" id="cb22"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="dt">$array</span>[<span class="dv">0</span>] = <span class="ot">&#39;</span><span class="ss">You</span><span class="ot">&#39;</span>;</span></code></pre></div>
+<p>I can copy an existing array <code>@array</code> to a new array
+<code>@copy</code>:</p>
+<div class="sourceCode" id="cb23"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="kw">my</span> <span class="dt">@copy</span> = <span class="dt">@array</span>;</span></code></pre></div>
+<p>Note that here I use <code>@</code> for both sides of the assignment:
+I’m creating an array <code>@copy</code> and copying the array
+<code>@array</code> (I am not referring to the individual elements in
+<code>@array</code>: the array is used in a <em>list</em> context).</p>
+<p>!!! <code>@copy</code> is indeed a copy: changing elements in
+<code>@copy</code> will <em>not</em> change elements in
+<code>@array</code>.</p>
+<h2 id="built-in-functions-2">Built-in Functions</h2>
+<h3 id="adding-and-removing-from-back-of-an-array">Adding and Removing
+from Back of an Array</h3>
+<p>You can remove elements from the back of an array, using <a
+href="https://perldoc.perl.org/functions/pop.html"><code>pop</code></a>:</p>
+<div class="sourceCode" id="cb24"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="kw">my</span> <span class="dt">@array</span> = (<span class="dv">4</span>, <span class="dv">5</span>);</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="kw">my</span> <span class="dt">$last</span> = <span class="fu">pop</span> <span class="dt">@array</span>;</span></code></pre></div>
+<p>Note that I did not write <code>pop(@array)</code> as
+<code>pop</code> is a built-in. We leave parentheses off of built-ins
+per convention. What will <code>$last</code> store? It will store the
+last element of <code>@array</code>: <code>5</code>. What will
+<code>@array</code> store after the <code>pop</code>ping? An array with
+the last element removed: <code>(4)</code>.</p>
+<p>You can add it back by adding it to the end of array using <a
+href="https://perldoc.perl.org/functions/pop.html"><code>push</code></a>:</p>
+<div class="sourceCode" id="cb25"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">push</span> <span class="dt">@array</span>, <span class="dv">5</span>;</span></code></pre></div>
+<p>Then, <code>@array</code> will be <code>(4, 5)</code> again. You can
+also use <code>push</code> to append a list:</p>
+<div class="sourceCode" id="cb26"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">push</span> <span class="dt">@array</span>, (<span class="dv">4</span>, <span class="dv">5</span>);</span></code></pre></div>
+<h3 id="adding-and-removing-from-front-of-an-array">Adding and Removing
+from Front of an Array</h3>
+<p>Sometimes you’d want to add something to the front of an array, and
+we use the unmemorable <a
+href="https://perldoc.perl.org/functions/unshift.html"><code>unshift</code></a>
+for that:</p>
+<div class="sourceCode" id="cb27"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">unshift</span> <span class="dt">@array</span>, <span class="dv">4</span>;</span></code></pre></div>
+<p>This adds <code>4</code> to the front of <code>@array</code>. You can
+also pre-pend lists like that:</p>
+<div class="sourceCode" id="cb28"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">unshift</span> <span class="dt">@array</span>, (<span class="dv">4</span>, <span class="dv">5</span>)</span></code></pre></div>
+<p>This turns an <code>@array</code> that is <code>(6, 7)</code> into
+<code>(4, 5, 6, 7)</code>. Note that the order is preserved (so it does
+not loop through <code>(4, 5)</code> and adds the elements one by
+one).</p>
+<p>Similar to how <code>pop</code> removes from the back of the list, we
+have a function to remove something from the start of the list:</p>
+<div class="sourceCode" id="cb29"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="kw">my</span> <span class="dt">$first</span> = <span class="fu">shift</span> <span class="dt">@array</span>;</span></code></pre></div>
+<p><code>@array</code> will be modified after this: the first element is
+removed and in this case I stored it in <code>$first</code>. You can
+imagine <a
+href="https://perldoc.perl.org/functions/shift.html"><code>shift</code></a>
+as shifting the array to the <em>left</em> and thus dropping the first
+element.</p>
+<h3 id="length-of-an-array-with-a-detour-to-contexts">Length of an Array
+with a detour to contexts</h3>
+<p>The notion of <em>context</em> is important in <code>perl</code>. For
+example, assigning an array to a scalar variable, will cause the
+<em>length</em> of that array to be assigned to the scalar. Indeed, you
+cannot store an array into a scalar, so what do you store? Well, a
+reasonable thing to store is the length of that array. So for this:</p>
+<div class="sourceCode" id="cb30"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="kw">my</span> <span class="dt">@array</span> = (<span class="ot">&#39;</span><span class="ss">hey</span><span class="ot">&#39;</span>, <span class="ot">&#39;</span><span class="ss">you</span><span class="ot">&#39;</span>);</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="kw">my</span> <span class="dt">$scalar_something</span> = <span class="dt">@array</span>;</span></code></pre></div>
+<p>we have that <code>$scalar_something</code> now contains
+<code>2</code>: the length of <code>@array</code>.</p>
+<p>This also works the other way: what if you want to store a scalar
+into a list? For example:</p>
+<div class="sourceCode" id="cb31"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="kw">my</span> <span class="dt">$scalar</span> = <span class="ot">&#39;</span><span class="ss">a</span><span class="ot">&#39;</span>;</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="kw">my</span> <span class="dt">@array</span> = <span class="dt">$scalar</span>;</span></code></pre></div>
+<p>You’re now trying to store a scalar variable <code>$scalar</code>
+into an array variable, or in other words, into a <em>list context</em>.
+<code>perl</code> will try to make a list out of the scalar, and the
+natural way to do so is by treating your scalar as a list with 1 element
+in it. So <code>@array</code> will effectively be the list
+<code>('a')</code>.</p>
+<h3 id="reverse"><a
+href="https://perldoc.perl.org/functions/reverse.html"><code>reverse</code></a></h3>
+<p>We can reverse arrays as follows:</p>
+<div class="sourceCode" id="cb32"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="kw">my</span> <span class="dt">@array</span> = (<span class="dv">1</span>, <span class="dv">2</span>);</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="kw">my</span> <span class="dt">@rev</span> = <span class="fu">reverse</span> <span class="dt">@array</span>;</span></code></pre></div>
+<p><code>@rev</code> will be <code>(2, 1)</code> and <code>@array</code>
+will have stayed the same.</p>
+<p>!!! <code>reverse</code> is non-destructive on its argument. Contrast
+that with <code>pop</code>/<code>push</code> and
+<code>shift/unshift</code>, all of which are destructive on the lists
+they operate on.</p>
+<h1 id="hash-variables">Hash Variables</h1>
+<h2 id="basics-3">Basics</h2>
+<p>Most programming languages have support for some key/value data
+structure (a <code>Map in Java</code>, a <code>dict</code> in Python).
+<code>perl</code> calls its key/value data structure a <em>hash</em>. A
+hash <em>literal</em> can be initialized as follows:</p>
+<div class="sourceCode" id="cb33"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="kw">my</span> <span class="dt">%some_hash</span> = (<span class="ot">&#39;</span><span class="ss">name</span><span class="ot">&#39;</span>, <span class="ot">&#39;</span><span class="ss">john</span><span class="ot">&#39;</span>, <span class="ot">&#39;</span><span class="ss">age</span><span class="ot">&#39;</span>, <span class="dv">39</span>);</span></code></pre></div>
+<p>!!! Tip I used a new symbol <code>%</code> to indicate that
+<code>some_hash</code> is a variable used to store a hash.</p>
+<p>I did not make a syntactical distinction between keys and values when
+writing <code>('name', 'john', 'age', 39)</code>. You expect
+<code>'name'</code> and <code>'age'</code> to be keys, and
+<code>'john'</code> and <code>39</code> to be values, but there is no
+apparent syntactical distinction with a literal <em>list</em> in this
+example. So why is this defining a hash and not a list?</p>
+<p>Let’s get back to our <em>contexts</em>. We already saw a <em>list
+context</em> and a <em>scalar context</em>. The <code>%</code> on the
+left-hand side of the assignment, indicates a <em>hash context</em> and
+whereas the right-hand side is indeed a list, we are trying to assign
+the list to a hash such that effectively we indeed store a hash (i.e,
+something we can access based on keys <code>'name'</code> and
+<code>'age'</code> as we will see in a bit).</p>
+<p>The keys <code>'name'</code> and <code>'age'</code> are strings while
+the values are strings or numbers (<code>39</code>). Indeed, the keys of
+a hash are always strings. The values are less strict and can be any
+<em>scalar</em>. As such we cannot nest hashes by embedding another hash
+as a value within a hash. At least not without a concept called
+<em>references</em> which I’ll introduce later. For now, remember that
+values of a hash are always scalars.</p>
+<p>As the list syntax for hashes can be confusing, <code>perl</code> has
+a trick: it treats the <em>fat comma</em> <code>=&gt;</code> exactly the
+same as a comma <code>,</code>, and thus we can replace certain commas
+by so-called fat commas to introduce syntactical clarity around what is
+a key and what is a value:</p>
+<div class="sourceCode" id="cb34"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="kw">my</span> <span class="dt">%some_hash</span> = (<span class="ot">&#39;</span><span class="ss">name</span><span class="ot">&#39;</span> =&gt; <span class="ot">&#39;</span><span class="ss">john</span><span class="ot">&#39;</span>, <span class="ot">&#39;</span><span class="ss">age</span><span class="ot">&#39;</span> =&gt; <span class="dv">39</span>);</span></code></pre></div>
+<p>When using the fat arrow notation, you can also leave off the quotes
+on the keys:</p>
+<div class="sourceCode" id="cb35"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="kw">my</span> <span class="dt">%some_hash</span> = (name =&gt; <span class="ot">&#39;</span><span class="ss">john</span><span class="ot">&#39;</span>, age =&gt; <span class="dv">39</span>);</span></code></pre></div>
+<p>We can access values of a hash, using curly braces (<code>{</code>
+<code>}</code>):</p>
+<div class="sourceCode" id="cb36"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="kw">my</span> <span class="dt">$name</span> = <span class="dt">$some_hash</span>{name};</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="kw">my</span> <span class="dt">$age</span> = <span class="dt">$some_hash</span>{age};</span></code></pre></div>
+<p>Note that I did not write <code>'name'</code> nor <code>'age'</code>
+(with single quotes around them): indeed once <code>%some_hash</code> is
+established as a hash, you can access values by using the keys without
+quotes whether you initialized with quoted keys or not. However, you
+<em>could</em> have written:</p>
+<div class="sourceCode" id="cb37"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="kw">my</span> <span class="dt">$name</span> = <span class="dt">$some_hash</span>{<span class="ot">&#39;</span><span class="ss">name</span><span class="ot">&#39;</span>};</span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="kw">my</span> <span class="dt">$age</span> = <span class="dt">$some_hash</span>{<span class="ot">&#39;</span><span class="ss">age</span><span class="ot">&#39;</span>};</span></code></pre></div>
+<p>We also used the scalar <code>$</code> symbol instead of the hash
+symbol <code>%</code> when <em>accessing</em> the hash. In effect, we’re
+accessing a scalar so we use <code>$</code>. Or differently,
+<code>$some_hash{name}</code> <em>is</em> a scalar (always, by the rule
+that values in hashes have to be scalars) rather than a <em>hash</em>,
+so it makes sense to refer to it with <code>$</code>.</p>
+<p>Changing the value for a key can be done without surprises:</p>
+<div class="sourceCode" id="cb38"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="dt">$some_hash</span>{name} = <span class="ot">&#39;</span><span class="ss">bill</span><span class="ot">&#39;</span>;</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a><span class="dt">$some_hash</span>{age} = <span class="dv">40</span>;</span></code></pre></div>
+<h2 id="built-in-functions-3">Built-in Functions</h2>
+<h3 id="valueskeys"><code>values</code>/<code>keys</code></h3>
+<p>As is usual with map-like structures in programming languages, you
+can get the keys <code>age</code> and <code>name</code> from the
+hash:</p>
+<div class="sourceCode" id="cb39"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="kw">my</span> <span class="dt">@keys</span> = <span class="fu">keys</span> <span class="dt">%some_hash</span>;</span></code></pre></div>
+<p>Indeed, <code>@keys</code> will be the array
+<code>('age', 'name')</code>. Similarly, you can get the values
+<code>39</code> and <code>john</code> from the hash:</p>
+<div class="sourceCode" id="cb40"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="kw">my</span> <span class="dt">@values</span> = <span class="fu">values</span> <span class="dt">%some_hash</span>;</span></code></pre></div>
+<p>Indeed, <code>@values</code> will be the array
+<code>(39, 'john')</code>. Note that even though I defined
+<code>%some_hash</code> using the literal
+<code>('name', 'john', 'age', '39')</code> which hints at some
+<em>ordering</em>, neither <code>values</code> nor <code>keys</code>
+need to satisfy that original order.</p>
+<h1 id="references">References</h1>
+<p><em>References</em> are the concept that makes nested structures
+possible. Recall that arrays can store lists of scalars and hashes are
+key-value maps where the key needs to be a string and the value needs to
+be a scalar.</p>
+<p>At first sight this restricts us to flat data structures. For
+example, I could not directly store a list of hashes. Or a hash that is
+an index of names (the key) to addresses (the value, consisting of
+street, zip code)).</p>
+<p>No-one wants to be restricted, the least of all to flat data
+structures. Enter: the <em>reference</em>. The reference is like C/C++
+style pointers. It is a <em>scalar</em> that <em>points</em> to other
+<em>things</em>. Those other other things could be other lists, other
+hashes, other scalars, or other references.</p>
+<p>Say we have a reference <code>$a_ref</code> (note that references are
+scalars, hence the <code>$</code>) that points to an array
+<code>(1, 2, 3)</code>:</p>
+<hr />
+<ul>
+<li><pre><code>                            *</code></pre></li>
+<li>.——–. .———. *</li>
+<li><div class="line-block">$a_ref +—–&gt;| (1, 2, 3) | *</div></li>
+<li>‘——–’ ‘———’ <em> </em>**********************************</li>
+</ul>
+<p>Since <code>$a_ref</code> is a scalar, we can have a hash with values
+that are pointing to arrays:</p>
+<div class="sourceCode" id="cb42"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="kw">my</span> <span class="dt">%array_value_hash</span> = (john =&gt; <span class="dt">$a_ref</span>);</span></code></pre></div>
+<p>We skipped a crucial piece though. How did I create that
+<code>$a_ref</code> reference to the array <code>(1, 2, 3)</code>?
+Recall that we can create an array variable as follows:</p>
+<div class="sourceCode" id="cb43"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="kw">my</span> <span class="dt">@array</span> = (<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>);</span></code></pre></div>
+<p>I can now take a reference to <code>@array</code> using the backslash
+:</p>
+<div class="sourceCode" id="cb44"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="kw">my</span> <span class="dt">$a_ref</span> = \<span class="dt">@array</span>;</span></code></pre></div>
+<p>There’s a shorthand for taking a reference to an array
+<em>literal</em>:</p>
+<div class="sourceCode" id="cb45"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="kw">my</span> <span class="dt">$a_ref</span> = [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>];</span></code></pre></div>
+<p>where I use square brackets <code>[ ]</code> instead of
+<code>( )</code>. Effectively, this:</p>
+<div class="sourceCode" id="cb46"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="kw">my</span> <span class="dt">@array</span> = (<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>);</span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a><span class="kw">my</span> <span class="dt">$a_ref</span> = \<span class="dt">@array</span>;</span></code></pre></div>
+<p>is the same as:</p>
+<div class="sourceCode" id="cb47"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="kw">my</span> <span class="dt">$a_ref</span> = [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>];</span></code></pre></div>
+<p>How could I get values out of that array using the reference
+<code>$a_ref</code> rather than using <code>@array</code> directly?
+Recall that you could get the first element (or change the first
+element) of <code>@array</code> with <code>$array[0]</code>. We can get
+to the underlying array based on the <code>$a_ref</code> reference, by
+<em>de-referencing</em> it using curly braces <code>{$a_ref}</code>.
+Getting the first element based on <code>$a_ref</code> can then be done
+by:</p>
+<div class="sourceCode" id="cb48"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="kw">my</span> <span class="dt">$first</span> = <span class="dt">$</span>{<span class="dt">$a_ref</span>}[<span class="dv">0</span>];</span></code></pre></div>
+<p>A similar dereferencing rule holds in situations where you’d normally
+deal with the array itself like when copying:</p>
+<div class="sourceCode" id="cb49"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="kw">my</span> <span class="dt">@copy</span> = <span class="dt">@array</span>;</span></code></pre></div>
+<p>To make a copy based on the <code>$a_ref</code>, you could do:</p>
+<div class="sourceCode" id="cb50"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="kw">my</span> <span class="dt">@copy</span> = <span class="dt">@</span>{<span class="dt">$a_ref</span>};</span></code></pre></div>
+<p>You can see that I just switched out the <code>array</code> part in
+<code>@array</code> by the dereferenced reference:
+<code>{$a_ref}</code>.</p>
+<p>I can copy array references:</p>
+<div class="sourceCode" id="cb51"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="kw">my</span> <span class="dt">$copy_ref</span> = <span class="dt">$a_ref</span>;</span></code></pre></div>
+<hr />
+<ul>
+<li><pre><code>                            *</code></pre></li>
+<li>.——–. .———. *</li>
+<li><div class="line-block">$a_ref +—–&gt;| (1, 2, 3) | *</div></li>
+<li>‘——–’ ‘———’ *</li>
+<li><pre><code>                    ^       *</code></pre></li>
+<li>.———–. | *</li>
+<li><div class="line-block">$copy_ref +——–’ *</div></li>
+<li>‘———–’ *</li>
+<li><pre><code>                            *</code></pre>
+<hr /></li>
+</ul>
+<p>If I then change <code>$copy_ref</code> I change the underlying
+array:</p>
+<div class="sourceCode" id="cb55"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="dt">$</span>{<span class="dt">$copy_ref</span>}[<span class="dv">0</span>] = <span class="dv">500</span>;</span></code></pre></div>
+<p>Indeed both <code>${$a_ref}[0]</code> and
+<code>${$copy_ref}[0]</code> are now equal to <code>500</code>:</p>
+<hr />
+<ul>
+<li><pre><code>                             *</code></pre></li>
+<li>.——–. .———–. *</li>
+<li><div class="line-block">$a_ref +—–&gt;| (500, 2, 3) |*</div></li>
+<li>‘——–’ ‘———–’ *</li>
+<li><pre><code>                      ^      *</code></pre></li>
+<li>.———–. | *</li>
+<li><div class="line-block">$copy_ref +———-’ *</div></li>
+<li>‘———–’ *</li>
+<li><pre><code>                             *</code></pre>
+<hr /></li>
+</ul>
+<p>To always type <code>${$a_ref}</code> is not very succinct. These are
+all the same:</p>
+<div class="sourceCode" id="cb59"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a><span class="dt">$</span>{<span class="dt">$a_ref</span>}[<span class="dv">0</span>]; <span class="co"># what we saw before</span></span>
+<span id="cb59-2"><a href="#cb59-2" aria-hidden="true" tabindex="-1"></a><span class="dt">$$a_ref</span>[<span class="dv">0</span>];   <span class="co"># 2 consecutive `$` so leave of braces (we&#39;ll not use this notation)</span></span>
+<span id="cb59-3"><a href="#cb59-3" aria-hidden="true" tabindex="-1"></a><span class="dt">$a_ref</span>-&gt;[<span class="dv">0</span>];  <span class="co"># use an arrow notation to indicate that `$a_ref` is actually a reference</span></span></code></pre></div>
+<p>That’s that for array references. What about hash references?
+Similarly to array references you can take a reference by using a
+backslash :</p>
+<div class="sourceCode" id="cb60"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a><span class="kw">my</span> <span class="dt">%hash</span> = (age =&gt; <span class="dv">9</span>);</span>
+<span id="cb60-2"><a href="#cb60-2" aria-hidden="true" tabindex="-1"></a><span class="kw">my</span> <span class="dt">$hash_ref</span> = \<span class="dt">%hash</span>;</span></code></pre></div>
+<p>Note again that <code>$hash_ref</code> is a scalar and thus prefixed
+with <code>$</code>. We can thus use this hash reference as values in
+other hashes or as members of an array.</p>
+<p>As with arrays there is a shorthand for creating such hash
+references:</p>
+<div class="sourceCode" id="cb61"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a><span class="kw">my</span> <span class="dt">$hash_ref</span> = { age =&gt; <span class="dv">9</span> };</span></code></pre></div>
+<p>Namely, use <code>{ }</code> instead of <code>( )</code>. You will
+see that notation frequently and it will comfort you as it is similar
+notation to JSON or Python <code>dict</code>s.</p>
+<p>Accessing values from hash references is similar. Recall that if
+you’d want the value <code>9</code> of the above <code>%hash</code>,
+you’d do:</p>
+<div class="sourceCode" id="cb62"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a><span class="dt">$hash</span>{age};</span></code></pre></div>
+<p>We have a similar <em>trick</em> as with arrays when you want to get
+that value via the <code>$hash_ref</code> rather than the
+<code>%hash</code>. We replace the name <code>hash</code> by
+<code>{$hash_ref}</code> – the dereferenced reference:</p>
+<div class="sourceCode" id="cb63"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a><span class="dt">$</span>{<span class="dt">$hash_ref</span>}{age};</span></code></pre></div>
+<p>Also this form has an easier to read form using an <code>-&gt;</code>
+notation:</p>
+<div class="sourceCode" id="cb64"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a><span class="dt">$hash_ref</span>-&gt;{age};</span></code></pre></div>
+<p>which is the preferable form.</p>
+<h1 id="conditions">Conditions</h1>
+<p>The syntax for <code>if</code>-conditions has no surprises:</p>
+<div class="sourceCode" id="cb65"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a><span class="kw">if</span> ( <span class="dt">$age</span> == <span class="dv">18</span> ) {</span>
+<span id="cb65-2"><a href="#cb65-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># stuff</span></span>
+<span id="cb65-3"><a href="#cb65-3" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<p>Note the equality test <code>==</code> for numbers (strings are
+compared with <code>eq</code>). Inequality is tested with
+<code>!=</code> for numbers (and <code>neq</code> for strings):</p>
+<div class="sourceCode" id="cb66"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a><span class="kw">if</span> ( <span class="dt">$age</span> != <span class="dv">18</span> ) {</span>
+<span id="cb66-2"><a href="#cb66-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># stuff</span></span>
+<span id="cb66-3"><a href="#cb66-3" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<p>or by using the negation operator <code>!</code> directly:</p>
+<div class="sourceCode" id="cb67"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb67-1"><a href="#cb67-1" aria-hidden="true" tabindex="-1"></a><span class="kw">if</span> ( !(<span class="dt">$age</span> == <span class="dv">18</span>) ) {</span>
+<span id="cb67-2"><a href="#cb67-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># stuff</span></span>
+<span id="cb67-3"><a href="#cb67-3" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<p>Note the extra parentheses in <code>!($age == 18)</code>. This is
+needed as in <code>!$age == 18</code>, <code>!$age</code> is interpreted
+first. This is unwanted as <code>$age</code> is assumed to be a number
+and the negation <code>!</code> of a number is false for all numbers
+except <code>0</code>.</p>
+<p>Other useful operators to use in conditions are
+<code>&amp;&amp;</code> for logical <em>and</em>, <code>||</code> for
+logical <em>or</em>.</p>
+<p>We have the usual <code>else</code>:</p>
+<div class="sourceCode" id="cb68"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true" tabindex="-1"></a><span class="kw">if</span> ( <span class="dt">$age</span> == <span class="dv">18</span> ) {</span>
+<span id="cb68-2"><a href="#cb68-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># stuff</span></span>
+<span id="cb68-3"><a href="#cb68-3" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb68-4"><a href="#cb68-4" aria-hidden="true" tabindex="-1"></a><span class="kw">else</span> {</span>
+<span id="cb68-5"><a href="#cb68-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># other stuff</span></span>
+<span id="cb68-6"><a href="#cb68-6" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<p>You can do cases using <code>elsif</code>:</p>
+<div class="sourceCode" id="cb69"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb69-1"><a href="#cb69-1" aria-hidden="true" tabindex="-1"></a><span class="kw">if</span> ( <span class="dt">$age</span> == <span class="dv">18</span> ) {</span>
+<span id="cb69-2"><a href="#cb69-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># stuff</span></span>
+<span id="cb69-3"><a href="#cb69-3" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb69-4"><a href="#cb69-4" aria-hidden="true" tabindex="-1"></a><span class="kw">elsif</span> ( <span class="dt">$age</span> &gt; <span class="dv">18</span>) {</span>
+<span id="cb69-5"><a href="#cb69-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># other stuff</span></span>
+<span id="cb69-6"><a href="#cb69-6" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb69-7"><a href="#cb69-7" aria-hidden="true" tabindex="-1"></a><span class="kw">else</span> {</span>
+<span id="cb69-8"><a href="#cb69-8" aria-hidden="true" tabindex="-1"></a>  <span class="co"># more stuff</span></span>
+<span id="cb69-9"><a href="#cb69-9" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<p>Note that it’s <em>not</em> <code>elseif</code> nor
+<code>else if</code>. It’s <code>elsif</code>.</p>
+<p><code>perl</code> also has the <code>unless</code> keyword for the
+“<code>if</code> not” situation. Do not use <code>unless</code> unless
+you feel like getting confused.</p>
+<p>Conditions can also be used to filter arrays. Using <code>grep</code>
+you can reduce an array to keep only the items that satisfy a certain
+condition. Say I want to create an array containing only negative
+numbers:</p>
+<div class="sourceCode" id="cb70"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a><span class="kw">my</span> <span class="dt">@all_numbers</span> = (<span class="dv">9</span>, -<span class="dv">7</span>, -<span class="dv">6</span>, <span class="dv">5</span>, <span class="dv">4</span>);</span>
+<span id="cb70-2"><a href="#cb70-2" aria-hidden="true" tabindex="-1"></a><span class="kw">my</span> <span class="dt">@negatives</span> = <span class="fu">grep</span> { <span class="wa">$_</span> &lt; <span class="dv">0</span> } <span class="dt">@all_numbers</span>;</span></code></pre></div>
+<p>I was able to avoid <code>$_</code> for a long time, but no more.
+<code>$_</code> is a scalar variable (given away by the <code>$</code>).
+And the <code>_</code> can be memorized as something that points to
+<em>whatever makes sense at this point in the code</em>. When used in a
+<code>grep</code>, <code>$_</code>, will contain, in sequence, every
+number from <code>@all_numbers</code>. <code>grep</code> will apply the
+condition <code>$_ &lt; 0</code> and will keep only those numbers that
+satisfy that condition (and store it in <code>@negatives</code>).</p>
+<p>Thus, <code>@negatives</code> will contain <code>(-7, -6)</code>.</p>
+<p>How to check whether there is <em>any</em> negative number (i.e., is
+there at least 1 negative number?) in a list <code>@all_numbers</code>.
+You could do this:</p>
+<div class="sourceCode" id="cb71"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb71-1"><a href="#cb71-1" aria-hidden="true" tabindex="-1"></a><span class="kw">my</span> <span class="dt">@all_numbers</span> = (<span class="dv">9</span>, -<span class="dv">7</span>, -<span class="dv">6</span>, <span class="dv">5</span>, <span class="dv">4</span>);</span>
+<span id="cb71-2"><a href="#cb71-2" aria-hidden="true" tabindex="-1"></a><span class="kw">my</span> <span class="dt">@negatives</span> = <span class="fu">grep</span> { <span class="wa">$_</span> &lt; <span class="dv">0</span> } <span class="dt">@all_numbers</span>;</span>
+<span id="cb71-3"><a href="#cb71-3" aria-hidden="true" tabindex="-1"></a><span class="kw">my</span> <span class="dt">$contains_negative</span> = <span class="dt">@negatives</span>;</span></code></pre></div>
+<p>I first used <code>grep</code> to get all negatives, and then I
+forced the array <code>@negatives</code> into a scalar. When you force
+an array into a scalar it will store the length of that array, such that
+<code>$contains_negative</code> contains a <code>0</code> or strictly
+positive number (in the example, it will contain a positive number as
+<code>@negatives</code> has 2 elements). You can use this in a
+condition:</p>
+<div class="sourceCode" id="cb72"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb72-1"><a href="#cb72-1" aria-hidden="true" tabindex="-1"></a><span class="kw">if</span> (<span class="dt">$contains_negative</span>) {</span>
+<span id="cb72-2"><a href="#cb72-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># stuff</span></span>
+<span id="cb72-3"><a href="#cb72-3" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<p>Indeed, since any non-zero positive number is considered true, this
+condition will be true if there was <em>any</em> negative number.</p>
+<p>Besides being slightly involved, this is also not as efficient as it
+could be: <code>grep</code> collects <em>all</em> negative numbers and
+we are interested in whether there’s at least <code>1</code> negative
+number. In other words, we’d want to short-circuit this. We have exactly
+that functionality in the core module <code>List::Util</code> with the
+function <a
+href="https://perldoc.perl.org/List/Util.html#any"><code>any</code></a>:</p>
+<div class="sourceCode" id="cb73"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb73-1"><a href="#cb73-1" aria-hidden="true" tabindex="-1"></a><span class="fu">use</span> <span class="fu">List::Util</span> <span class="ot">qw(</span>any<span class="ot">)</span>;</span>
+<span id="cb73-2"><a href="#cb73-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb73-3"><a href="#cb73-3" aria-hidden="true" tabindex="-1"></a><span class="kw">if</span> ( any { <span class="wa">$_</span> &lt; <span class="dv">0</span> } <span class="dt">@all_numbers</span> ) {</span>
+<span id="cb73-4"><a href="#cb73-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># stuff</span></span>
+<span id="cb73-5"><a href="#cb73-5" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<p>You see that <code>any { $_ &lt; 0 } @all_numbers</code> returns true
+if the condition <code>$_ &lt; 0</code> is true for <em>any</em> of the
+numbers in <code>@all_numbers</code>.</p>
+<p>I sprung something else on you:</p>
+<div class="sourceCode" id="cb74"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb74-1"><a href="#cb74-1" aria-hidden="true" tabindex="-1"></a><span class="fu">use</span> <span class="fu">List::Util</span> <span class="ot">qw(</span>any<span class="ot">)</span>;</span></code></pre></div>
+<p>You’re used to such inclusions of modules/packages/languages (modules
+in <code>perl</code> parlance) in other languages (Java has import). In
+this example, <code>use</code> announces <em>I’m making stuff available
+to use from the module <code>List::Util</code></em>. But what with
+<code>qw(any)</code>?</p>
+<p><code>any</code> is a function/subroutine (<code>subroutine</code> in
+<code>perl</code>) defined in that <code>List::Util</code> module, so
+we’re indicating that we’d like to import <code>any</code> from
+<code>List::Util</code>. But what about <code>qw</code>? You essentially
+want to indicate what functions you’d want to include, so you could
+write a literal list of strings: <code>("any")</code>. And if you want
+also the subroutine <code>first</code>:</p>
+<div class="sourceCode" id="cb75"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb75-1"><a href="#cb75-1" aria-hidden="true" tabindex="-1"></a><span class="fu">use</span> <span class="fu">List::Util</span> (<span class="ot">&quot;</span><span class="st">any</span><span class="ot">&quot;</span>, <span class="ot">&quot;</span><span class="st">first</span><span class="ot">&quot;</span>);</span></code></pre></div>
+<p><code>perl</code> programmers find double quotes and commans
+burdensome, so you can write this as:</p>
+<div class="sourceCode" id="cb76"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb76-1"><a href="#cb76-1" aria-hidden="true" tabindex="-1"></a><span class="fu">use</span> <span class="fu">List::Util</span> <span class="ot">qw(</span>any first<span class="ot">)</span>;</span></code></pre></div>
+<p>where <code>qw</code> signifies, <em>hey, these are quoted
+words</em>.</p>
+<p>I already mentioned <code>first</code>: use <code>first</code> when
+you’d like to find the first element that matches the condition:</p>
+<div class="sourceCode" id="cb77"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb77-1"><a href="#cb77-1" aria-hidden="true" tabindex="-1"></a><span class="kw">my</span> <span class="dt">@all_numbers</span> = (<span class="dv">9</span>, -<span class="dv">7</span>, -<span class="dv">6</span>, <span class="dv">5</span>, <span class="dv">4</span>);</span>
+<span id="cb77-2"><a href="#cb77-2" aria-hidden="true" tabindex="-1"></a><span class="kw">my</span> <span class="dt">$first_negative</span> = first { <span class="wa">$_</span> &lt; <span class="dv">0</span> } <span class="dt">@all_numbers</span>;</span></code></pre></div>
+<h1 id="looping">Looping</h1>
+<p>For <code>for</code>-loops, I prefer this form:</p>
+<div class="sourceCode" id="cb78"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb78-1"><a href="#cb78-1" aria-hidden="true" tabindex="-1"></a><span class="kw">for</span> <span class="kw">my</span> <span class="dt">$number</span> (<span class="dt">@all_numbers</span>) {</span>
+<span id="cb78-2"><a href="#cb78-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span> <span class="ot">&quot;</span><span class="st">el: </span><span class="dt">$number</span><span class="st"> </span><span class="ot">&quot;</span>;</span>
+<span id="cb78-3"><a href="#cb78-3" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<p>With the above <code>@all_numbers</code>, this prints:
+<code>el: 9 el: -7 el: -6 el: 5 el: 4</code>.</p>
+<p>The first line of that loop:
+<code>for my $number (@all_numbers)</code>, indicates that we are going
+to loop through the elements of the array <code>@all_numbers</code>. We
+initialize <code>my $number</code> with each such element from
+<code>@all_numbers</code>.</p>
+<p>Why are there parentheses <code>( )</code> around
+<code>@all_numbers</code> in that syntax? That seems odd, but it seems
+that there are not many reasons apart from that <a
+href="https://stackoverflow.com/questions/3650000/what-is-the-purpose-of-the-parentheses-in-perls-foreach-statement">Larry
+wants it</a>.</p>
+<p>Let’s modify the above loop to only print negative numbers:</p>
+<div class="sourceCode" id="cb79"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb79-1"><a href="#cb79-1" aria-hidden="true" tabindex="-1"></a><span class="kw">for</span> <span class="kw">my</span> <span class="dt">$number</span> (<span class="dt">@all_numbers</span>) {</span>
+<span id="cb79-2"><a href="#cb79-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">if</span> ( <span class="dt">$number</span> &lt; <span class="dv">0</span> ) {</span>
+<span id="cb79-3"><a href="#cb79-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">print</span> <span class="dt">$number</span>;</span>
+<span id="cb79-4"><a href="#cb79-4" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb79-5"><a href="#cb79-5" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<p>Let’s rewrite that loop using the opposite condition:
+<code>$number &gt; 0</code> (testing for positive numbers) but let’s
+still print negative numbers:</p>
+<div class="sourceCode" id="cb80"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb80-1"><a href="#cb80-1" aria-hidden="true" tabindex="-1"></a><span class="kw">for</span> <span class="kw">my</span> <span class="dt">$number</span> (<span class="dt">@all_numbers</span>) {</span>
+<span id="cb80-2"><a href="#cb80-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">if</span> ( <span class="dt">$number</span> &gt; <span class="dv">0</span> ) {</span>
+<span id="cb80-3"><a href="#cb80-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># do nothing</span></span>
+<span id="cb80-4"><a href="#cb80-4" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb80-5"><a href="#cb80-5" aria-hidden="true" tabindex="-1"></a>  <span class="kw">else</span> {</span>
+<span id="cb80-6"><a href="#cb80-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">print</span> <span class="dt">$number</span>;</span>
+<span id="cb80-7"><a href="#cb80-7" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb80-8"><a href="#cb80-8" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<p>Let’s take that one step further and try to write that without an
+<code>else</code>. If there’s a way to skip the rest of the loop I can
+just put the <code>print</code> as the last statement. I just need to
+make sure I never reach that last statement when a number is positive. I
+could do that by skipping to the <em>next</em> iteration of the loop
+when a number is positive.</p>
+<div class="sourceCode" id="cb81"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb81-1"><a href="#cb81-1" aria-hidden="true" tabindex="-1"></a><span class="kw">for</span> <span class="kw">my</span> <span class="dt">$number</span> (<span class="dt">@all_numbers</span>) {</span>
+<span id="cb81-2"><a href="#cb81-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">if</span> ( <span class="dt">$number</span> &gt; <span class="dv">0</span> ) {</span>
+<span id="cb81-3"><a href="#cb81-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">next</span>;</span>
+<span id="cb81-4"><a href="#cb81-4" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb81-5"><a href="#cb81-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span> <span class="dt">$number</span>;</span>
+<span id="cb81-6"><a href="#cb81-6" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<p>Usually, when using <code>next</code> in such a simple case, you’d
+like it to be more prominent, so you’d use the postfix notation:</p>
+<div class="sourceCode" id="cb82"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb82-1"><a href="#cb82-1" aria-hidden="true" tabindex="-1"></a><span class="kw">for</span> <span class="kw">my</span> <span class="dt">$number</span> (<span class="dt">@all_numbers</span>) {</span>
+<span id="cb82-2"><a href="#cb82-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">next</span> <span class="kw">if</span> ( <span class="dt">$number</span> &gt; <span class="dv">0</span> );</span>
+<span id="cb82-3"><a href="#cb82-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span> <span class="dt">$number</span>;</span>
+<span id="cb82-4"><a href="#cb82-4" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<p>For additional clarity, you can label your for-loops when having such
+control statements like <code>next</code>:</p>
+<div class="sourceCode" id="cb83"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb83-1"><a href="#cb83-1" aria-hidden="true" tabindex="-1"></a>NUMBER:</span>
+<span id="cb83-2"><a href="#cb83-2" aria-hidden="true" tabindex="-1"></a><span class="kw">for</span> <span class="kw">my</span> <span class="dt">$number</span> (<span class="dt">@all_numbers</span>) {</span>
+<span id="cb83-3"><a href="#cb83-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">next</span> NUMBER <span class="kw">if</span> ( <span class="dt">$number</span> &gt; <span class="dv">0</span> );</span>
+<span id="cb83-4"><a href="#cb83-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span> <span class="dt">$number</span>;</span>
+<span id="cb83-5"><a href="#cb83-5" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<p>That’s often useful when nesting loops as it adds clarity as to where
+your <code>next</code> is jumping to.</p>
+<p>That <code>next</code> showed how to skip the current iteration. You
+can also break out of the loop entirely by using <a
+href="https://perldoc.perl.org/functions/last.html">last</a>.</p>
+<p>Let’s do another example of a loop. Construct a new array out of
+<code>@all_numbers</code> that contains the elements of
+<code>@all_numbers</code> but doubled:</p>
+<div class="sourceCode" id="cb84"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb84-1"><a href="#cb84-1" aria-hidden="true" tabindex="-1"></a><span class="kw">my</span> <span class="dt">@doubled_numbers</span> = ();</span>
+<span id="cb84-2"><a href="#cb84-2" aria-hidden="true" tabindex="-1"></a><span class="kw">for</span> <span class="kw">my</span> <span class="dt">$number</span> (<span class="dt">@all_numbers</span>) {</span>
+<span id="cb84-3"><a href="#cb84-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">push</span> <span class="dt">@doubled_numbers</span>, <span class="dv">2</span> <span class="ot">*</span> <span class="dt">$number</span>;</span>
+<span id="cb84-4"><a href="#cb84-4" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<p>I initialized a new array <code>@doubled_numbers</code> with the
+empty array <code>( )</code>. I looped through <code>@all_numbers</code>
+and using <code>push</code> I added all doubled numbers.
+<code>push</code> adds numbers from the back as we saw before so order
+nicely stays maintained. Is there a problem with this approach?</p>
+<p>It works, but the caveat is that, as is usual in most programming
+languages, the memory allocated for <code>@doubled_numbers</code>
+potentially has to be re-allocated when we run out of initial memory for
+<code>@doubled_numbers</code>. This is inefficient. In cases where we’re
+constructing a new <em>something</em> out of an another
+<em>something</em> consider using a <a
+href="https://perldoc.perl.org/functions/map.html"><code>map</code></a>:</p>
+<div class="sourceCode" id="cb85"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb85-1"><a href="#cb85-1" aria-hidden="true" tabindex="-1"></a><span class="kw">my</span> <span class="dt">@doubled_numbers</span> = <span class="fu">map</span> { <span class="dv">2</span> <span class="ot">*</span> <span class="wa">$_</span> } <span class="dt">@all_numbers</span>;</span></code></pre></div>
+<p>As with <code>grep</code>, the variable <code>$_</code> will be
+<em>each element from <code>@all_numbers</code></em>. We will take that
+element and execute the expression within <code>{ }</code>, and then we
+will put the results of all those executions in 1 list. That list is the
+result of the <code>map</code>. Note that we can generate multiple
+elements for each element of the list that we apply the <code>map</code>
+to, so we can increase the size of the list. Say we want to repeat each
+occurrence of each element:</p>
+<div class="sourceCode" id="cb86"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb86-1"><a href="#cb86-1" aria-hidden="true" tabindex="-1"></a><span class="kw">my</span> <span class="dt">@double_sight</span> = <span class="fu">map</span> { <span class="wa">$_</span>, <span class="wa">$_</span> } <span class="dt">@all_numbers</span>;</span></code></pre></div>
+<p>will return a list of 2 elements for each number in
+<code>@all_numbers</code> which we’ll then concatenate. For example, say
+<code>@all_numbers</code> is <code>(1, 2, 3)</code>, then
+<code>@double_sight</code> will be <code>(1, 1, 2, 2, 3, 3)</code>. Why
+will it not be <code>((1, 1), (2, 2), (3, 3))</code>: <code>perl</code>
+does not allow such nested lists, so the inner lists will be implicitly
+flattened. We could make the list construction in that latter a bit more
+explicit by writing:</p>
+<div class="sourceCode" id="cb87"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb87-1"><a href="#cb87-1" aria-hidden="true" tabindex="-1"></a><span class="kw">my</span> <span class="dt">@double_sight</span> = <span class="fu">map</span> { (<span class="wa">$_</span>, <span class="wa">$_</span>) } <span class="dt">@all_numbers</span>;</span></code></pre></div>
+<p>Since the result of a <code>map</code> is always an array, we can
+always store that result into an array variable. But we also saw that we
+can initialize a hash using an array. In other words, something like
+this:</p>
+<div class="sourceCode" id="cb88"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb88-1"><a href="#cb88-1" aria-hidden="true" tabindex="-1"></a><span class="kw">my</span> <span class="dt">%hash</span> = <span class="fu">map</span> { <span class="wa">$_</span> =&gt; <span class="wa">$_</span> } <span class="dt">@something</span>;</span></code></pre></div>
+<p>creates a <code>%hash</code> with as keys the elements from
+<code>@something</code> and as values those same elements. So if
+<code>@something</code> is <code>("stijn", "stijn")</code>, we’ll have
+that <code>%hash</code> is
+<code>(stijn =&gt; 'stijn', stijn =&gt; 'stijn')</code>.</p>
+<h1 id="subroutines">Subroutines</h1>
+<p>We have talked about data, ways to store it, and ways to manipulate
+it using <code>perl</code>’s built-ins and control structures such as
+conditions and loops. How do we write our own functions/methods to
+manipulate data? In <code>perl</code>, functions/methods are called
+<em>subroutines</em>. We indicate that we’re defining a subroutine by
+the keyword <code>sub</code>.</p>
+<p>For example, let’s define a subroutine that doubles a number:</p>
+<div class="sourceCode" id="cb89"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb89-1"><a href="#cb89-1" aria-hidden="true" tabindex="-1"></a><span class="kw">sub </span><span class="fu">double_it</span> {</span>
+<span id="cb89-2"><a href="#cb89-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">my</span> (<span class="dt">$x</span>) = <span class="dt">@_</span>;</span>
+<span id="cb89-3"><a href="#cb89-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb89-4"><a href="#cb89-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">return</span> <span class="dv">2</span> <span class="ot">*</span> <span class="dt">$x</span>;</span>
+<span id="cb89-5"><a href="#cb89-5" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<p>What <code>2 * $x</code> does is clear. What is new is the
+<code>return</code>: it tells <code>perl</code> to exit from the
+subroutine and to return double the value of <code>$x</code> to the
+caller of the subroutine.</p>
+<p>Where are the arguments to this function? It <em>seems</em> like
+<code>$x</code> is the argument but it’s first mentioned in an
+unexpected way:</p>
+<div class="sourceCode" id="cb90"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb90-1"><a href="#cb90-1" aria-hidden="true" tabindex="-1"></a><span class="kw">my</span> (<span class="dt">$x</span>) = <span class="dt">@_</span>;</span></code></pre></div>
+<p>Let’s walk through a subroutine call to see how the argument to a
+subroutine call gets stored in <code>$x</code> in this example. Say I
+want to double <code>5</code>:</p>
+<div class="sourceCode" id="cb91"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb91-1"><a href="#cb91-1" aria-hidden="true" tabindex="-1"></a><span class="kw">my</span> <span class="dt">$y</span> = double_it(<span class="dv">5</span>);</span></code></pre></div>
+<p>The argument list to <code>double_it</code> now gets implicitly bound
+to the special array variable <code>@_</code>. Note that we already saw
+special variable <code>$_</code>, well, this is another special one, for
+arrays.</p>
+<p>In this case, we’d have that <code>@_</code> is be bound to the list
+<code>(5)</code>. So <code>my ($x) = @_</code>is at that point the same
+as <code>my ($x) = (5)</code>. The left hand side is an array literal
+with a variable <code>$x</code> in it, the right hand side is just an
+array literal. <code>perl</code> matches those 2 for you such that
+<code>$x</code> is now <code>5</code>.</p>
+<p>Let’s take a quick detour around this mechanism of matching. It
+allows you to do:</p>
+<div class="sourceCode" id="cb92"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb92-1"><a href="#cb92-1" aria-hidden="true" tabindex="-1"></a><span class="kw">my</span> (<span class="dt">$x</span>, <span class="dt">$y</span>) = (<span class="dv">5</span>);</span></code></pre></div>
+<p><code>$x</code> is now <code>5</code>, but what happened to
+<code>$y</code>? It’s <code>undef</code> as you had nothing to match it
+with. What about:</p>
+<div class="sourceCode" id="cb93"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb93-1"><a href="#cb93-1" aria-hidden="true" tabindex="-1"></a><span class="kw">my</span> (<span class="dt">$x</span>) = (<span class="dv">5</span>, <span class="dv">6</span>);</span></code></pre></div>
+<p>Again, <code>$x</code> is <code>5</code>, but what happened with
+<code>6</code>? Nothing. It fell on the floor.</p>
+<p>I’ll mention an alternative way to get to the arguments as you’ll see
+that one as well frequently used:</p>
+<div class="sourceCode" id="cb94"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb94-1"><a href="#cb94-1" aria-hidden="true" tabindex="-1"></a><span class="kw">my</span> <span class="dt">$x</span> = <span class="fu">shift</span>;</span>
+<span id="cb94-2"><a href="#cb94-2" aria-hidden="true" tabindex="-1"></a><span class="kw">my</span> <span class="dt">$y</span> = <span class="fu">shift</span>;</span></code></pre></div>
+<p>This is an alternative for</p>
+<div class="sourceCode" id="cb95"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb95-1"><a href="#cb95-1" aria-hidden="true" tabindex="-1"></a><span class="kw">my</span> (<span class="dt">$x</span>, <span class="dt">$y</span>) = <span class="dt">@_</span>;</span></code></pre></div>
+<p>You might ask why do I see <code>shift</code> and not
+<code>shift @_</code>? Well, <code>perl</code> is in the habit of
+assuming defaults, in this case the <code>@_</code> is assumed and
+<code>shift</code> indeed stands for <code>shift @_</code>.</p>
+<p>This might be a cleaner way in case you want to validate
+<code>$x</code> for example, before continuing with the rest of the
+arguments.</p>
+<p>To test our knowledge, let’s look at this:</p>
+<div class="sourceCode" id="cb96"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb96-1"><a href="#cb96-1" aria-hidden="true" tabindex="-1"></a><span class="kw">my</span> <span class="dt">@a</span> = (<span class="dv">1</span>, <span class="dv">2</span>);</span>
+<span id="cb96-2"><a href="#cb96-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb96-3"><a href="#cb96-3" aria-hidden="true" tabindex="-1"></a><span class="kw">sub </span><span class="fu">f</span> {</span>
+<span id="cb96-4"><a href="#cb96-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">my</span> <span class="dt">@args</span> = <span class="dt">@_</span>;</span>
+<span id="cb96-5"><a href="#cb96-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">$args</span>[<span class="dv">0</span>] = <span class="dv">3</span>;</span>
+<span id="cb96-6"><a href="#cb96-6" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb96-7"><a href="#cb96-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb96-8"><a href="#cb96-8" aria-hidden="true" tabindex="-1"></a>f(<span class="dt">@a</span>);</span>
+<span id="cb96-9"><a href="#cb96-9" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span> <span class="ot">&quot;</span><span class="dt">@a</span><span class="ch">\n</span><span class="ot">&quot;</span>;</span></code></pre></div>
+<p>What will this print? The array will print the original
+<code>@a</code>, namely <code>1 2</code>. The reason is that
+<code>@args</code> is a copy of <code>@_</code>, and we only changed the
+copy.</p>
+<p>How can we make it so the original <code>@a</code> is indeed changed.
+Well, we have references for that:</p>
+<div class="sourceCode" id="cb97"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb97-1"><a href="#cb97-1" aria-hidden="true" tabindex="-1"></a><span class="kw">my</span> <span class="dt">@a</span> = (<span class="dv">1</span>, <span class="dv">2</span>);</span>
+<span id="cb97-2"><a href="#cb97-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb97-3"><a href="#cb97-3" aria-hidden="true" tabindex="-1"></a><span class="kw">sub </span><span class="fu">f</span> {</span>
+<span id="cb97-4"><a href="#cb97-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">my</span> (<span class="dt">$args_ref</span>) = <span class="dt">@_</span>;</span>
+<span id="cb97-5"><a href="#cb97-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">$args_ref</span>-&gt;[<span class="dv">0</span>] = <span class="dv">3</span>;</span>
+<span id="cb97-6"><a href="#cb97-6" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb97-7"><a href="#cb97-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb97-8"><a href="#cb97-8" aria-hidden="true" tabindex="-1"></a>f(\<span class="dt">@a</span>);</span>
+<span id="cb97-9"><a href="#cb97-9" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span> <span class="ot">&quot;</span><span class="dt">@a</span><span class="ch">\n</span><span class="ot">&quot;</span>;</span></code></pre></div>
+<p>will print <code>3 2</code> as the original <code>@a</code> is now
+indeed changed since we passed it by reference.</p>
+<h1 id="matching-and-substituting">Matching and Substituting</h1>
+<p>We cannot talk about <code>perl</code> without mentioning regular
+expressions. Let’s look at some examples to explain common
+constructs.</p>
+<p>Assume you have a string “there is a wolf somewhere” and you’d like
+to check whether it contains the word <em>wolf</em>:</p>
+<div class="sourceCode" id="cb98"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb98-1"><a href="#cb98-1" aria-hidden="true" tabindex="-1"></a><span class="kw">my</span> <span class="dt">$test</span> = <span class="ot">&quot;</span><span class="st">there is a wolf somewhere</span><span class="ot">&quot;</span>;</span>
+<span id="cb98-2"><a href="#cb98-2" aria-hidden="true" tabindex="-1"></a><span class="kw">if</span> (<span class="dt">$test</span> =~ <span class="ot">/wolf/</span>) {</span>
+<span id="cb98-3"><a href="#cb98-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span> <span class="ot">&quot;</span><span class="st">there is a wolf somewhere but you already knew that!</span><span class="ot">&quot;</span>;</span>
+<span id="cb98-4"><a href="#cb98-4" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<p>The meat of this code is in the <code>if</code> test:
+<code>$test =~ /wolf/</code>. With the binding operator <code>=~</code>
+we are saying: I want to check the pattern on the right of
+<code>=~</code> in the text on the left of <code>=~</code>. What is the
+pattern? The pattern is between slashes <code>/</code>:
+<code>/wolf/</code>. Note that you’ll sometimes see
+<code>m/wolf/</code>, i.e, the pattern prefixed with <code>m</code>.
+That’s because there’s a version with <code>s</code> as well, which
+stands for <em>substitute</em>.</p>
+<p>That was the absolute basics. Let’s advance to <em>capture
+groups</em>. They allow you to use the matched pattern later:</p>
+<div class="sourceCode" id="cb99"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb99-1"><a href="#cb99-1" aria-hidden="true" tabindex="-1"></a><span class="kw">my</span> <span class="dt">$test</span> = <span class="ot">&quot;</span><span class="st">there is a Wolf somewhere</span><span class="ot">&quot;</span>;</span>
+<span id="cb99-2"><a href="#cb99-2" aria-hidden="true" tabindex="-1"></a><span class="kw">if</span> (<span class="dt">$test</span> =~ <span class="ot">/</span><span class="ch">([</span><span class="bn">wW</span><span class="ch">]</span><span class="ot">olf</span><span class="ch">)</span><span class="ot">/</span>) {</span>
+<span id="cb99-3"><a href="#cb99-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">my</span> <span class="dt">$matched_wolf</span> = <span class="wa">$1</span>;</span>
+<span id="cb99-4"><a href="#cb99-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span> <span class="ot">&quot;</span><span class="st">there is a </span><span class="dt">$matched_wolf</span><span class="st"> somewhere but you already knew that!</span><span class="ot">&quot;</span>;</span>
+<span id="cb99-5"><a href="#cb99-5" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<p>I used a <em>character class</em> <code>[wW]</code> which stands for
+a match with either <code>w</code> or <code>W</code>. And I surrounded
+<code>[wW]olf</code> with parentheses like so: <code>([wW]olf)</code>.
+The parentheses created a capture group which I referenced later using
+<code>$1</code>. Note that you could have several capture groups in a
+pattern, and you can refer to these as <code>$1</code>, <code>$2</code>,
+etc. The ordering in those variable names is following the order of the
+parentheses. For example, if you have pattern <code>((stuff)more)</code>
+and a text <code>somestuffmore</code>, <code>stuffmore</code> is matched
+in <code>$1</code> and <code>stuff</code> in <code>$2</code>.</p>
+<p>I’ll further say that the dot <code>.</code> stands for any character
+<em>except</em> a newline.</p>
+<p>That was for matching, what about substituting those matches? Let’s
+try:</p>
+<div class="sourceCode" id="cb100"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb100-1"><a href="#cb100-1" aria-hidden="true" tabindex="-1"></a><span class="kw">my</span> <span class="dt">$test</span> = <span class="ot">&quot;</span><span class="st">there is a Wolf somewhere</span><span class="ot">&quot;</span>;</span>
+<span id="cb100-2"><a href="#cb100-2" aria-hidden="true" tabindex="-1"></a><span class="dt">$test</span> =~ <span class="ot">s/</span><span class="ch">([</span><span class="bn">wW</span><span class="ch">]</span><span class="ot">olf</span><span class="ch">)</span><span class="ot">/</span><span class="st">bear</span><span class="ot">/</span>;</span>
+<span id="cb100-3"><a href="#cb100-3" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span> <span class="dt">$test</span>;</span></code></pre></div>
+<p>will predictably announce to us that <em>there is a bear
+somewhere</em>. We already mentioned the <code>s</code> for
+<code>substitute</code>. The first part <code>([wW]olf)</code> of that
+<code>s//</code> construct is the pattern to replace, the second part
+<code>bear</code> is the pattern to replace it with.</p>
+<p>We can refer to the capturing groups of the first pattern in the 2nd
+pattern:</p>
+<div class="sourceCode" id="cb101"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb101-1"><a href="#cb101-1" aria-hidden="true" tabindex="-1"></a><span class="kw">my</span> <span class="dt">$test</span> = <span class="ot">&quot;</span><span class="st">there is a wolf somewhere</span><span class="ot">&quot;</span>;</span>
+<span id="cb101-2"><a href="#cb101-2" aria-hidden="true" tabindex="-1"></a><span class="dt">$test</span> =~ <span class="ot">s/</span><span class="ch">([</span><span class="bn">wW</span><span class="ch">]</span><span class="ot">olf</span><span class="ch">)</span><span class="ot">/</span><span class="st">bear</span><span class="wa">$1</span><span class="ot">/</span>;</span>
+<span id="cb101-3"><a href="#cb101-3" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span> <span class="dt">$test</span>;</span></code></pre></div>
+<p>which prints <code>there is a bearwolf somewhere</code>. At which
+point, we should all just leave the campground and find a hotel.</p>
+<h1 id="constants">Constants</h1>
+<p>Java programmers might wonder how to declare something as constant
+(<code>private static final</code>), i.e., you can define it once, but
+you can afterward no longer re-assign it.</p>
+<p>You can use the <code>ReadOnly</code> module:</p>
+<div class="sourceCode" id="cb102"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb102-1"><a href="#cb102-1" aria-hidden="true" tabindex="-1"></a><span class="fu">use</span> Readonly;</span>
+<span id="cb102-2"><a href="#cb102-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb102-3"><a href="#cb102-3" aria-hidden="true" tabindex="-1"></a>Readonly <span class="kw">my</span> <span class="dt">$MEANING_OF_LIFE</span> =&gt; <span class="dv">42</span>;</span></code></pre></div>
+<p>Things to note:</p>
+<ul>
+<li>we use <code>=&gt;</code> instead of <code>=</code></li>
+<li>we write <code>Readonly</code> before the variable declaration.</li>
+</ul>
+<p>While this looks a lot like a variable declaration, you can see that,
+given <code>perl</code>’s looseness with parentheses, this is probably
+just a subroutine call <code>Readonly(my $MEANING_OF_LIFE, 42)</code>
+made to look like a variable declaration.</p>
+<p>In any case, try this:</p>
+<div class="sourceCode" id="cb103"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb103-1"><a href="#cb103-1" aria-hidden="true" tabindex="-1"></a><span class="dt">$MEANING_OF_LIFE</span> = <span class="dv">41</span>;</span></code></pre></div>
+<p>The compiler will complain with an <em>Invalid initialization by
+assignment</em>, because we declared the variable to be read-only and
+<code>41</code> is not the <a
+href="https://en.wikipedia.org/wiki/The_Hitchhiker%27s_Guide_to_the_Galaxy">meaning
+of life</a>.</p>
+<h1 id="printing-anything">Printing Anything</h1>
+<p>If you print, for example, a hash reference:</p>
+<pre><code>print {a =&gt; 1, b =&gt; 2};</code></pre>
+<p>you’ll see a useless <code>HASH(0x7f8d43004ee8)</code> printed. In
+order to print more than strings or numbers, the
+<code>Data::Dumper</code> module is there to help:</p>
+<div class="sourceCode" id="cb105"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb105-1"><a href="#cb105-1" aria-hidden="true" tabindex="-1"></a><span class="fu">use</span> <span class="fu">Data::Dumper</span>;</span>
+<span id="cb105-2"><a href="#cb105-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb105-3"><a href="#cb105-3" aria-hidden="true" tabindex="-1"></a><span class="kw">my</span> <span class="dt">$hash_ref</span> = {a =&gt; <span class="dv">1</span>, b =&gt; <span class="dv">2</span>};</span>
+<span id="cb105-4"><a href="#cb105-4" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span> Dumper(<span class="dt">$hash_ref</span>);</span></code></pre></div>
+<p>Often the thing you’d like to print is a deeply nested structure. If
+you want to limit the levels of that nested structure you’d like to
+print you can do:</p>
+<div class="sourceCode" id="cb106"><pre
+class="sourceCode perl"><code class="sourceCode perl"><span id="cb106-1"><a href="#cb106-1" aria-hidden="true" tabindex="-1"></a><span class="dt">$Data</span>::<span class="dt">Dumper</span>::<span class="dt">Maxdepth</span>=<span class="dv">2</span>;</span></code></pre></div>
+<h1 id="acknowledgements">Acknowledgements</h1>
+<p>Thanks to <a href="https://github.com/csbuja">csbuja</a> for
+corrections.</p>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-12447521-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+
+  function gtag() {
+    dataLayer.push(arguments);
+  }
+
+  gtag('js', new Date());
+
+  gtag('config', 'UA-12447521-1');
+</script>
+</body>
+</html>

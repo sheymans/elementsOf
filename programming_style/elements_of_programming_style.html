@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Stijn Heymans" />
+  <title>Elements of Programming Style</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <link rel="stylesheet" href="../elements_of.css" />
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Elements of Programming Style</h1>
+<p class="author">Stijn Heymans</p>
+</header>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#introduction" id="toc-introduction">Introduction</a></li>
+<li><a href="#expression" id="toc-expression">Expression</a>
+<ul>
+<li><a href="#say-what-you-mean-simply-and-directly"
+id="toc-say-what-you-mean-simply-and-directly">Say what you mean, simply
+and directly</a></li>
+</ul></li>
+<li><a href="#control-structure" id="toc-control-structure">Control
+Structure</a></li>
+<li><a href="#program-structure" id="toc-program-structure">Program
+Structure</a></li>
+<li><a href="#input-and-output" id="toc-input-and-output">Input and
+Output</a></li>
+<li><a href="#common-blunders" id="toc-common-blunders">Common
+Blunders</a></li>
+<li><a href="#efficiency-and-instrumentation"
+id="toc-efficiency-and-instrumentation">Efficiency and
+Instrumentation</a></li>
+<li><a href="#documentation"
+id="toc-documentation">Documentation</a></li>
+<li><a href="#supplementary-reading"
+id="toc-supplementary-reading">Supplementary Reading</a></li>
+</ul>
+</nav>
+<h1 id="introduction">Introduction</h1>
+<p>This article is taking a different approach than we have before in
+our other <a href="./elements.html">elements of</a> articles. Back in
+ancient times, probably around 2003-2004, I found Strunk and White’s <a
+href="https://www.goodreads.com/book/show/33514.The_Elements_of_Style">The
+Elements of Style</a>. A classic style manual for improving your
+writing, formulated as non-negotiable rules. The year 2021 will go into
+history as the year of the P. The year I discovered <a
+href="https://www.goodreads.com/book/show/454039.The_Elements_of_Programming_Style?ac=1&amp;from_search=true&amp;qid=oWF4aKlBCP&amp;rank=1">The
+Elements of Programming Style</a> by Brian W. Kernighan and P.J.
+Plauger.</p>
+<p><em>The Elements of Programming Style</em> sets out to do for
+programming what <em>The Elements of Style</em> did for writing: a set
+of guidelines to follow when programming, resulting in more readable
+code (versus more readable prose). In fact, Kernighan and Plauger, refer
+to <em>The Elements of Style</em> explicitly where they “tried to
+emulate their brevity by concentrating on the essential practical
+aspects of style”.</p>
+<p>Why are you reading this? Why did I write this? “What a useless
+endeavor. Even in the grand scheme of useleness, it’s deeply unsettling
+how useless this is.” I see the reader has a sense of drama. Welcome,
+you’ve come to the right place. <em>The Elements of Programming
+Style</em> was first published in 1974 and all code examples of bad
+style and good style are all in <a
+href="https://en.wikipedia.org/wiki/Fortran">Fortran</a> and <a
+href="https://en.wikipedia.org/wiki/PL/I">PL/I</a>. While interesting
+historically, this makes the bar for new readers high. This article sets
+out to do a reading of the original book and chapter by chapter will try
+come up with modernized examples of Kernighan and Plauger’s rules. I’ll
+pick [Ruby](https://en.wikipedia.org/wiki/Ruby_(programming_language) as
+the choice of modern language as it’s widely used industry (e.g., at <a
+href="https://www.shopify.com">Shopify</a>) and should make sense to a
+lot of developers living in the year 2020 (and maybe a bit beyond).</p>
+<p>A side adventure to this journey, will be finding out how well the
+original rules have held up: does a modern language like Ruby make it
+more difficult to violate these rules or are the majority still relevent
+and in the hands of the skillful developer to apply?</p>
+<h1 id="expression">Expression</h1>
+<h2 id="say-what-you-mean-simply-and-directly">Say what you mean, simply
+and directly</h2>
+<p>Let’s start by looking at the following program:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>    sig <span class="kw">{</span> params(<span class="wa">x: </span><span class="dt">Integer</span>, <span class="wa">y: </span><span class="dt">Integer</span>, <span class="wa">z: </span><span class="dt">Integer</span>)<span class="at">.returns</span>(<span class="dt">Integer</span>)<span class="kw">}</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">def</span> <span class="dv">self</span><span class="at">.f</span>(x, y, z)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> x <span class="kw">&lt;=</span> y</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> x <span class="kw">&lt;=</span> z</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>                <span class="cf">return</span> x</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>            <span class="cf">end</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> z</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>        <span class="cf">end</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> y <span class="kw">&lt;=</span> z</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> y</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>        <span class="cf">end</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>        z</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span></code></pre></div>
+<p>todo: mention sorbet todo: mention that original uses
+<code>GO TO</code></p>
+<h1 id="control-structure">Control Structure</h1>
+<h1 id="program-structure">Program Structure</h1>
+<h1 id="input-and-output">Input and Output</h1>
+<h1 id="common-blunders">Common Blunders</h1>
+<h1 id="efficiency-and-instrumentation">Efficiency and
+Instrumentation</h1>
+<h1 id="documentation">Documentation</h1>
+<h1 id="supplementary-reading">Supplementary Reading</h1>
+</body>
+</html>

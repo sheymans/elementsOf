@@ -1,0 +1,227 @@
+---
+title:                             Elements of OAuth 2.0
+author:                             Stijn Heymans
+date:                             30 January 2020
+---
+                            last updated: 23 February 2020
+
+# Introduction
+
+Existing OAuth 2.0 protocol explanations are riddled with terminology or tied
+to specific implementations of the protocol.  I'm mainly interested in
+understanding what problem OAuth 2.0 solves and what the elements of its
+solution are.  In this article, I start with the scenario that you want
+to give a budgeting tool like [mint](mint.com) access to your transaction data
+at [Bank of America](bankofamerica.com).  I'll show the problems with the naive
+approach and will gradually move toward explaining why OAuth 2.0 solves these
+problems and how.
+
+I gained my intuition from the book [OAuth 2 in
+Action](https://www.goodreads.com/book/show/30102872-oauth-2-in-action) which
+has code-along examples if you want to see the OAuth 2.0 flow at work.
+
+# Login at Bank of America
+
+On Mondays you check your transactions at [Bank of
+America](https://bankofamerica.com) to see the weekend's damages.  You open up
+your browser and you navigate to said site. You click _Sign-in_ and are
+presented with the classical login form.  Full of anticipation, you enter your
+username and password and get to see your poor monetary decision making. This is
+the flow:
+
+(insert ./images/simple_auth.atxt.html here)
+
+While a sense of dread sets in, we'll agree that I will refer to your
+username/password combo as your _credentials_. To add to your existential crisis,
+I'll shout at you:
+
+!!! Tip
+    OAuth 2 is not about credentials.
+
+As if things did not start off bad enough, I will also identify you (aka the
+human) with your browser, and will refer to you and your browser as one (in my defense, at
+this point in human history, a fair assumption) and
+officially name you and your browser, the _User_.
+
+I'll call [Bank of America](bankofamerica.com), the _Resource Owner_: they own your
+transactions (the resources). This how this story looks after dehumanizing it:
+
+(insert ./images/simple_auth2.atxt.html here)
+
+# Use Mint to see your Bank of America Data
+
+As you live in the illusion that life can be better, you want to start using a
+budgeting tool like [mint](mint.com). [mint](mint.com) allows you to pull in
+your transaction data from a variety of resources. [Bank of
+America](bankofamerica.com) may be one of them, as could be your retirement
+accounts at Vanguard, or your stocks at Morgan Stanley.  In this
+scenario, [mint](mint.com) needs access to the _Resource Owner_ ([Bank of
+America](bankofamerica.com), Vanguard, ...) on behalf of you, the _User_.
+
+The first approach that comes to mind to make this access possible is to let
+[mint](mint.com) ask you for your credentials and pass them straight through to
+[Bank of America](bankofamerica.com) whenever [mint](mint.com) needs transaction data:
+
+(insert ./images/mint_first_version.atxt.html here)
+
+I'll call [mint](mint.com) the _Client_ in this scenario, such that the
+general scheme looks like this:
+
+(insert ./images/mint_first_version_abstracted.atxt.html here)
+
+Of course, [mint](mint.com) asking you each time for your
+credentials is unpleasant. So [mint](mint.com) might
+be tempted to think _we'll ask you once, and then we'll store it so we don't
+have to ask you again_.
+The flow looks exactly like above, except that now [mint](mint.com) asks you
+for credentials once and then stops asking you as they now store them.
+
+What are the problems with this approach?
+
+- _the client stores your credentials_. If [mint](mint.com) gets compromised and your credentials get stolen, someone else now can access your [Bank of America](bankofamerica.com) account.  You have the same problem with Bank of America itself getting compromised, but this scenario increases your risk with a factor of 2 (from 1 place that has your credentials, to 2 places that have your credentials). With each additional client, your risk goes up.
+
+- _anyone with your credentials has the same access you have_. Depending on what you can do as a user, someone having your credentials can do exactly what you can do. Whereas you want [mint](mint.com) to _see_ your transactions and categorize them, you would not want [mint](mint.com) to able to transfer money. However, someone with your credentials from [mint](mint.com) could exactly do that.
+
+We're thus looking for a solution where:
+
+- the client gets read-only access to your transaction data without having to ask you each time for your credentials, aka the client can get the data _on your behalf_
+- the client does not store your credentials directly as this is unacceptable risk
+
+# OAuth 2.0
+
+OAuth 2.0, a delegation protocol, solves exactly the above. It's named a
+_delegation protocol_ as it concerns itself with the _on your behalf_ part in
+the above: how can you, the _User_, delegate _Resource_ access to the
+_Client_ without that it exposes you to unacceptable risk? We leave it as an
+exercise to the reader why the name is _OAuth_ and not _ODel_.
+
+## The Players
+
+So far we identified 3 players in the OAuth 2.0 delegation protocol:
+
+- the _User_: you, or a proxy for you, like your browser
+- the _Client_: the application you're interacting with and you want to delegate your access rights to, for example [mint](mint.com)
+- the _Resource Owner_: the origin of your data, for example [Bank of America](bankofamerica.com)
+
+OAuth 2.0 introduces a 4th player for the actual authorization:
+
+- the _Authorization Server_.
+
+In our running example, I'll assume the authorization server is owned by [Bank
+of America](bankofamerica.com), a logical choice as [Bank of
+America](bankofamerica.com) is the one that can verify your credentials
+directly.
+
+## The Dance
+
+Given such an authorization server, can we instruct the client to delegate
+authorizing you to the authorization server? If yes, the authorization
+server can then verify your credentials and inform the client that _yes, you
+can give that user access to the transaction data_.
+
+What are the elements of such a delegation? Let's see:
+
+- the client ([mint](mint.com)) needs to send you, the user (or your browser), to [Bank of America](bankofamerica.com)'s authorization server
+- the authorization server needs to verify your credentials and needs to conclude _yes, you have access_
+- the authorization server needs to tell the client that _the particular user has access and can get the data from the Resource Owner_.
+- the client needs to take that authorization to the _Resource Owner_ to ask for the user's data
+
+Each of those elements can be accomplished as follows:
+
+- sending the browser to the authorization server can happen using an [HTTP redirect (code 301)](https://moz.com/learn/seo/redirection). The user wants to access the data from the client, but the client instead sends the user's browser a redirect to the authorization server. The browser subsequently follows that redirect and lands at the authorization server.
+- the authorization server then starts an interaction with the user's browser to get and check the user's credentials
+- the authorization server can tell the client that the user's credentials are OK by similarly redirecting the user's browser back to the client by including in the redirect URL something called an _access token_.
+- the client would then use that _access token_ (which it keeps associated with the user) to go and ask the _Resource Owner_ for the user's data. Since the _Resource Owner_ is presumably able to interpret the access token (both the _Resource Owner_ as well as the Authorization Server are [Bank of America](bankofamerica.com)), the _Resource Owner_ can verify that the access token is indeed valid.
+
+That flow looks like this:
+
+(insert ./images/access_token_only_mint.atxt.html here)
+
+Or abstractly:
+
+(insert ./images/access_token_only_abstract.atxt.html here)
+
+Recall that we had the following problems with the naive approach:
+
+- _the client stores your credentials_
+- _anyone with your credentials has the same access you have_
+
+Let's see whether this new flow solves those problems:
+
+- The client indeed no longer stores your credentials. The client stores the access token, not the credentials. How is that different from storing credentials?  The access token has been provided by the authorization server and is assumed to be unique for the client. Thus, when your access token is stolen from the client and used by someone else, the _Resource Owner_ can verify that the access token does not belong to the right client. Furthermore, once access tokens are stolen, the _Resource Owner_ could disable all access tokens for the client and ask all users to authenticate again. A client being compromised would not affect you, the User, to get data from the _Resource Owner_ directly (i.e., by logging into [Bank of America](bankofamerica.com) directly).
+
+- Someone with the access token does not have the same privileges as you have at the _Resource Owner_. We left that out of the above discussion but clients would redirect you to the authorization server specifically asking for a certain _scope_ of access (read-only access to certain parts of your data for example). So even if someone can use your access token, they would be able to do only what the scope for that access token allows them to do (which would presumably not be to transfer money or change your original credentials at [Bank of America](bankofamerica.com), but just use your transaction data, which is bad, but not as bad as having the full access you have).
+
+That was not too complicated. However, there is one problem with this access
+token flow as it is right now. Can you spot it?
+
+Let's zoom in on the interaction between you, mint, and the Bank of America authorization server:
+
+(insert ./images/access_token_only_mint_zoom.atxt.html here)
+
+As we explained above, this interaction happens mostly via HTTP redirects over your browser:
+
+- the authorization server sends your browser a redirect with the access token in the URL or body
+- the browser hits mint with that access token in the URL where mint stores it and uses it to gain access to the resource (Bank of America)
+
+The problematic part here is the _browser_. This part of the communication, the
+back-and-forth using redirects, is called the _front-channel_ communication and
+since it goes via your browser it is vulnerable to having the access token
+intercepted. The _back-channel_ communication (for example, from mint to the
+_Resource Owner_) is much more secure in that respect; there is no user browser
+involved, just service to service communication.
+
+The way OAuth 2.0 deals with this is to have the Authorization Server not
+redirect you to the client with the magical access token, but with an
+authorization code grant instead:
+
+(insert ./images/authorization_token_abstract.atxt.html here)
+
+The front-channel no longer sees the access token. It does see the
+authorization code grant. What if that authorization code grant gets stolen? Can
+the thief access our data at the _Resource Owner_ with that information?
+
+The authorization code grant does not give you access to the data at the _Resource
+Owner_ as the _Resource Owner_ needs an access token. Can the thief get an
+access token from the _Authorization Server_ given the authorization code grant?
+
+The getting of the access token happens on the back-channel from the _Client_
+to the _Authorization Server_ and as such can be protected (no _User_ involved)
+by requiring the _Client_ to send a _client id_ and _client secret_ which the
+_Authorization Server_ can verify.
+
+# Conclusion
+
+We illustrated two problems with giving your credentials to a client such as
+[mint](mint.com) directly:
+
+- the client stores your credentials
+- someone that steals your credentials has the same access you have
+
+We gradually introduced the OAuth 2.0 flow (_The Dance_) that solves these
+problems, moving from an incomplete solution with just an access token to a
+solution with both access token and authorization code grant.
+
+In order to convey the basic intuition (the _why_ of OAuth 2.0) we left out
+many parts such as the different types of authorization code grants, the
+particular format of access tokens, what refresh tokens are and where they come
+into play.  If you're interested in learning more check out [OAuth 2 in
+Action](https://www.goodreads.com/book/show/30102872-oauth-2-in-action) or,
+better, implement OAuth 2.0 yourself to secure your service.
+
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-12447521-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+
+  function gtag() {
+    dataLayer.push(arguments);
+  }
+
+  gtag('js', new Date());
+
+  gtag('config', 'UA-12447521-1');
+</script>
+
+
