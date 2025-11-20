@@ -1,6 +1,56 @@
 body {
+  font-family: Georgia, serif;
+  font-size: 18px;
+  line-height: 1.6;
   margin: 0 auto;
   max-width: 800px;
   padding: 0 1em;
-  line-height: 1.5;
+}
+
+/* Header Styles */
+h1.title {
+  font-size: 2.5em;
+  font-weight: bold;
+  margin-bottom: 0.5em;
+  text-align: center;
+}
+
+p.author {
+  font-variant: small-caps; /* Classic, strong look */
+  font-size: 0.9em;
+  text-align: center;
+  margin-top: 2em; /* More space after title */
+  margin-bottom: 0;
+}
+
+p.date {
+  font-size: 0.9em; /* Smaller and more subtle */
+  text-align: center;
+  margin-top: 0.2em;
+}
+
+/* Table of Contents Styles */
+#TOC {
+  font-size: 0.9em; /* Make the TOC text smaller */
+  border: 1px solid #ccc; /* Add a light border */
+  padding: 1em 2em; /* Add some padding inside the border */
+  margin: 2em 0; /* Add space above and below the TOC */
+}
+
+#TOC ul {
+  list-style-type: none; /* Remove bullet points */
+  padding-left: 0; /* Remove default padding */
+}
+
+#TOC ul ul {
+  padding-left: 1em; /* Indent nested lists */
+}
+
+#TOC a {
+  text-decoration: none; /* Remove underline from links */
+  color: #333; /* Change link color to a subtle dark gray */
+}
+
+#TOC a:hover {
+  text-decoration: underline; /* Add underline on hover for affordance */
 }
