@@ -1,6 +1,6 @@
 ---
 title:                             Elements of OAuth 2.0
-author:                             Stijn Heymans
+author: Stijn Heymans
 date:                             30 January 2020
 ---
                             last updated: 23 February 2020
@@ -35,9 +35,12 @@ While a sense of dread sets in, we'll agree that I will refer to your
 username/password combo as your _credentials_. To add to your existential crisis,
 I'll shout at you:
 
-!!! Tip
-    OAuth 2 is not about credentials.
 
+::: warning
+Tip
+OAuth 2 is not about credentials.
+
+:::
 As if things did not start off bad enough, I will also identify you (aka the
 human) with your browser, and will refer to you and your browser as one (in my defense, at
 this point in human history, a fair assumption) and
@@ -212,7 +215,6 @@ better, implement OAuth 2.0 yourself to secure your service.
 
 <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-12447521-1"></script>
-<script>
   window.dataLayer = window.dataLayer || [];
 
   function gtag() {

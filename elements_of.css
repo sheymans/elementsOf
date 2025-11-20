@@ -54,3 +54,45 @@ p.date {
 #TOC a:hover {
   text-decoration: underline; /* Add underline on hover for affordance */
 }
+
+/* Warning Box Styles */
+div.warning {
+  background-color: #fffbe6; /* A light yellow background */
+  border-left: 5px solid #ffc107; /* A prominent yellow-orange left border */
+  padding: 1em;
+  margin: 2em 0;
+}
+
+/* 80s Amber Screen Style for Code Blocks (for non-Pandoc generated blocks) */
+pre:not(.sourceCode) {
+  font-family: 'Courier New', Courier, monospace; /* Classic monospace font */
+  background-color: #222222; /* Dark background */
+  color: #FFB000; /* Amber color */
+  padding: 0.5em;
+  border: 1px solid #FFB000; /* Amber border */
+  box-shadow: 0 0 5px #FFB000; /* Subtle glow effect */
+  display: block; /* Ensures pre takes full width */
+  overflow-x: auto; /* For long lines of code */
+  white-space: pre; /* Respect preformatted whitespace */
+}
+
+/* By default, `code` elements are inline and have a different style */
+code {
+  font-family: 'Courier New', Courier, monospace;
+  background-color: #f4f4f4; /* Light grey background for inline code */
+  color: #333; /* Dark text for inline code */
+  padding: 0.2em 0.4em;
+  border-radius: 3px;
+  white-space: nowrap;
+}
+
+/* Styling for `code` elements specifically inside amber `pre` blocks */
+pre:not(.sourceCode) > code {
+  font-family: inherit; /* Inherit font from pre */
+  background-color: transparent; /* No background */
+  color: inherit; /* Inherit amber color from pre */
+  padding: 0;
+  border: none;
+  box-shadow: none;
+  white-space: inherit; /* Inherit whitespace handling from pre */
+}

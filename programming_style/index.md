@@ -1,7 +1,7 @@
+
 ---
 title:                             Elements of Programming Style
-author:                             Stijn Heymans
-date: 
+author: # Introduction
 ---
 # Introduction
 

@@ -198,8 +198,10 @@ and I’ll go over every single one of the above problems/requirements and
 discuss how k8s helps solving them.</p>
 <h1 id="instances-of-your-application">Instances of your
 Application</h1>
-<p>!!! Your application needs to serve 1000s of requests per second so
-you need many instances of the application running</p>
+<div class="warning">
+<p>Your application needs to serve 1000s of requests per second so you
+need many instances of the application running</p>
+</div>
 <h2 id="a-containerized-application">A Containerized Application</h2>
 <p>As an example application, I’ll run a web server that serves up the
 sentence</p>
@@ -575,9 +577,11 @@ CPU requirements of your application.</p>
 <h1 id="clients-of-your-application">Clients of your Application</h1>
 <p>Recall the 2nd requirement I listed in the
 <a href="#introduction">Introduction</a>:</p>
-<p>!!! Clients of your application need to connect to one IP address and
+<div class="warning">
+<p>Clients of your application need to connect to one IP address and
 requests will be routed to the different application instances
 automatically</p>
+</div>
 <h2 id="internal-clients-on-the-same-cluster">(Internal) Clients on the
 Same Cluster</h2>
 <p>First consider clients on the same cluster. Why is it tricky for
@@ -775,9 +779,13 @@ controller</a>: I don’t want to know, I don’t need to know, and
 <code>Controller</code> is just that one step too far.</p>
 <h1 id="push-changes">Push Changes</h1>
 <p>Recall the 2 requirements around pushing changes to your app:</p>
-<p>!!! You need to be able to push changes to your application without
+<div class="warning">
+<p>You need to be able to push changes to your application without
 downtime</p>
-<p>!!! You need to be able to rollback changes to your application</p>
+</div>
+<div class="warning">
+<p>You need to be able to rollback changes to your application</p>
+</div>
 <p>This was the YAML describing our <code>Deployment</code>:</p>
 <pre><code>apiVersion: apps/v1
 kind: Deployment
@@ -864,10 +872,12 @@ while bringing in new pods with the latest version? Go checkout out <a
 href="https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#proportional-scaling">proportional
 scaling</a>.</p>
 <h1 id="warm-up-of-your-application">Warm-up Of Your Application</h1>
-<p>!!! Your application needs to be <em>warmed up</em>: certain things
-need to happen before your application can start serving up requests.
-For example, the application instance needs to sync its data with the
-data of other instances</p>
+<div class="warning">
+<p>Your application needs to be <em>warmed up</em>: certain things need
+to happen before your application can start serving up requests. For
+example, the application instance needs to sync its data with the data
+of other instances</p>
+</div>
 <p>When a pod gets deployed on a cluster (as part of a
 <code>Deployment</code> for example), it might not immediately be ready
 for serving traffic. The app may need to pull configuration data from <a
@@ -927,10 +937,12 @@ reaching of consensus in a distributed setting), you should guarantee
 that the <code>/readiness</code> path only returns a <code>200</code>
 when the application has reached consensus.</p>
 <h1 id="are-you-alive">Are you alive?</h1>
-<p>!!! When an instance of your application dies (and is thus no longer
-able to serve requests), that instance needs to become invisible to
-clients of your application. Traffic should be guided to
-still-functioning instances of your application</p>
+<div class="warning">
+<p>When an instance of your application dies (and is thus no longer able
+to serve requests), that instance needs to become invisible to clients
+of your application. Traffic should be guided to still-functioning
+instances of your application</p>
+</div>
 <p>Well, that requirement sounds related to the readiness requirement,
 doesn’t it? In this case, one or more instances of your application died
 (or started spewing errors and only Leonardo DiCaprio knows why but he
@@ -944,9 +956,11 @@ not alive (for example, no <code>200</code> was returned), the pod gets
 taken out of rotation and a new pod is restarted.</p>
 <p>Liveness probes are specified similarly to readiness probes.</p>
 <h1 id="horizontal-autoscaling">Horizontal Autoscaling</h1>
-<p>!!! To save costs during the night when you need less capability for
-your main application, you want to reuse some of the available
-capability to run batch jobs</p>
+<div class="warning">
+<p>To save costs during the night when you need less capability for your
+main application, you want to reuse some of the available capability to
+run batch jobs</p>
+</div>
 <p>Note that this does not talk about getting rid of actual
 machines/nodes: the requirement indicates that there are periods that
 you want to downscale the number of pods of your main application to
@@ -955,8 +969,10 @@ make room on the nodes for other jobs.</p>
 href="https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/">CronJobs</a>
 so that’s not the interesting part of this requirement. The core of what
 I’m interested in is:</p>
-<p>!!! Can I minimize the amount of pods while still being able to serve
+<div class="warning">
+<p>Can I minimize the amount of pods while still being able to serve
 traffic?</p>
+</div>
 <p>Simplified, during the day I may need 4 replicas of my application,
 but during the night I may only need 1. Rather than having all 4
 replicas run all the time and incur costs, can I scale down to the
@@ -1054,11 +1070,13 @@ down.</p>
 <p>Try it out as usual with:</p>
 <pre class="shell"><code>$ kubectl create -f hi-hpa.yaml</code></pre>
 <h1 id="autoscale-the-cluster">Autoscale the cluster</h1>
-<p>!!! There will be times when there will not be enough machines to
-serve your traffic (during a promotion, or, say, the holiday period), so
-you want to increase, <em>scale up</em>, the amount of physical machines
-you have available. After the busy period, you want to get back to
-normal and scale down</p>
+<div class="warning">
+<p>There will be times when there will not be enough machines to serve
+your traffic (during a promotion, or, say, the holiday period), so you
+want to increase, <em>scale up</em>, the amount of physical machines you
+have available. After the busy period, you want to get back to normal
+and scale down</p>
+</div>
 <p>The HPA I defined helps increase and decrease pods on your cluster,
 making up space for other applications/batch processes to run, and thus
 helps save costs. However, the HPA does nothing about the actual
@@ -1112,21 +1130,12 @@ day.</p>
 <h1 id="endnotes">Endnotes</h1>
 <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-12447521-1"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-
-  function gtag() {
-    dataLayer.push(arguments);
-  }
-
-  gtag('js', new Date());
-
-  gtag('config', 'UA-12447521-1');
-</script>
-<script>
-var dt = new Date();
-document.getElementById("datetime").innerHTML = dt.toLocaleString();
-</script>
+<p>window.dataLayer = window.dataLayer || [];</p>
+<p>function gtag() { dataLayer.push(arguments); }</p>
+<p>gtag(‘js’, new Date());</p>
+<p>gtag(‘config’, ‘UA-12447521-1’); </script></p>
+<p>var dt = new Date(); document.getElementById(“datetime”).innerHTML =
+dt.toLocaleString(); </script></p>
 <section class="footnotes footnotes-end-of-document"
 role="doc-endnotes">
 <hr />

@@ -1,6 +1,6 @@
 ---
 title:                             Elements of Perl
-author:                             Stijn Heymans
+author: Stijn Heymans
 date:                             12 October 2019
 ---
                             last updated: 3 March 2021
@@ -50,9 +50,12 @@ how you can store a string `'I am a string'` in a scalar variable `$var`:
 my $var = 'I am a string';
 ~~~
 
-!!! note
-   _statements_ in perl end with `;` as they do in Java or C++
 
+::: warning
+note
+_statements_ in perl end with `;` as they do in Java or C++
+
+:::
 The `my` keyword _declares_ the variable `$var` (similar to a `let` in
 Javascript) and `$var` consists of the symbol `$` and the name `var`. The
 symbol `$` hints that the variable is used or accessed as a scalar. In this
@@ -107,10 +110,12 @@ Printing to standard output is useful for debugging the odd statement:
 print "This is a printed string\n";
 ~~~
 
-!!!
-   There's an explicit `\n` in that statement; you might be used to a `println`
-   from other languages that puts that `\n` there for you.
 
+::: warning
+There's an explicit `\n` in that statement; you might be used to a `println`
+from other languages that puts that `\n` there for you.
+
+:::
 #### [`substr`](https://perldoc.perl.org/functions/substr.html)
 
 Extract a substring out of a string. For example, to get `cat` out of the string `concatenate`:
@@ -146,15 +151,17 @@ pattern `//` matches _everything_.
 I will introduce lists/arrays as well as regular expressions later.
 
 
-!!!
-   Note that `split //, 'yeah'` has no parentheses. Based on
-   how I wrote `substr` you expected to see `split(//,'yeah')` and you'd been
-   right as well! `perl` is playing loose with parentheses, so for
-   built-in functions you'll often see parentheses dropped. For functions you
-   write yourself, I suggest to keep parentheses when invoking them. Life is
-   complicated enough as it is.
+
+::: warning
+Note that `split //, 'yeah'` has no parentheses. Based on
+how I wrote `substr` you expected to see `split(//,'yeah')` and you'd been
+right as well! `perl` is playing loose with parentheses, so for
+built-in functions you'll often see parentheses dropped. For functions you
+write yourself, I suggest to keep parentheses when invoking them. Life is
+complicated enough as it is.
 
 
+:::
 ## Numbers
 
 ### Basics
@@ -272,10 +279,12 @@ Note that here I use `@` for both sides of the assignment: I'm creating an
 array `@copy` and copying the array `@array` (I am not referring to the
 individual elements in `@array`: the array is used in a _list_ context).
 
-!!!
-   `@copy` is indeed a copy: changing elements in `@copy` will _not_ change
-   elements in `@array`.
 
+::: warning
+`@copy` is indeed a copy: changing elements in `@copy` will _not_ change
+elements in `@array`.
+
+:::
 ## Built-in Functions
 
 ### Adding and Removing from Back of an Array
@@ -375,11 +384,13 @@ my @rev = reverse @array;
 
 `@rev` will be `(2, 1)` and `@array` will have stayed the same.
 
-!!!
-    `reverse` is non-destructive on its argument. Contrast that with
-    `pop`/`push` and `shift/unshift`, all of which are destructive on the lists
-    they operate on.
 
+::: warning
+`reverse` is non-destructive on its argument. Contrast that with
+`pop`/`push` and `shift/unshift`, all of which are destructive on the lists
+they operate on.
+
+:::
 # Hash Variables
 
 ## Basics
@@ -392,9 +403,12 @@ a _hash_. A hash _literal_ can be initialized as follows:
 my %some_hash = ('name', 'john', 'age', 39);
 ~~~
 
-!!! Tip
-    I used a new symbol `%` to indicate that `some_hash` is a variable used to store a hash.
 
+::: warning
+Tip
+I used a new symbol `%` to indicate that `some_hash` is a variable used to store a hash.
+
+:::
 I did not make a syntactical distinction between keys and values when writing
 `('name', 'john', 'age', 39)`. You expect `'name'` and `'age'` to be keys, and
 `'john'` and `39` to be values, but there is no apparent syntactical distinction
@@ -1216,7 +1230,6 @@ Thanks to [csbuja](https://github.com/csbuja) for corrections.
 
 <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-12447521-1"></script>
-<script>
   window.dataLayer = window.dataLayer || [];
 
   function gtag() {

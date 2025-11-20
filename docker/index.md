@@ -1,6 +1,6 @@
 ---
 title:                             Elements of Docker Containers
-author:                             Stijn Heymans
+author: Stijn Heymans
 date:                             23 April 2020
 ---
 
@@ -105,10 +105,13 @@ depending on your OS), you could package your app while specifying:
 In other words, what if you could define a small container based on the above
 specification that you can run anywhere where such containers can run?
 
-!!! WARNING: Obligatory Container on a Ship Reference
-    A container is a standard packaging solution that you can fill with any stuff,
-    you can put it on a ship and send it off anywhere in the world.
 
+::: warning
+WARNING: Obligatory Container on a Ship Reference
+A container is a standard packaging solution that you can fill with any stuff,
+you can put it on a ship and send it off anywhere in the world.
+
+:::
 # Containerizing the App
 
 To containerize the app, I use [docker](docker.com). In this article, I'll refer to a _Docker
@@ -142,10 +145,13 @@ dependencies, and a `Dockerfile` specifies the dependencies the app has from an
 OS perspective (what OS does the app assume, what should be installed on the OS
 to be able to run the app).
 
-!!! Tip
-   The directory on your laptop where your `Dockerfile` exists is
-   called the _build-context_.
 
+::: warning
+Tip
+The directory on your laptop where your `Dockerfile` exists is
+called the _build-context_.
+
+:::
 I want the app to be layered on the [Linux alpine OS
 system](https://alpinelinux.org/) -- a small Linux, about 4MB,
 compared to Ubuntu which is more than 100MB -- so the first line of the
@@ -250,9 +256,12 @@ Dissecting this command:
 - `-t hi:latest`: we're *t*agging an image with name `hi` and with tag `latest`. A tag can be used to identify different versions of your software (tag `v1` for example)
 - `.`: don't forget the `.`. The `.` stands for _look into your current directory for the Dockerfile_.
 
-!!! Tip
-   `-t` indeed stands for _tag_ and not _target_ (there's a `--target` option as well)
 
+::: warning
+Tip
+`-t` indeed stands for _tag_ and not _target_ (there's a `--target` option as well)
+
+:::
 After running that command, I can check whether there's now an image available using `ls`:
 
 ~~~
@@ -392,9 +401,12 @@ into_:
 docker container exec -it boring_dijkstra sh
 ~~~
 
-!!! Tip
-    I used the the container's name, `boring_dijkstra`, but I can also use its ID `885288159d28`
 
+::: warning
+Tip
+I used the the container's name, `boring_dijkstra`, but I can also use its ID `885288159d28`
+
+:::
 After executing that command, I see a shell prompt appear ( on a blue Monday, maybe even
 a  &#128026;[^shell] ) and if I check what processes are running in this
 container using <a href="https://en.wikipedia.org/wiki/Ps_(Unix)">`ps`</a>, I indeed
@@ -613,7 +625,6 @@ desktop computer, or be logged in into an EC2 instance.
 
 <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-12447521-1"></script>
-<script>
   window.dataLayer = window.dataLayer || [];
 
   function gtag() {

@@ -205,9 +205,11 @@ that</li>
 <p>In other words, what if you could define a small container based on
 the above specification that you can run anywhere where such containers
 can run?</p>
-<p>!!! WARNING: Obligatory Container on a Ship Reference A container is
-a standard packaging solution that you can fill with any stuff, you can
+<div class="warning">
+<p>WARNING: Obligatory Container on a Ship Reference A container is a
+standard packaging solution that you can fill with any stuff, you can
 put it on a ship and send it off anywhere in the world.</p>
+</div>
 <h1 id="containerizing-the-app">Containerizing the App</h1>
 <p>To containerize the app, I use <a href="docker.com">docker</a>. In
 this article, I’ll refer to a <em>Docker container</em> as a synonym of
@@ -253,8 +255,10 @@ your application’s dependencies, and a <code>Dockerfile</code> specifies
 the dependencies the app has from an OS perspective (what OS does the
 app assume, what should be installed on the OS to be able to run the
 app).</p>
-<p>!!! Tip The directory on your laptop where your
-<code>Dockerfile</code> exists is called the <em>build-context</em>.</p>
+<div class="warning">
+<p>Tip The directory on your laptop where your <code>Dockerfile</code>
+exists is called the <em>build-context</em>.</p>
+</div>
 <p>I want the app to be layered on the <a
 href="https://alpinelinux.org/">Linux alpine OS system</a> – a small
 Linux, about 4MB, compared to Ubuntu which is more than 100MB – so the
@@ -339,8 +343,10 @@ example)</li>
 stands for <em>look into your current directory for the
 Dockerfile</em>.</li>
 </ul>
-<p>!!! Tip <code>-t</code> indeed stands for <em>tag</em> and not
+<div class="warning">
+<p>Tip <code>-t</code> indeed stands for <em>tag</em> and not
 <em>target</em> (there’s a <code>--target</code> option as well)</p>
+</div>
 <p>After running that command, I can check whether there’s now an image
 available using <code>ls</code>:</p>
 <pre><code>docker image ls</code></pre>
@@ -430,9 +436,10 @@ The output further shows that my container is executing the command
 <p>Now that I have the name of the running container, I can do some
 <em>jumping into</em>:</p>
 <pre><code>docker container exec -it boring_dijkstra sh</code></pre>
-<p>!!! Tip I used the the container’s name,
-<code>boring_dijkstra</code>, but I can also use its ID
-<code>885288159d28</code></p>
+<div class="warning">
+<p>Tip I used the the container’s name, <code>boring_dijkstra</code>,
+but I can also use its ID <code>885288159d28</code></p>
+</div>
 <p>After executing that command, I see a shell prompt appear ( on a blue
 Monday, maybe even a 🐚<a href="#fn3" class="footnote-ref" id="fnref3"
 role="doc-noteref"><sup>3</sup></a> ) and if I check what processes are
@@ -626,17 +633,10 @@ and much, much more.</p>
 <h1 id="endnotes">Endnotes</h1>
 <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-12447521-1"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-
-  function gtag() {
-    dataLayer.push(arguments);
-  }
-
-  gtag('js', new Date());
-
-  gtag('config', 'UA-12447521-1');
-</script>
+<p>window.dataLayer = window.dataLayer || [];</p>
+<p>function gtag() { dataLayer.push(arguments); }</p>
+<p>gtag(‘js’, new Date());</p>
+<p>gtag(‘config’, ‘UA-12447521-1’); </script></p>
 <section class="footnotes footnotes-end-of-document"
 role="doc-endnotes">
 <hr />

@@ -1,6 +1,6 @@
 ---
 title:                             Elements of Ruby
-author:                             Stijn Heymans
+author: Stijn Heymans
 date:                             17 December 2021
 ---
 
@@ -637,9 +637,11 @@ Get those [Anki flashcards](https://apps.ankiweb.net/) out to memorize
 the order of `|el, i|`. You did not ask for it, but here's a tip: in Ruby, it often works to
 ask "how would I say this out loud?". 
 
-!!!
-   In the array `a`, for _each_ `el` at index `i`, do something. 
 
+::: warning
+In the array `a`, for _each_ `el` at index `i`, do something.
+
+:::
 If your intuition is _for each index `i` which has element `el`_, change your
 intuition.
 

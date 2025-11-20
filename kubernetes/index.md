@@ -1,6 +1,6 @@
 ---
 title:                             Elements of Kubernetes
-author:                             Stijn Heymans
+author: Stijn Heymans
 date:                             17 December 2020
 ---
 
@@ -54,9 +54,11 @@ one of the above problems/requirements and discuss how k8s helps solving them.
 
 # Instances of your Application
 
-!!!
-   Your application needs to serve 1000s of requests per second so you need many instances of the application running
 
+::: warning
+Your application needs to serve 1000s of requests per second so you need many instances of the application running
+
+:::
 ## A Containerized Application
 
 As an example application, I'll run a web server that serves up the sentence
@@ -506,9 +508,11 @@ application.
 
 Recall the 2nd requirement I listed in the <a href="#introduction">Introduction</a>:
 
-!!!
-   Clients of your application need to connect to one IP address and requests will be routed to the different application instances automatically
 
+::: warning
+Clients of your application need to connect to one IP address and requests will be routed to the different application instances automatically
+
+:::
 ## (Internal) Clients on the Same Cluster
 
 First consider clients on the same cluster. Why is it tricky for clients to connect to your application?
@@ -745,12 +749,16 @@ enough, making it also a `Controller` is just that one step too far.
 
 Recall the 2 requirements around pushing changes to your app:
 
-!!!
-   You need to be able to push changes to your application without downtime
 
-!!!
-   You need to be able to rollback changes to your application
+::: warning
+You need to be able to push changes to your application without downtime
 
+:::
+
+::: warning
+You need to be able to rollback changes to your application
+
+:::
 This was the YAML describing our `Deployment`:
 
 ```
@@ -856,11 +864,13 @@ scaling](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#p
 
 # Warm-up Of Your Application
 
-!!!
-   Your application needs to be _warmed up_: certain things need to happen
-   before your application can start serving up requests. For example, the
-   application instance needs to sync its data with the data of other instances
 
+::: warning
+Your application needs to be _warmed up_: certain things need to happen
+before your application can start serving up requests. For example, the
+application instance needs to sync its data with the data of other instances
+
+:::
 When a pod gets deployed on a cluster (as part of a `Deployment` for example),
 it might not immediately be ready for serving traffic. The app may need to pull
 configuration data from [S3](https://aws.amazon.com/s3/) into memory, or in a
@@ -927,12 +937,14 @@ the `/readiness` path only returns a `200` when the application has reached cons
 
 # Are you alive?
 
-!!!
-   When an instance of your application dies (and is thus no longer able to
-   serve requests), that instance needs to become invisible to clients of your
-   application. Traffic should be guided to still-functioning instances of your
-   application
 
+::: warning
+When an instance of your application dies (and is thus no longer able to
+serve requests), that instance needs to become invisible to clients of your
+application. Traffic should be guided to still-functioning instances of your
+application
+
+:::
 Well, that requirement sounds related to the readiness requirement, doesn't it?
 In this case, one or more instances of your application died (or started
 spewing errors and only Leonardo DiCaprio knows why but he won't tell).  If
@@ -948,10 +960,12 @@ Liveness probes are specified similarly to readiness probes.
 
 # Horizontal Autoscaling
 
-!!!
-   To save costs during the night when you need less capability for your main application,
-   you want to reuse some of the available capability to run batch jobs
 
+::: warning
+To save costs during the night when you need less capability for your main application,
+you want to reuse some of the available capability to run batch jobs
+
+:::
 Note that this does not talk about getting rid of actual machines/nodes: the
 requirement indicates that there are periods that you want to downscale the
 number of pods of your main application to make room on the nodes for other
@@ -962,9 +976,11 @@ You can schedule jobs during the night using k8s resources like
 so that's not the interesting part of this requirement. The core of what I'm
 interested in is:
 
-!!!
-   Can I minimize the amount of pods while still being able to serve traffic?
 
+::: warning
+Can I minimize the amount of pods while still being able to serve traffic?
+
+:::
 Simplified, during the day I may need 4 replicas of my application, but during
 the night I may only need 1. Rather than having all 4 replicas run all the time
 and incur costs, can I scale down to the amount of replicas _I need_ during the
@@ -1090,12 +1106,14 @@ $ kubectl create -f hi-hpa.yaml
 
 # Autoscale the cluster
 
-!!!
-   There will be times when there will not be enough machines to serve your
-   traffic (during a promotion, or, say, the holiday period), so you want to
-   increase, _scale up_, the amount of physical machines you have available.
-   After the busy period, you want to get back to normal and scale down
 
+::: warning
+There will be times when there will not be enough machines to serve your
+traffic (during a promotion, or, say, the holiday period), so you want to
+increase, _scale up_, the amount of physical machines you have available.
+After the busy period, you want to get back to normal and scale down
+
+:::
 The HPA I defined helps increase and decrease pods on your cluster, making up
 space for other applications/batch processes to run, and thus helps save costs.
 However, the HPA does nothing about the actual physical nodes in your cluster.
@@ -1148,7 +1166,6 @@ for you right now: if you saw a dog today, yes, you had a good day.
 
 <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-12447521-1"></script>
-<script>
   window.dataLayer = window.dataLayer || [];
 
   function gtag() {
@@ -1160,7 +1177,6 @@ for you right now: if you saw a dog today, yes, you had a good day.
   gtag('config', 'UA-12447521-1');
 </script>
 
-<script>
 var dt = new Date();
 document.getElementById("datetime").innerHTML = dt.toLocaleString();
 </script>

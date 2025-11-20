@@ -199,8 +199,10 @@ data in perl, for example, numbers and strings. We store scalars in
 <code>'I am a string'</code> in a scalar variable <code>$var</code>:</p>
 <div class="sourceCode" id="cb2"><pre
 class="sourceCode perl"><code class="sourceCode perl"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">my</span> <span class="dt">$var</span> = <span class="ot">&#39;</span><span class="ss">I am a string</span><span class="ot">&#39;</span>;</span></code></pre></div>
-<p>!!! note <em>statements</em> in perl end with <code>;</code> as they
-do in Java or C++</p>
+<div class="warning">
+<p>note <em>statements</em> in perl end with <code>;</code> as they do
+in Java or C++</p>
+</div>
 <p>The <code>my</code> keyword <em>declares</em> the variable
 <code>$var</code> (similar to a <code>let</code> in Javascript) and
 <code>$var</code> consists of the symbol <code>$</code> and the name
@@ -244,9 +246,11 @@ href="https://perldoc.perl.org/functions/print.html"><code>print</code></a></h4>
 statement:</p>
 <div class="sourceCode" id="cb8"><pre
 class="sourceCode perl"><code class="sourceCode perl"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span> <span class="ot">&quot;</span><span class="st">This is a printed string</span><span class="ch">\n</span><span class="ot">&quot;</span>;</span></code></pre></div>
-<p>!!! There’s an explicit <code>\n</code> in that statement; you might
-be used to a <code>println</code> from other languages that puts that
+<div class="warning">
+<p>There’s an explicit <code>\n</code> in that statement; you might be
+used to a <code>println</code> from other languages that puts that
 <code>\n</code> there for you.</p>
+</div>
 <h4 id="substr"><a
 href="https://perldoc.perl.org/functions/substr.html"><code>substr</code></a></h4>
 <p>Extract a substring out of a string. For example, to get
@@ -274,13 +278,15 @@ class="sourceCode perl"><code class="sourceCode perl"><span id="cb11-1"><a href=
 individual characters because the pattern <code>//</code> matches
 <em>everything</em>. I will introduce lists/arrays as well as regular
 expressions later.</p>
-<p>!!! Note that <code>split //, 'yeah'</code> has no parentheses. Based
-on how I wrote <code>substr</code> you expected to see
+<div class="warning">
+<p>Note that <code>split //, 'yeah'</code> has no parentheses. Based on
+how I wrote <code>substr</code> you expected to see
 <code>split(//,'yeah')</code> and you’d been right as well!
 <code>perl</code> is playing loose with parentheses, so for built-in
 functions you’ll often see parentheses dropped. For functions you write
 yourself, I suggest to keep parentheses when invoking them. Life is
 complicated enough as it is.</p>
+</div>
 <h2 id="numbers">Numbers</h2>
 <h3 id="basics-1">Basics</h3>
 <p>Let’s dive into numbers:</p>
@@ -363,9 +369,11 @@ class="sourceCode perl"><code class="sourceCode perl"><span id="cb23-1"><a href=
 I’m creating an array <code>@copy</code> and copying the array
 <code>@array</code> (I am not referring to the individual elements in
 <code>@array</code>: the array is used in a <em>list</em> context).</p>
-<p>!!! <code>@copy</code> is indeed a copy: changing elements in
+<div class="warning">
+<p><code>@copy</code> is indeed a copy: changing elements in
 <code>@copy</code> will <em>not</em> change elements in
 <code>@array</code>.</p>
+</div>
 <h2 id="built-in-functions-2">Built-in Functions</h2>
 <h3 id="adding-and-removing-from-back-of-an-array">Adding and Removing
 from Back of an Array</h3>
@@ -445,10 +453,12 @@ class="sourceCode perl"><code class="sourceCode perl"><span id="cb32-1"><a href=
 <span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="kw">my</span> <span class="dt">@rev</span> = <span class="fu">reverse</span> <span class="dt">@array</span>;</span></code></pre></div>
 <p><code>@rev</code> will be <code>(2, 1)</code> and <code>@array</code>
 will have stayed the same.</p>
-<p>!!! <code>reverse</code> is non-destructive on its argument. Contrast
+<div class="warning">
+<p><code>reverse</code> is non-destructive on its argument. Contrast
 that with <code>pop</code>/<code>push</code> and
 <code>shift/unshift</code>, all of which are destructive on the lists
 they operate on.</p>
+</div>
 <h1 id="hash-variables">Hash Variables</h1>
 <h2 id="basics-3">Basics</h2>
 <p>Most programming languages have support for some key/value data
@@ -457,8 +467,10 @@ structure (a <code>Map in Java</code>, a <code>dict</code> in Python).
 hash <em>literal</em> can be initialized as follows:</p>
 <div class="sourceCode" id="cb33"><pre
 class="sourceCode perl"><code class="sourceCode perl"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="kw">my</span> <span class="dt">%some_hash</span> = (<span class="ot">&#39;</span><span class="ss">name</span><span class="ot">&#39;</span>, <span class="ot">&#39;</span><span class="ss">john</span><span class="ot">&#39;</span>, <span class="ot">&#39;</span><span class="ss">age</span><span class="ot">&#39;</span>, <span class="dv">39</span>);</span></code></pre></div>
-<p>!!! Tip I used a new symbol <code>%</code> to indicate that
+<div class="warning">
+<p>Tip I used a new symbol <code>%</code> to indicate that
 <code>some_hash</code> is a variable used to store a hash.</p>
+</div>
 <p>I did not make a syntactical distinction between keys and values when
 writing <code>('name', 'john', 'age', 39)</code>. You expect
 <code>'name'</code> and <code>'age'</code> to be keys, and
@@ -1125,16 +1137,9 @@ class="sourceCode perl"><code class="sourceCode perl"><span id="cb106-1"><a href
 corrections.</p>
 <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-12447521-1"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-
-  function gtag() {
-    dataLayer.push(arguments);
-  }
-
-  gtag('js', new Date());
-
-  gtag('config', 'UA-12447521-1');
-</script>
+<p>window.dataLayer = window.dataLayer || [];</p>
+<p>function gtag() { dataLayer.push(arguments); }</p>
+<p>gtag(‘js’, new Date());</p>
+<p>gtag(‘config’, ‘UA-12447521-1’); </script></p>
 </body>
 </html>

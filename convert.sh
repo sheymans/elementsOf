@@ -20,41 +20,91 @@ find . -name "index.md.html" | while read -r file; do
 
   # Extract metadata and content using awk
   awk '
+    function ltrim(s) { sub(/^[ \t\r\n]+/, "", s); return s }
+    function rtrim(s) { sub(/[ \t\r\n]+$/, "", s); return s }
+    function trim(s)  { return rtrim(ltrim(s)); }
+
     BEGIN {
       in_header = 1
+      header_processed = 0
     }
-    {
-      if (in_header) {
-        if ($0 ~ /<meta charset="utf-8">/) {
-          next
-        }
-        if ($0 ~ /\*\*/) {
-          gsub(/\*\*/, "", $0)
-          title = $0
-        } else if ($0 ~ /published:/) {
-          gsub(/published: /, "", $0)
-          date = $0
-        } else if (NF > 0) {
-          author = $0
-        }
-        if (NR >= 4) {
-          in_header = 0
-          print "---"
-          print "title: " title
-          print "author: " author
-          print "date: " date
-          print "---"
-        }
+    # Skip Markdeep-specific lines
+    /<meta|<link rel="stylesheet"|<script>|<!-- Markdeep: -->|<style class="fallback">/ { next }
+
+    # Process header
+    in_header && NF > 0 {
+      if ($0 ~ /\*\*/) {
+        gsub(/\*\*|^\s+|\s+$/, "", $0);
+        title = $0
+      } else if ($0 ~ /published:/) {
+        gsub(/published: |^\s+|\s+$/, "", $0);
+        date = $0
       } else {
-        if ($0 !~ /<link rel="stylesheet" href="https:\/\/casual-effects.com\/markdeep\/latest\/latex.css\?">/ && $0 !~ /<!-- Markdeep: -->/ && $0 !~ /<style class="fallback">body{visibility:hidden}<\/style><script src="https:\/\/casual-effects.com\/markdeep\/latest\/markdeep.min.js\?" charset="utf-8"><\/script>/) {
-          print
-        }
+        author = trim($0)
       }
+      # If we have processed 4 lines or we hit a line that looks like a markdown header, end header processing
+      if (NR >= 4 || $0 ~ /^#/) {
+        in_header = 0
+        header_processed = 1
+        print "---"
+        if (title) print "title: " title
+        if (author) print "author: " author
+        if (date) print "date: " date
+        print "---"
+        if ($0 !~ /^#/) next # Dont consume the markdown header line
+      } else {
+        next
+      }
+    }
+
+    # If the header was not processed (e.g. file with no metadata), but we are past the first few lines
+    !header_processed && NR > 4 {
+        in_header = 0
+        header_processed = 1
+    }
+
+
+    # Process warning blocks
+    /^[ \t]*!!!/ {
+        if (in_warning) print ":::" # Close previous block if needed
+        in_warning = 1
+        print "\n::: warning"
+        # Check if there is text on the same line
+        sub(/^[ \t]*!!![ \t]*/, "")
+        if (NF > 0) {
+            print trim($0)
+        }
+        next
+    }
+
+    # If we are in a warning block
+    in_warning {
+        # If we find a line that is not indented, it ends the block
+        if ($0 !~ /^[ \t]/ && NF > 0) {
+            print ":::"
+            in_warning = 0
+            # Fall through to print the current line
+        } else {
+            print trim($0)
+            next
+        }
+    }
+
+    # Print all other lines
+    { print }
+
+    END {
+        if (in_warning) print ":::" # Close any open block at the end
     }
   ' "$file" > "$md_file"
 
   # Extract title from the markdown file
   title=$(grep -m 1 "title:" "$md_file" | sed 's/title: //' | sed 's/^[ \t]*//;s/[ \t]*$//')
+
+  # If title is empty, use the directory name as a fallback
+  if [ -z "$title" ]; then
+    title=$(basename "$dir")
+  fi
 
   # Convert title to snake_case
   snake_case_title=$(echo "$title" | tr '[:upper:]' '[:lower:]' | tr -s ' ' '_' | sed 's/[^a-z0-9_]//g')
