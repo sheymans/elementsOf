@@ -1228,17 +1228,3 @@ $Data::Dumper::Maxdepth=2;
 
 Thanks to [csbuja](https://github.com/csbuja) for corrections.
 
-<!-- Global site tag (gtag.js) - Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=UA-12447521-1"></script>
-  window.dataLayer = window.dataLayer || [];
-
-  function gtag() {
-    dataLayer.push(arguments);
-  }
-
-  gtag('js', new Date());
-
-  gtag('config', 'UA-12447521-1');
-</script>
-
-

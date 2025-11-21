@@ -1164,23 +1164,3 @@ for you right now: if you saw a dog today, yes, you had a good day.
 [^sidecar]: We refer to containers that run alongside your _main_ container as _sidecars_ for obvious non-inspired reasons.
 
 
-<!-- Global site tag (gtag.js) - Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=UA-12447521-1"></script>
-  window.dataLayer = window.dataLayer || [];
-
-  function gtag() {
-    dataLayer.push(arguments);
-  }
-
-  gtag('js', new Date());
-
-  gtag('config', 'UA-12447521-1');
-</script>
-
-var dt = new Date();
-document.getElementById("datetime").innerHTML = dt.toLocaleString();
-</script>
-
-
-
-

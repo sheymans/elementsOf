@@ -213,17 +213,3 @@ Action](https://www.goodreads.com/book/show/30102872-oauth-2-in-action) or,
 better, implement OAuth 2.0 yourself to secure your service.
 
 
-<!-- Global site tag (gtag.js) - Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=UA-12447521-1"></script>
-  window.dataLayer = window.dataLayer || [];
-
-  function gtag() {
-    dataLayer.push(arguments);
-  }
-
-  gtag('js', new Date());
-
-  gtag('config', 'UA-12447521-1');
-</script>
-
-

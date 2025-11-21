@@ -1137,9 +1137,21 @@ class="sourceCode perl"><code class="sourceCode perl"><span id="cb106-1"><a href
 corrections.</p>
 <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-12447521-1"></script>
-<p>window.dataLayer = window.dataLayer || [];</p>
-<p>function gtag() { dataLayer.push(arguments); }</p>
-<p>gtag(‘js’, new Date());</p>
-<p>gtag(‘config’, ‘UA-12447521-1’); </script></p>
+<script>
+  window.dataLayer = window.dataLayer || [];
+
+  function gtag() {
+    dataLayer.push(arguments);
+  }
+
+  gtag('js', new Date());
+
+  gtag('config', 'UA-12447521-1');
+</script>
+
+<script>
+var dt = new Date();
+document.getElementById("datetime").innerHTML = dt.toLocaleString();
+</script>
 </body>
 </html>

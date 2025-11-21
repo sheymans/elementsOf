@@ -623,17 +623,3 @@ desktop computer, or be logged in into an EC2 instance.
 [^shell]: Of course [not](https://en.wikipedia.org/wiki/Unix_shell), but I admire your outlook on life.
 
 
-<!-- Global site tag (gtag.js) - Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=UA-12447521-1"></script>
-  window.dataLayer = window.dataLayer || [];
-
-  function gtag() {
-    dataLayer.push(arguments);
-  }
-
-  gtag('js', new Date());
-
-  gtag('config', 'UA-12447521-1');
-</script>
-
-

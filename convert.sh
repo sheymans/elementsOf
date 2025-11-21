@@ -27,9 +27,19 @@ find . -name "index.md.html" | while read -r file; do
     BEGIN {
       in_header = 1
       header_processed = 0
+      in_script_block = 0
     }
     # Skip Markdeep-specific lines
     /<meta|<link rel="stylesheet"|<script>|<!-- Markdeep: -->|<style class="fallback">/ { next }
+
+    /<!-- Global site tag/ { in_script_block = 1 }
+    in_script_block {
+        if ($0 ~ /latex.css/) {
+            in_script_block = 0
+        } else {
+            next
+        }
+    }
 
     # Process header
     in_header && NF > 0 {
@@ -113,7 +123,7 @@ find . -name "index.md.html" | while read -r file; do
   html_file="$dir/$snake_case_title.html"
 
   # Convert the Markdown file to a clean HTML file using Pandoc
-  pandoc "$md_file" -s -o "$html_file" --css=../elements_of.css --toc --highlight-style=pygments
+  pandoc "$md_file" -s -o "$html_file" --css=../elements_of.css --toc --highlight-style=pygments --include-after-body analytics.html
 
   echo "Successfully converted $file to $html_file"
 done

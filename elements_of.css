@@ -96,3 +96,7 @@ pre:not(.sourceCode) > code {
   box-shadow: none;
   white-space: inherit; /* Inherit whitespace handling from pre */
 }
+
+figure {
+  text-align: center;
+}
