@@ -1,7 +1,0 @@
-@startsalt
-{
-  username    | "Stijn   "
-  password | "****     "
-  [Cancel] | [  OK   ]
-}
-@endsalt

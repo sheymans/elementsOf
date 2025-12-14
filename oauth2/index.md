@@ -29,7 +29,13 @@ presented with the classical login form.  Full of anticipation, you enter your
 username and password and get to see your poor monetary decision making. This is
 the flow:
 
-(insert ./images/simple_auth.atxt.html here)
+```mermaid
+sequenceDiagram
+    participant You
+    participant BankOfAmerica
+    You->>BankOfAmerica: my username/password
+    BankOfAmerica-->>You: your transactions
+```
 
 While a sense of dread sets in, we'll agree that I will refer to your
 username/password combo as your _credentials_. To add to your existential crisis,
@@ -49,7 +55,13 @@ officially name you and your browser, the _User_.
 I'll call [Bank of America](bankofamerica.com), the _Resource Owner_: they own your
 transactions (the resources). This how this story looks after dehumanizing it:
 
-(insert ./images/simple_auth2.atxt.html here)
+```mermaid
+sequenceDiagram
+    participant User
+    participant ResourceOwner
+    User->>ResourceOwner: credentials
+    ResourceOwner-->>User: transactions
+```
 
 # Use Mint to see your Bank of America Data
 
@@ -65,12 +77,30 @@ The first approach that comes to mind to make this access possible is to let
 [mint](mint.com) ask you for your credentials and pass them straight through to
 [Bank of America](bankofamerica.com) whenever [mint](mint.com) needs transaction data:
 
-(insert ./images/mint_first_version.atxt.html here)
+```mermaid
+sequenceDiagram
+    participant You
+    participant Mint
+    participant BankOfAmerica
+    You->>Mint: credentials
+    Mint->>BankOfAmerica: credentials
+    BankOfAmerica-->>Mint: transactions
+    Mint-->>You: transactions
+```
 
 I'll call [mint](mint.com) the _Client_ in this scenario, such that the
 general scheme looks like this:
 
-(insert ./images/mint_first_version_abstracted.atxt.html here)
+```mermaid
+sequenceDiagram
+    participant User
+    participant Client
+    participant ResourceOwner
+    User->>Client: credentials
+    Client->>ResourceOwner: credentials
+    ResourceOwner-->>Client: data
+    Client-->>User: data
+```
 
 Of course, [mint](mint.com) asking you each time for your
 credentials is unpleasant. So [mint](mint.com) might
@@ -138,11 +168,45 @@ Each of those elements can be accomplished as follows:
 
 That flow looks like this:
 
-(insert ./images/access_token_only_mint.atxt.html here)
+```mermaid
+sequenceDiagram
+    participant You
+    participant Mint
+    participant AuthorizationServerBoA
+    participant BankOfAmerica
+
+    You->>Mint: show my transactions
+    Mint-->>You: I can't. I'll redirect you
+    You->>AuthorizationServerBoA: give mint access to my transactions
+    AuthorizationServerBoA-->>You: give me your credentials
+    You->>AuthorizationServerBoA: credentials
+    AuthorizationServerBoA-->>You: OK. redirecting you to mint with an access token
+    You->>Mint: show transactions given the access token
+    Mint->>BankOfAmerica: here's the access token. give me data
+    BankOfAmerica-->>Mint: transactions
+    Mint-->>You: transactions
+```
 
 Or abstractly:
 
-(insert ./images/access_token_only_abstract.atxt.html here)
+```mermaid
+sequenceDiagram
+    participant User
+    participant Client
+    participant AuthorizationServer
+    participant ResourceOwner
+
+    User->>Client: get data
+    Client-->>User: I can't. I'll redirect you
+    User->>AuthorizationServer: I want to give Client access to data
+    AuthorizationServer-->>User: give me your credentials
+    User->>AuthorizationServer: credentials
+    AuthorizationServer-->>User: OK. redirecting you to Client with an access token
+    User->>Client: get data with access token
+    Client->>ResourceOwner: get data with access token
+    ResourceOwner-->>Client: data
+    Client-->>User: data
+```
 
 Recall that we had the following problems with the naive approach:
 
@@ -160,7 +224,16 @@ token flow as it is right now. Can you spot it?
 
 Let's zoom in on the interaction between you, mint, and the Bank of America authorization server:
 
-(insert ./images/access_token_only_mint_zoom.atxt.html here)
+```mermaid
+sequenceDiagram
+    participant You
+    participant AuthorizationServerBoA
+    participant Mint
+
+    You->>AuthorizationServerBoA: credentials
+    AuthorizationServerBoA-->>You: OK. redirecting you to mint with an access token
+    You->>Mint: show transactions given my access token
+```
 
 As we explained above, this interaction happens mostly via HTTP redirects over your browser:
 
@@ -178,7 +251,26 @@ The way OAuth 2.0 deals with this is to have the Authorization Server not
 redirect you to the client with the magical access token, but with an
 authorization code grant instead:
 
-(insert ./images/authorization_token_abstract.atxt.html here)
+```mermaid
+sequenceDiagram
+    participant User
+    participant Client
+    participant AuthorizationServer
+    participant ResourceOwner
+
+    User->>Client: get data
+    Client-->>User: I can't. I'll redirect you
+    User->>AuthorizationServer: I want to give Client access to data
+    AuthorizationServer-->>User: give me your credentials
+    User->>AuthorizationServer: credentials
+    AuthorizationServer-->>User: OK. redirecting you to Client with authorization code grant
+    User->>Client: authorization code grant
+    Client->>AuthorizationServer: get access token given authorization code grant
+    AuthorizationServer-->>Client: your access token
+    Client->>ResourceOwner: get data with access token
+    ResourceOwner-->>Client: data
+    Client-->>User: data
+```
 
 The front-channel no longer sees the access token. It does see the
 authorization code grant. What if that authorization code grant gets stolen? Can

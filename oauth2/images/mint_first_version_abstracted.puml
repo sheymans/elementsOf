@@ -1,9 +1,0 @@
-@startuml
-User -> Client: credentials
-Client -> ResourceOwner: credentials
-rnote over ResourceOwner
-  check credentials
-endrnote
-ResourceOwner --> Client: data
-Client --> User: data
-@enduml

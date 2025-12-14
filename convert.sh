@@ -19,7 +19,7 @@ find . -name "index.md.html" | while read -r file; do
   md_file="$dir/index.md"
 
   # Extract metadata and content using awk
-  awk '
+  awk -v dir="$dir" '
     function ltrim(s) { sub(/^[ \t\r\n]+/, "", s); return s }
     function rtrim(s) { sub(/[ \t\r\n]+$/, "", s); return s }
     function trim(s)  { return rtrim(ltrim(s)); }
@@ -74,6 +74,19 @@ find . -name "index.md.html" | while read -r file; do
     }
 
 
+    # Process includes
+    /^\(insert .* here\)$/ {
+        # extract the file path
+        gsub(/^\(insert /, "", $0)
+        gsub(/ here\)$/, "", $0)
+        include_file = dir "/" $0
+        while ( (getline line < include_file) > 0 ) {
+            print line
+        }
+        close(include_file)
+        next
+    }
+
     # Process warning blocks
     /^[ \t]*!!!/ {
         if (in_warning) print ":::" # Close previous block if needed
@@ -123,7 +136,7 @@ find . -name "index.md.html" | while read -r file; do
   html_file="$dir/$snake_case_title.html"
 
   # Convert the Markdown file to a clean HTML file using Pandoc
-  pandoc "$md_file" -s -o "$html_file" --css=../elements_of.css --toc --highlight-style=pygments --include-after-body analytics.html
+  pandoc "$md_file" -s -o "$html_file" --css=../elements_of.css --toc --highlight-style=pygments --include-after-body analytics.html --filter mermaid-filter
 
   echo "Successfully converted $file to $html_file"
 done

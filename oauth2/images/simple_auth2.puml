@@ -1,4 +1,0 @@
-@startuml
-User -> ResourceOwner: credentials
-ResourceOwner --> User: transactions
-@enduml

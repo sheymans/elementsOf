@@ -1,9 +1,0 @@
-@startuml
-You -> Mint: credentials
-Mint -> BankOfAmerica: credentials
-rnote over BankOfAmerica
-  check credentials
-endrnote
-BankOfAmerica --> Mint: transactions
-Mint --> You: transactions
-@enduml

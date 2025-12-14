@@ -1,8 +1,0 @@
-@startuml
-You -> AuthorizationServerBoA: credentials
-rnote over AuthorizationServerBoA
-  check credentials
-endrnote
-AuthorizationServerBoA --> You: OK, redirecting you to mint with an access token
-You -> Mint: show transactions \ngiven my access token
-@enduml
