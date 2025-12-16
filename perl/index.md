@@ -513,12 +513,10 @@ be other lists, other hashes, other scalars, or other references.
 Say we have a reference `$a_ref` (note that references are
 scalars, hence the `$`) that points to an array `(1, 2, 3)`:
 
-***********************************
-*                                 *
-*   .--------.       .---------.  *
-*   | $a_ref +----->| (1, 2, 3) | *
-*   '--------'       '---------'  *
-***********************************
+```mermaid
+graph LR
+    a_ref["$a_ref"] --> array["(1, 2, 3)"]
+```
 
 Since `$a_ref` is a scalar, we can have a hash with values that are pointing to arrays:
 
@@ -591,17 +589,14 @@ I can copy array references:
 my $copy_ref = $a_ref;
 ~~~
 
-***********************************
-*                                 *
-*   .--------.       .---------.  *
-*   | $a_ref +----->| (1, 2, 3) | *
-*   '--------'       '---------'  *
-*                         ^       *
-*   .-----------.         |       *
-*   | $copy_ref +--------'        *
-*   '-----------'                 *
-*                                 *
-***********************************
+```mermaid
+graph LR
+    subgraph " "
+        direction LR
+        a_ref["$a_ref"] --> array["(1, 2, 3)"]
+        copy_ref["$copy_ref"] --> array
+    end
+```
 
 If I then change `$copy_ref` I change the underlying array:
 
@@ -611,17 +606,14 @@ ${$copy_ref}[0] = 500;
 
 Indeed both `${$a_ref}[0]` and `${$copy_ref}[0]` are now equal to `500`:
 
-************************************
-*                                  *
-*   .--------.       .-----------. *
-*   | $a_ref +----->| (500, 2, 3) |*
-*   '--------'       '-----------' *
-*                           ^      *
-*   .-----------.           |      *
-*   | $copy_ref +----------'       *
-*   '-----------'                  *
-*                                  *
-************************************
+```mermaid
+graph LR
+    subgraph " "
+        direction LR
+        a_ref["$a_ref"] --> array["(500, 2, 3)"]
+        copy_ref["$copy_ref"] --> array
+    end
+```
 
 To always type `${$a_ref}` is not very succinct. These are all the same:
 
