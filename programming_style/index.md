@@ -1,8 +1,8 @@
-
 ---
 title:                             Elements of Programming Style
-author: # Introduction
+author: Stijn Heymans
 ---
+
 # Introduction
 
 This article is taking a different approach than we have before in our other

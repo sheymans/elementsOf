@@ -2,8 +2,8 @@
 title:                             Elements of Perl
 author: Stijn Heymans
 date:                             12 October 2019
+last_updated:                             3 March 2021
 ---
-                            last updated: 3 March 2021
 
 # Introduction
 

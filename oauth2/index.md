@@ -2,8 +2,8 @@
 title:                             Elements of OAuth 2.0
 author: Stijn Heymans
 date:                             30 January 2020
+last_updated:                             23 February 2020
 ---
-                            last updated: 23 February 2020
 
 # Introduction
 
