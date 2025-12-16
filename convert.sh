@@ -1,134 +1,18 @@
 #!/bin/bash
 
-# This script finds all index.md.html files in the current directory and its
-# subdirectories, extracts the Markdown content and metadata, formats it with
-# a YAML front matter block, and then uses Pandoc to convert them to clean
+# This script finds all index.md files in the current directory and its
+# subdirectories, and then uses Pandoc to convert them to clean
 # HTML files with a name based on the title.
 
 # Stop on error
 set -e
 
-# Find all index.md.html files
-find . -name "index.md.html" | while read -r file; do
-  echo "Processing $file"
+# Find all index.md files
+find . -name "index.md" | while read -r md_file; do
+  echo "Processing $md_file"
 
   # The directory where the file is located
-  dir=$(dirname "$file")
-
-  # The name of the markdown file
-  md_file="$dir/index.md"
-
-  # Extract metadata and content using awk
-  awk -v dir="$dir" '
-    function ltrim(s) { sub(/^[ \t\r\n]+/, "", s); return s }
-    function rtrim(s) { sub(/[ \t\r\n]+$/, "", s); return s }
-    function trim(s)  { return rtrim(ltrim(s)); }
-
-    BEGIN {
-      in_header = 1
-      header_processed = 0
-      in_script_block = 0
-    }
-    # Skip Markdeep-specific lines
-    /<meta|<link rel="stylesheet"|<script>|<!-- Markdeep: -->|<style class="fallback">/ { next }
-
-    /<!-- Global site tag/ { in_script_block = 1 }
-    in_script_block {
-        if ($0 ~ /latex.css/) {
-            in_script_block = 0
-        } else {
-            next
-        }
-    }
-
-    # Process header
-    in_header {
-        if ($0 ~ /^# /) {
-            in_header = 0
-            if (title == "") {
-                gsub(/^# /, "", $0)
-                title = trim($0)
-            }
-        } else if (NF == 0) {
-            in_header = 0
-        } else {
-            if ($0 ~ /\*\*/) {
-                gsub(/\*\*|^\s+|\s+$/, "", $0);
-                title = $0
-            } else if ($0 ~ /published:/) {
-                gsub(/published: |^\s+|\s+$/, "", $0);
-                date = $0
-            } else if ($0 ~ /last updated:/) {
-                gsub(/last updated: |^\s+|\s+$/, "", $0);
-                last_updated = $0
-            } else {
-                author = trim($0)
-            }
-            next
-        }
-    }
-
-    !header_processed && !in_header {
-        header_processed = 1
-        print "---"
-        if (title) print "title: " title
-        if (author) print "author: " author
-        if (date) print "date: " date
-        if (last_updated) print "last_updated: " last_updated
-        print "---"
-    }
-
-    
-
-    
-
-
-    # Process includes
-    /^\(insert .* here\)$/ {
-        # extract the file path
-        gsub(/^\(insert /, "", $0)
-        gsub(/ here\)$/, "", $0)
-        include_file = dir "/" $0
-        while ( (getline line < include_file) > 0 ) {
-            print line
-        }
-        close(include_file)
-        next
-    }
-
-    # Process warning blocks
-    /^[ \t]*!!!/ {
-        if (in_warning) print ":::" # Close previous block if needed
-        in_warning = 1
-        print "\n::: warning"
-        # Check if there is text on the same line
-        sub(/^[ \t]*!!![ \t]*/, "")
-        if (NF > 0) {
-            print trim($0)
-        }
-        next
-    }
-
-    # If we are in a warning block
-    in_warning {
-        # If we find a line that is not indented, it ends the block
-        if ($0 !~ /^[ \t]/ && NF > 0) {
-            print ":::"
-            in_warning = 0
-            # Fall through to print the current line
-        } else {
-            print trim($0)
-            next
-        }
-    }
-
-    # Print all other lines
-    { print }
-
-    END {
-        if (in_warning) print ":::" # Close any open block at the end
-    }
-  ' "$file" > "$md_file"
+  dir=$(dirname "$md_file")
 
   # Extract title from the markdown file
   title=$(grep -m 1 "title:" "$md_file" | sed 's/title: //' | sed 's/^[ \t]*//;s/[ \t]*$//')
@@ -147,7 +31,7 @@ find . -name "index.md.html" | while read -r file; do
   # Convert the Markdown file to a clean HTML file using Pandoc
   pandoc "$md_file" -s -o "$html_file" --css=../elements_of.css --toc --highlight-style=pygments --include-after-body analytics.html --filter mermaid-filter
 
-  echo "Successfully converted $file to $html_file"
+  echo "Successfully converted $md_file to $html_file"
 done
 
 echo "All files converted."

@@ -3,3 +3,4 @@ elementsOf.iml
 node_modules
 .DS_Store
 .vscode
+mermaid-filter.err
