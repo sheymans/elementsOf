@@ -29,7 +29,7 @@ find . -name "index.md" | while read -r md_file; do
   html_file="$dir/$snake_case_title.html"
 
   # Convert the Markdown file to a clean HTML file using Pandoc
-  pandoc "$md_file" -s -o "$html_file" --css=../elements_of.css --toc --highlight-style=pygments --include-after-body analytics.html --filter mermaid-filter
+  pandoc "$md_file" -s -o "$html_file" --css=../elements_of.css --toc --syntax-highlighting=pygments --include-after-body analytics.html --filter mermaid-filter
 
   echo "Successfully converted $md_file to $html_file"
 done

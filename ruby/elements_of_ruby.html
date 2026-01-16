@@ -8,12 +8,26 @@
   <meta name="dcterms.date" content="2021-12-17" />
   <title>Elements of Ruby</title>
   <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
-    span.underline{text-decoration: underline;}
-    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    ul.task-list{list-style: none;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
     pre > code.sourceCode { white-space: pre; position: relative; }
     pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
     pre > code.sourceCode > span:empty { height: 1.2em; }
@@ -52,7 +66,7 @@
     code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
     code span.at { color: #7d9029; } /* Attribute */
     code span.bn { color: #40a070; } /* BaseN */
-    code span.bu { } /* BuiltIn */
+    code span.bu { color: #008000; } /* BuiltIn */
     code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
     code span.ch { color: #4070a0; } /* Char */
     code span.cn { color: #880000; } /* Constant */
@@ -65,7 +79,7 @@
     code span.ex { } /* Extension */
     code span.fl { color: #40a070; } /* Float */
     code span.fu { color: #06287e; } /* Function */
-    code span.im { } /* Import */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
     code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
     code span.kw { color: #007020; font-weight: bold; } /* Keyword */
     code span.op { color: #666666; } /* Operator */
@@ -77,12 +91,8 @@
     code span.va { color: #19177c; } /* Variable */
     code span.vs { color: #4070a0; } /* VerbatimString */
     code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
-    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
   </style>
   <link rel="stylesheet" href="../elements_of.css" />
-  <!--[if lt IE 9]>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
-  <![endif]-->
 </head>
 <body>
 <header id="title-block-header">
@@ -393,7 +403,7 @@ irb&gt; :a.equal?(:a)
 =&gt; true</code></pre>
 <p>Back to our <code>if</code>. Instead of:</p>
 <div class="sourceCode" id="cb21"><pre
-class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span><span class="kw"> !</span>condition</span>
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="op">!</span>condition</span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  do_something</span>
 <span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
 <p>write:</p>
@@ -417,7 +427,7 @@ class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb25-1"><a href=
 example, this <code>go</code> loop:</p>
 <div class="sourceCode" id="cb26"><pre
 class="sourceCode go"><code class="sourceCode go"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>n <span class="op">:=</span> <span class="dv">5</span></span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="kw">for</span> i <span class="op">:=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> n<span class="op">;</span> i<span class="op">++</span> <span class="op">{</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="op">:=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> n<span class="op">;</span> i<span class="op">++</span> <span class="op">{</span></span>
 <span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  fmt<span class="op">.</span>Println<span class="op">(</span>i<span class="op">)</span></span>
 <span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
 <p>This prints:</p>
@@ -430,17 +440,17 @@ class="sourceCode go"><code class="sourceCode go"><span id="cb26-1"><a href="#cb
 <code>for</code> construct is not one of them. Closest in spirit to the
 original is to use a <code>while</code>:</p>
 <div class="sourceCode" id="cb28"><pre
-class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>n <span class="kw">=</span> <span class="dv">5</span></span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>i <span class="kw">=</span> <span class="dv">0</span></span>
-<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> i <span class="kw">&lt;</span> n</span>
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>n <span class="op">=</span> <span class="dv">5</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>i <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> i <span class="op">&lt;</span> n</span>
 <span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">puts</span> i</span>
-<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>  i <span class="kw">+=</span> <span class="dv">1</span></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>  i <span class="op">+=</span> <span class="dv">1</span></span>
 <span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
 <p>This is more verbose than the corresponding <code>for</code> loop in
 <code>go</code>. More idiomatic Ruby uses <a
 href="https://docs.ruby-lang.org/en/2.6.0/Integer.html#method-i-times"><code>times</code></a>:</p>
 <div class="sourceCode" id="cb29"><pre
-class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>n<span class="at">.times</span> <span class="kw">{</span> <span class="kw">|</span>i<span class="kw">|</span> <span class="fu">puts</span> i <span class="kw">}</span></span></code></pre></div>
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>n<span class="at">.times</span> <span class="op">{</span> <span class="op">|</span>i<span class="op">|</span> <span class="fu">puts</span> i <span class="op">}</span></span></code></pre></div>
 <p>More elegant than the clunky <code>while</code>. Deconstruct this
 expression:</p>
 <ul>
@@ -449,7 +459,7 @@ has methods.</p></li>
 <li><p><code>times</code>. A <a
 href="https://docs.ruby-lang.org/en/2.6.0/Integer.html#method-i-times">method</a>
 that is called on the object <code>n</code> and <em>iterates</em> the
-following block <code>{ |i|   puts i}</code> from <code>0</code> to
+following block <code>{ |i| puts i}</code> from <code>0</code> to
 <code>n - 1</code>, passing in those values to <code>i</code> with each
 iteration. More on blocks later, but for those familiar, the block is
 essentially an anonymous function or lambda with parameter
@@ -606,7 +616,7 @@ each of those elements to <em>el</em> in the block
 <code>puts el</code>. If you need more than a one-liner, do use
 <code>do...end</code>:</p>
 <div class="sourceCode" id="cb44"><pre
-class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>a<span class="at">.each</span> <span class="cf">do</span> <span class="kw">|</span>el<span class="kw">|</span></span>
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>a<span class="at">.each</span> <span class="cf">do</span> <span class="op">|</span>el<span class="op">|</span></span>
 <span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">puts</span> el</span>
 <span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">puts</span> el</span>
 <span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
@@ -614,7 +624,7 @@ class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb44-1"><a href=
 interviews, in real life not so much). So similar to the trickery we saw
 before you could do:</p>
 <div class="sourceCode" id="cb45"><pre
-class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>a<span class="at">.length.times</span> <span class="kw">{</span> <span class="kw">|</span>i<span class="kw">|</span> <span class="fu">puts</span> a<span class="kw">[</span>i<span class="kw">]</span> <span class="kw">}</span></span></code></pre></div>
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>a<span class="at">.length.times</span> <span class="op">{</span> <span class="op">|</span>i<span class="op">|</span> <span class="fu">puts</span> a<span class="kw">[</span>i<span class="kw">]</span> <span class="op">}</span></span></code></pre></div>
 <p>However, the thought police favors <code>each_with_index</code>:</p>
 <pre class="none"><code>irb&gt; a.each_with_index { |el, i| puts &quot;#{i}: #{el}&quot; }
 0: 100
@@ -693,14 +703,14 @@ convert that array to a hash. Generally:</p>
 <p>Functions (or <em>methods</em>, when appearing in classes) have this
 shape:</p>
 <div class="sourceCode" id="cb55"><pre
-class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="cf">def</span> function_name(arg1, arg2,<span class="kw">...</span>)</span>
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="cf">def</span> function_name(arg1, arg2,<span class="op">...</span>)</span>
 <span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># do stuff</span></span>
 <span id="cb55-3"><a href="#cb55-3" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
 <p>Functions start with <code>def</code> and end with <code>end</code>.
 A function that doubles every element in an array <code>a</code>:</p>
 <div class="sourceCode" id="cb56"><pre
 class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="cf">def</span> double_all(a)</span>
-<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a>  a<span class="at">.map</span> <span class="kw">{</span> <span class="kw">|</span>x<span class="kw">|</span> x <span class="kw">*</span> <span class="dv">2</span> <span class="kw">}</span></span>
+<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a>  a<span class="at">.map</span> <span class="op">{</span> <span class="op">|</span>x<span class="op">|</span> x <span class="op">*</span> <span class="dv">2</span> <span class="op">}</span></span>
 <span id="cb56-3"><a href="#cb56-3" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
 <p>“Oh no,” you say. “They forgot to type the arguments.” Yes. That
 <code>a</code> can be anything as long as it understands
@@ -717,16 +727,16 @@ href="https://sorbet.org/">sorbet</a>. Sorbet allows you to annotate
 functions with type information. For example, add a signature to
 <code>double_all</code> with the sorbet <code>sig</code> annotation:</p>
 <div class="sourceCode" id="cb58"><pre
-class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a>sig <span class="kw">{</span> params(<span class="wa">a: </span>T<span class="kw">::</span><span class="dt">Array</span><span class="kw">[</span><span class="dt">Integer</span><span class="kw">]</span>)<span class="at">.returns</span>(T<span class="kw">::</span><span class="dt">Array</span><span class="kw">[</span><span class="dt">Integer</span><span class="kw">]</span>) <span class="kw">}</span></span>
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a>sig <span class="op">{</span> params(<span class="wa">a:</span> <span class="cn">T</span><span class="op">::</span><span class="dt">Array</span><span class="kw">[</span><span class="dt">Integer</span><span class="kw">]</span>)<span class="at">.returns</span>(<span class="cn">T</span><span class="op">::</span><span class="dt">Array</span><span class="kw">[</span><span class="dt">Integer</span><span class="kw">]</span>) <span class="op">}</span></span>
 <span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a><span class="cf">def</span> double_all(a)</span>
-<span id="cb58-3"><a href="#cb58-3" aria-hidden="true" tabindex="-1"></a>  a<span class="at">.map</span> <span class="kw">{</span> <span class="kw">|</span>x<span class="kw">|</span> x <span class="kw">*</span> <span class="dv">2</span> <span class="kw">}</span></span>
+<span id="cb58-3"><a href="#cb58-3" aria-hidden="true" tabindex="-1"></a>  a<span class="at">.map</span> <span class="op">{</span> <span class="op">|</span>x<span class="op">|</span> x <span class="op">*</span> <span class="dv">2</span> <span class="op">}</span></span>
 <span id="cb58-4"><a href="#cb58-4" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
 <p>This indicates that <code>double_all</code> takes in an array of
 integers <code>a</code> and returns an array of integers.</p>
 <p>You can have defaults for your arguments:</p>
 <div class="sourceCode" id="cb59"><pre
-class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a><span class="cf">def</span> double_all(a <span class="kw">=</span> <span class="kw">[</span><span class="dv">1</span>, <span class="dv">2</span><span class="kw">]</span>)</span>
-<span id="cb59-2"><a href="#cb59-2" aria-hidden="true" tabindex="-1"></a>  a<span class="at">.map</span> <span class="kw">{</span> <span class="kw">|</span>x<span class="kw">|</span> x <span class="kw">*</span> <span class="dv">2</span> <span class="kw">}</span></span>
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a><span class="cf">def</span> double_all(a <span class="op">=</span> <span class="kw">[</span><span class="dv">1</span>, <span class="dv">2</span><span class="kw">]</span>)</span>
+<span id="cb59-2"><a href="#cb59-2" aria-hidden="true" tabindex="-1"></a>  a<span class="at">.map</span> <span class="op">{</span> <span class="op">|</span>x<span class="op">|</span> x <span class="op">*</span> <span class="dv">2</span> <span class="op">}</span></span>
 <span id="cb59-3"><a href="#cb59-3" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
 <p>After which, you can leave off the argument to
 <code>double_all</code>:</p>
@@ -758,7 +768,7 @@ b: 2</code></pre>
 <p>Define a minimal class with the <code>class</code> keyword, a name,
 and <code>end</code>:</p>
 <div class="sourceCode" id="cb65"><pre
-class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> A</span>
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="cn">A</span></span>
 <span id="cb65-2"><a href="#cb65-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb65-3"><a href="#cb65-3" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
 <p>This introduces <code>A</code> into the world. Here’s how to create a
@@ -798,7 +808,7 @@ minimal class like <code>A</code> we use the <code>initialize</code> of
 <code>Object</code>. If you want to use your own <em>constructor</em>
 you can need to define your own <code>initialize</code>:</p>
 <div class="sourceCode" id="cb69"><pre
-class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb69-1"><a href="#cb69-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> A</span>
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb69-1"><a href="#cb69-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="cn">A</span></span>
 <span id="cb69-2"><a href="#cb69-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb69-3"><a href="#cb69-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">def</span> initialize</span>
 <span id="cb69-4"><a href="#cb69-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">puts</span> <span class="st">&quot;you called new!&quot;</span></span>
@@ -816,10 +826,10 @@ variables</em> capture that state.</p>
 <p>In Ruby, instance variables start with an <code>@</code>. Give
 <code>A</code> state:</p>
 <div class="sourceCode" id="cb71"><pre
-class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb71-1"><a href="#cb71-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> A</span>
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb71-1"><a href="#cb71-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="cn">A</span></span>
 <span id="cb71-2"><a href="#cb71-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb71-3"><a href="#cb71-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">def</span> initialize</span>
-<span id="cb71-4"><a href="#cb71-4" aria-hidden="true" tabindex="-1"></a>    <span class="ot">@a</span> <span class="kw">=</span> <span class="dv">10</span></span>
+<span id="cb71-4"><a href="#cb71-4" aria-hidden="true" tabindex="-1"></a>    <span class="ot">@a</span> <span class="op">=</span> <span class="dv">10</span></span>
 <span id="cb71-5"><a href="#cb71-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
 <span id="cb71-6"><a href="#cb71-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb71-7"><a href="#cb71-7" aria-hidden="true" tabindex="-1"></a>  <span class="cf">def</span> print_your_state</span>
@@ -846,10 +856,10 @@ goes for objects. You want to create objects with different states. Give
 <code>initialize</code> arguments that indicate the initial state you
 want for the object:</p>
 <div class="sourceCode" id="cb73"><pre
-class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb73-1"><a href="#cb73-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> A</span>
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb73-1"><a href="#cb73-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="cn">A</span></span>
 <span id="cb73-2"><a href="#cb73-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb73-3"><a href="#cb73-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">def</span> initialize(a)</span>
-<span id="cb73-4"><a href="#cb73-4" aria-hidden="true" tabindex="-1"></a>    <span class="ot">@a</span> <span class="kw">=</span> a</span>
+<span id="cb73-4"><a href="#cb73-4" aria-hidden="true" tabindex="-1"></a>    <span class="ot">@a</span> <span class="op">=</span> a</span>
 <span id="cb73-5"><a href="#cb73-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
 <span id="cb73-6"><a href="#cb73-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb73-7"><a href="#cb73-7" aria-hidden="true" tabindex="-1"></a>  <span class="cf">def</span> print_your_state</span>
@@ -867,14 +877,14 @@ irb(main):014:0&gt; y.print_your_state
 my state is 11</code></pre>
 <p>You can also give instance methods arguments:</p>
 <div class="sourceCode" id="cb75"><pre
-class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb75-1"><a href="#cb75-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> A</span>
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb75-1"><a href="#cb75-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="cn">A</span></span>
 <span id="cb75-2"><a href="#cb75-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb75-3"><a href="#cb75-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">def</span> initialize(a)</span>
-<span id="cb75-4"><a href="#cb75-4" aria-hidden="true" tabindex="-1"></a>    <span class="ot">@a</span> <span class="kw">=</span> a</span>
+<span id="cb75-4"><a href="#cb75-4" aria-hidden="true" tabindex="-1"></a>    <span class="ot">@a</span> <span class="op">=</span> a</span>
 <span id="cb75-5"><a href="#cb75-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
 <span id="cb75-6"><a href="#cb75-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb75-7"><a href="#cb75-7" aria-hidden="true" tabindex="-1"></a>  <span class="cf">def</span> print_your_state_with_a_factor(x)</span>
-<span id="cb75-8"><a href="#cb75-8" aria-hidden="true" tabindex="-1"></a>    result <span class="kw">=</span> <span class="ot">@a</span> <span class="kw">*</span> x</span>
+<span id="cb75-8"><a href="#cb75-8" aria-hidden="true" tabindex="-1"></a>    result <span class="op">=</span> <span class="ot">@a</span> <span class="op">*</span> x</span>
 <span id="cb75-9"><a href="#cb75-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">puts</span> <span class="st">&quot;my state is </span><span class="sc">#{</span>result<span class="sc">}</span><span class="st">&quot;</span></span>
 <span id="cb75-10"><a href="#cb75-10" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span></code></pre></div>
 <p>And then:</p>
@@ -901,10 +911,10 @@ NoMethodError (undefined method `a&#39; for #&lt;A:0x00007fc8cc180280 @a=3&gt;)<
 variables in Java. If you want direct access to the instance variable,
 you need a getter:</p>
 <div class="sourceCode" id="cb78"><pre
-class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb78-1"><a href="#cb78-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> A</span>
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb78-1"><a href="#cb78-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="cn">A</span></span>
 <span id="cb78-2"><a href="#cb78-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb78-3"><a href="#cb78-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">def</span> initialize(a)</span>
-<span id="cb78-4"><a href="#cb78-4" aria-hidden="true" tabindex="-1"></a>    <span class="ot">@a</span> <span class="kw">=</span> a</span>
+<span id="cb78-4"><a href="#cb78-4" aria-hidden="true" tabindex="-1"></a>    <span class="ot">@a</span> <span class="op">=</span> a</span>
 <span id="cb78-5"><a href="#cb78-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
 <span id="cb78-6"><a href="#cb78-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb78-7"><a href="#cb78-7" aria-hidden="true" tabindex="-1"></a>  <span class="cf">def</span> a</span>
@@ -928,18 +938,18 @@ NoMethodError (undefined method `a=&#39; for #&lt;A:0x00007f913a943c70 @a=3&gt;)
 Did you mean?  a</code></pre>
 <p>Write a setter:</p>
 <div class="sourceCode" id="cb81"><pre
-class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb81-1"><a href="#cb81-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> A</span>
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb81-1"><a href="#cb81-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="cn">A</span></span>
 <span id="cb81-2"><a href="#cb81-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb81-3"><a href="#cb81-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">def</span> initialize(a)</span>
-<span id="cb81-4"><a href="#cb81-4" aria-hidden="true" tabindex="-1"></a>    <span class="ot">@a</span> <span class="kw">=</span> a</span>
+<span id="cb81-4"><a href="#cb81-4" aria-hidden="true" tabindex="-1"></a>    <span class="ot">@a</span> <span class="op">=</span> a</span>
 <span id="cb81-5"><a href="#cb81-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
 <span id="cb81-6"><a href="#cb81-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb81-7"><a href="#cb81-7" aria-hidden="true" tabindex="-1"></a>  <span class="cf">def</span> a</span>
 <span id="cb81-8"><a href="#cb81-8" aria-hidden="true" tabindex="-1"></a>    <span class="ot">@a</span></span>
 <span id="cb81-9"><a href="#cb81-9" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
 <span id="cb81-10"><a href="#cb81-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb81-11"><a href="#cb81-11" aria-hidden="true" tabindex="-1"></a>  <span class="cf">def</span> a<span class="kw">=</span>(a)</span>
-<span id="cb81-12"><a href="#cb81-12" aria-hidden="true" tabindex="-1"></a>    <span class="ot">@a</span> <span class="kw">=</span> a</span>
+<span id="cb81-11"><a href="#cb81-11" aria-hidden="true" tabindex="-1"></a>  <span class="cf">def</span> a<span class="op">=</span>(a)</span>
+<span id="cb81-12"><a href="#cb81-12" aria-hidden="true" tabindex="-1"></a>    <span class="ot">@a</span> <span class="op">=</span> a</span>
 <span id="cb81-13"><a href="#cb81-13" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
 <span id="cb81-14"><a href="#cb81-14" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
 <p>and then:</p>
@@ -953,19 +963,19 @@ irb&gt; x.a
 =&gt; 5</code></pre>
 <p>I’ll pause, so you can enjoy the view.</p>
 <div class="sourceCode" id="cb83"><pre
-class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb83-1"><a href="#cb83-1" aria-hidden="true" tabindex="-1"></a><span class="cf">def</span> a<span class="kw">=</span>(a)</span>
-<span id="cb83-2"><a href="#cb83-2" aria-hidden="true" tabindex="-1"></a>  <span class="ot">@a</span> <span class="kw">=</span> a</span>
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb83-1"><a href="#cb83-1" aria-hidden="true" tabindex="-1"></a><span class="cf">def</span> a<span class="op">=</span>(a)</span>
+<span id="cb83-2"><a href="#cb83-2" aria-hidden="true" tabindex="-1"></a>  <span class="ot">@a</span> <span class="op">=</span> a</span>
 <span id="cb83-3"><a href="#cb83-3" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
 <p>That <code>a=</code> is an <a
 href="https://docs.ruby-lang.org/en/2.6.0/doc/syntax/assignment_rdoc.html#label-Assignment+Methods">assignment
 method</a>. This is an ordeal. As fortune has it, there is shorthand for
 getting and setting a getter and setter:</p>
 <div class="sourceCode" id="cb84"><pre
-class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb84-1"><a href="#cb84-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> A</span>
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb84-1"><a href="#cb84-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="cn">A</span></span>
 <span id="cb84-2"><a href="#cb84-2" aria-hidden="true" tabindex="-1"></a>  <span class="ot">attr_accessor</span> <span class="wa">:a</span></span>
 <span id="cb84-3"><a href="#cb84-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb84-4"><a href="#cb84-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">def</span> initialize(a)</span>
-<span id="cb84-5"><a href="#cb84-5" aria-hidden="true" tabindex="-1"></a>    <span class="ot">@a</span> <span class="kw">=</span> a</span>
+<span id="cb84-5"><a href="#cb84-5" aria-hidden="true" tabindex="-1"></a>    <span class="ot">@a</span> <span class="op">=</span> a</span>
 <span id="cb84-6"><a href="#cb84-6" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
 <span id="cb84-7"><a href="#cb84-7" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
 <p>Yes, you write <code>:a</code> there.</p>
@@ -994,15 +1004,15 @@ data, they are both <code>A</code> objects with the same state
 <p>You can override <code>==</code> in <code>A</code> to get equality
 based on state, rather than on object identity:</p>
 <div class="sourceCode" id="cb87"><pre
-class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb87-1"><a href="#cb87-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> A</span>
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb87-1"><a href="#cb87-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="cn">A</span></span>
 <span id="cb87-2"><a href="#cb87-2" aria-hidden="true" tabindex="-1"></a>  <span class="ot">attr_accessor</span> <span class="wa">:a</span></span>
 <span id="cb87-3"><a href="#cb87-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb87-4"><a href="#cb87-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">def</span> initialize(a)</span>
-<span id="cb87-5"><a href="#cb87-5" aria-hidden="true" tabindex="-1"></a>    <span class="ot">@a</span> <span class="kw">=</span> a</span>
+<span id="cb87-5"><a href="#cb87-5" aria-hidden="true" tabindex="-1"></a>    <span class="ot">@a</span> <span class="op">=</span> a</span>
 <span id="cb87-6"><a href="#cb87-6" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
 <span id="cb87-7"><a href="#cb87-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb87-8"><a href="#cb87-8" aria-hidden="true" tabindex="-1"></a>  <span class="cf">def</span> <span class="kw">==</span>(other)</span>
-<span id="cb87-9"><a href="#cb87-9" aria-hidden="true" tabindex="-1"></a>    <span class="dv">self</span><span class="at">.a</span> <span class="kw">==</span> other<span class="at">.a</span></span>
+<span id="cb87-8"><a href="#cb87-8" aria-hidden="true" tabindex="-1"></a>  <span class="cf">def</span> <span class="op">==</span>(other)</span>
+<span id="cb87-9"><a href="#cb87-9" aria-hidden="true" tabindex="-1"></a>    <span class="dv">self</span><span class="at">.a</span> <span class="op">==</span> other<span class="at">.a</span></span>
 <span id="cb87-10"><a href="#cb87-10" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
 <span id="cb87-11"><a href="#cb87-11" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
 <p>And then:</p>
@@ -1044,11 +1054,11 @@ methods</em> have their name preceded with <code>self</code>. The body
 is not yet cold and here we are: <code>self</code> in this context
 refers to the class rather than the object. An example:</p>
 <div class="sourceCode" id="cb89"><pre
-class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb89-1"><a href="#cb89-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> A</span>
-<span id="cb89-2"><a href="#cb89-2" aria-hidden="true" tabindex="-1"></a>  <span class="ot">@@counter</span> <span class="kw">=</span> <span class="dv">0</span></span>
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb89-1"><a href="#cb89-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="cn">A</span></span>
+<span id="cb89-2"><a href="#cb89-2" aria-hidden="true" tabindex="-1"></a>  <span class="ot">@@counter</span> <span class="op">=</span> <span class="dv">0</span></span>
 <span id="cb89-3"><a href="#cb89-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb89-4"><a href="#cb89-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">def</span> initialize</span>
-<span id="cb89-5"><a href="#cb89-5" aria-hidden="true" tabindex="-1"></a>    <span class="ot">@@counter</span> <span class="kw">+=</span> <span class="dv">1</span></span>
+<span id="cb89-5"><a href="#cb89-5" aria-hidden="true" tabindex="-1"></a>    <span class="ot">@@counter</span> <span class="op">+=</span> <span class="dv">1</span></span>
 <span id="cb89-6"><a href="#cb89-6" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
 <span id="cb89-7"><a href="#cb89-7" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb89-8"><a href="#cb89-8" aria-hidden="true" tabindex="-1"></a>  <span class="cf">def</span> <span class="dv">self</span><span class="at">.counter</span></span>
@@ -1072,21 +1082,21 @@ error.</p>
 <h2 id="inheritance">Inheritance</h2>
 <p>Make <code>B</code> a subclass of <code>A</code>:</p>
 <div class="sourceCode" id="cb91"><pre
-class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb91-1"><a href="#cb91-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> A</span>
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb91-1"><a href="#cb91-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="cn">A</span></span>
 <span id="cb91-2"><a href="#cb91-2" aria-hidden="true" tabindex="-1"></a>  <span class="ot">attr_accessor</span> <span class="wa">:a</span></span>
 <span id="cb91-3"><a href="#cb91-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb91-4"><a href="#cb91-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">def</span> initialize(a)</span>
-<span id="cb91-5"><a href="#cb91-5" aria-hidden="true" tabindex="-1"></a>    <span class="ot">@a</span> <span class="kw">=</span> a</span>
+<span id="cb91-5"><a href="#cb91-5" aria-hidden="true" tabindex="-1"></a>    <span class="ot">@a</span> <span class="op">=</span> a</span>
 <span id="cb91-6"><a href="#cb91-6" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
 <span id="cb91-7"><a href="#cb91-7" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb91-8"><a href="#cb91-8" aria-hidden="true" tabindex="-1"></a>  <span class="cf">def</span> double</span>
-<span id="cb91-9"><a href="#cb91-9" aria-hidden="true" tabindex="-1"></a>    <span class="dv">2</span> <span class="kw">*</span> <span class="ot">@a</span></span>
+<span id="cb91-9"><a href="#cb91-9" aria-hidden="true" tabindex="-1"></a>    <span class="dv">2</span> <span class="op">*</span> <span class="ot">@a</span></span>
 <span id="cb91-10"><a href="#cb91-10" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
 <span id="cb91-11"><a href="#cb91-11" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span>
 <span id="cb91-12"><a href="#cb91-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb91-13"><a href="#cb91-13" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> B <span class="kw">&lt;</span> A</span>
+<span id="cb91-13"><a href="#cb91-13" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="cn">B</span> <span class="op">&lt;</span> <span class="cn">A</span></span>
 <span id="cb91-14"><a href="#cb91-14" aria-hidden="true" tabindex="-1"></a>  <span class="cf">def</span> triple</span>
-<span id="cb91-15"><a href="#cb91-15" aria-hidden="true" tabindex="-1"></a>    <span class="dv">3</span> <span class="kw">*</span> <span class="ot">@a</span></span>
+<span id="cb91-15"><a href="#cb91-15" aria-hidden="true" tabindex="-1"></a>    <span class="dv">3</span> <span class="op">*</span> <span class="ot">@a</span></span>
 <span id="cb91-16"><a href="#cb91-16" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
 <span id="cb91-17"><a href="#cb91-17" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
 <p>Poke around:</p>
@@ -1124,15 +1134,15 @@ href="https://www.jetbrains.com/idea/">IDE</a></p></li>
 name, do your thing, and end with <code>end</code>:</p>
 <div class="sourceCode" id="cb93"><pre
 class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb93-1"><a href="#cb93-1" aria-hidden="true" tabindex="-1"></a><span class="cf">module</span> <span class="dt">HomeMade</span></span>
-<span id="cb93-2"><a href="#cb93-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">class</span> A</span>
+<span id="cb93-2"><a href="#cb93-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">class</span> <span class="cn">A</span></span>
 <span id="cb93-3"><a href="#cb93-3" aria-hidden="true" tabindex="-1"></a>    <span class="ot">attr_accessor</span> <span class="wa">:a</span></span>
 <span id="cb93-4"><a href="#cb93-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb93-5"><a href="#cb93-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">def</span> initialize(a)</span>
-<span id="cb93-6"><a href="#cb93-6" aria-hidden="true" tabindex="-1"></a>      <span class="ot">@a</span> <span class="kw">=</span> a</span>
+<span id="cb93-6"><a href="#cb93-6" aria-hidden="true" tabindex="-1"></a>      <span class="ot">@a</span> <span class="op">=</span> a</span>
 <span id="cb93-7"><a href="#cb93-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
 <span id="cb93-8"><a href="#cb93-8" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb93-9"><a href="#cb93-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">def</span> double</span>
-<span id="cb93-10"><a href="#cb93-10" aria-hidden="true" tabindex="-1"></a>      <span class="dv">2</span> <span class="kw">*</span> <span class="ot">@a</span></span>
+<span id="cb93-10"><a href="#cb93-10" aria-hidden="true" tabindex="-1"></a>      <span class="dv">2</span> <span class="op">*</span> <span class="ot">@a</span></span>
 <span id="cb93-11"><a href="#cb93-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
 <span id="cb93-12"><a href="#cb93-12" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
 <span id="cb93-13"><a href="#cb93-13" aria-hidden="true" tabindex="-1"></a></span>
@@ -1149,21 +1159,21 @@ irb&gt; a.double
 <code>A</code>. Modules are name islands of peace and quiet:</p>
 <div class="sourceCode" id="cb95"><pre
 class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb95-1"><a href="#cb95-1" aria-hidden="true" tabindex="-1"></a><span class="cf">module</span> <span class="dt">HomeMade</span></span>
-<span id="cb95-2"><a href="#cb95-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">class</span> A</span>
+<span id="cb95-2"><a href="#cb95-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">class</span> <span class="cn">A</span></span>
 <span id="cb95-3"><a href="#cb95-3" aria-hidden="true" tabindex="-1"></a>    <span class="ot">attr_accessor</span> <span class="wa">:a</span></span>
 <span id="cb95-4"><a href="#cb95-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb95-5"><a href="#cb95-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">def</span> initialize(a)</span>
-<span id="cb95-6"><a href="#cb95-6" aria-hidden="true" tabindex="-1"></a>      <span class="ot">@a</span> <span class="kw">=</span> a</span>
+<span id="cb95-6"><a href="#cb95-6" aria-hidden="true" tabindex="-1"></a>      <span class="ot">@a</span> <span class="op">=</span> a</span>
 <span id="cb95-7"><a href="#cb95-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
 <span id="cb95-8"><a href="#cb95-8" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb95-9"><a href="#cb95-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">def</span> double</span>
-<span id="cb95-10"><a href="#cb95-10" aria-hidden="true" tabindex="-1"></a>      <span class="dv">2</span> <span class="kw">*</span> <span class="ot">@a</span></span>
+<span id="cb95-10"><a href="#cb95-10" aria-hidden="true" tabindex="-1"></a>      <span class="dv">2</span> <span class="op">*</span> <span class="ot">@a</span></span>
 <span id="cb95-11"><a href="#cb95-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
 <span id="cb95-12"><a href="#cb95-12" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
 <span id="cb95-13"><a href="#cb95-13" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span>
 <span id="cb95-14"><a href="#cb95-14" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb95-15"><a href="#cb95-15" aria-hidden="true" tabindex="-1"></a><span class="cf">module</span> <span class="dt">NeighborMade</span></span>
-<span id="cb95-16"><a href="#cb95-16" aria-hidden="true" tabindex="-1"></a>  <span class="cf">class</span> A</span>
+<span id="cb95-16"><a href="#cb95-16" aria-hidden="true" tabindex="-1"></a>  <span class="cf">class</span> <span class="cn">A</span></span>
 <span id="cb95-17"><a href="#cb95-17" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Same name A, yet worse</span></span>
 <span id="cb95-18"><a href="#cb95-18" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
 <span id="cb95-19"><a href="#cb95-19" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
@@ -1192,7 +1202,7 @@ class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb97-1"><a href=
 the methods from the <code>Logger</code> and <code>Analytics</code>
 modules:</p>
 <div class="sourceCode" id="cb98"><pre
-class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb98-1"><a href="#cb98-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> A</span>
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb98-1"><a href="#cb98-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="cn">A</span></span>
 <span id="cb98-2"><a href="#cb98-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb98-3"><a href="#cb98-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">def</span> do_something</span>
 <span id="cb98-4"><a href="#cb98-4" aria-hidden="true" tabindex="-1"></a>    log_it(<span class="st">&quot;we&#39;re logging this&quot;</span>)</span>
@@ -1215,7 +1225,7 @@ thought the semi-colon is dead; it’s not) can solve this by <em>mixing
 in</em> the 2 modules in the class <code>A</code> by using
 <code>include</code>:</p>
 <div class="sourceCode" id="cb99"><pre
-class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb99-1"><a href="#cb99-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> A</span>
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb99-1"><a href="#cb99-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="cn">A</span></span>
 <span id="cb99-2"><a href="#cb99-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">include</span> <span class="dt">Logger</span></span>
 <span id="cb99-3"><a href="#cb99-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">include</span> <span class="dt">Analytics</span></span>
 <span id="cb99-4"><a href="#cb99-4" aria-hidden="true" tabindex="-1"></a></span>
@@ -1232,13 +1242,13 @@ class. You long for a better life.</p>
 <p>Define a class <code>A</code> in some file
 <code>ruby_playground.rb</code>:</p>
 <div class="sourceCode" id="cb100"><pre
-class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb100-1"><a href="#cb100-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> A</span>
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb100-1"><a href="#cb100-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="cn">A</span></span>
 <span id="cb100-2"><a href="#cb100-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">def</span> initialize(a)</span>
-<span id="cb100-3"><a href="#cb100-3" aria-hidden="true" tabindex="-1"></a>    <span class="ot">@a</span> <span class="kw">=</span> a</span>
+<span id="cb100-3"><a href="#cb100-3" aria-hidden="true" tabindex="-1"></a>    <span class="ot">@a</span> <span class="op">=</span> a</span>
 <span id="cb100-4"><a href="#cb100-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
 <span id="cb100-5"><a href="#cb100-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb100-6"><a href="#cb100-6" aria-hidden="true" tabindex="-1"></a>  <span class="cf">def</span> double</span>
-<span id="cb100-7"><a href="#cb100-7" aria-hidden="true" tabindex="-1"></a>    <span class="ot">@a</span> <span class="kw">*</span> <span class="dv">2</span></span>
+<span id="cb100-7"><a href="#cb100-7" aria-hidden="true" tabindex="-1"></a>    <span class="ot">@a</span> <span class="op">*</span> <span class="dv">2</span></span>
 <span id="cb100-8"><a href="#cb100-8" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
 <span id="cb100-9"><a href="#cb100-9" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
 <p>How to unit test <code>double</code>? Create a file
@@ -1247,9 +1257,9 @@ class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb100-1"><a href
 class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb101-1"><a href="#cb101-1" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span> <span class="vs">&#39;test/unit&#39;</span></span>
 <span id="cb101-2"><a href="#cb101-2" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span> <span class="vs">&#39;./ruby_playground&#39;</span></span>
 <span id="cb101-3"><a href="#cb101-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb101-4"><a href="#cb101-4" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="dt">RubyPlayGroundTest</span> <span class="kw">&lt;</span> <span class="dt">Test</span><span class="kw">::</span><span class="dt">Unit</span><span class="kw">::</span><span class="dt">TestCase</span></span>
+<span id="cb101-4"><a href="#cb101-4" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="dt">RubyPlayGroundTest</span> <span class="op">&lt;</span> <span class="dt">Test</span><span class="op">::</span><span class="dt">Unit</span><span class="op">::</span><span class="dt">TestCase</span></span>
 <span id="cb101-5"><a href="#cb101-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">def</span> test_double</span>
-<span id="cb101-6"><a href="#cb101-6" aria-hidden="true" tabindex="-1"></a>    a <span class="kw">=</span> A<span class="at">.new</span>(<span class="dv">3</span>)</span>
+<span id="cb101-6"><a href="#cb101-6" aria-hidden="true" tabindex="-1"></a>    a <span class="op">=</span> <span class="cn">A</span><span class="at">.new</span>(<span class="dv">3</span>)</span>
 <span id="cb101-7"><a href="#cb101-7" aria-hidden="true" tabindex="-1"></a>    assert_equal <span class="dv">6</span>, a<span class="at">.double</span></span>
 <span id="cb101-8"><a href="#cb101-8" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
 <span id="cb101-9"><a href="#cb101-9" aria-hidden="true" tabindex="-1"></a></span>
@@ -1292,9 +1302,9 @@ irb&gt; a.map { |el| el * 2 }
 <code>el * 2</code>. For multi-line blocks, use the
 <code>do...end</code> form.</p>
 <div class="sourceCode" id="cb104"><pre
-class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb104-1"><a href="#cb104-1" aria-hidden="true" tabindex="-1"></a>a<span class="at">.map</span> <span class="cf">do</span> <span class="kw">|</span>el<span class="kw">|</span></span>
-<span id="cb104-2"><a href="#cb104-2" aria-hidden="true" tabindex="-1"></a> double <span class="kw">=</span> el <span class="kw">*</span> <span class="dv">2</span></span>
-<span id="cb104-3"><a href="#cb104-3" aria-hidden="true" tabindex="-1"></a> double <span class="kw">+</span> <span class="dv">1</span></span>
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb104-1"><a href="#cb104-1" aria-hidden="true" tabindex="-1"></a>a<span class="at">.map</span> <span class="cf">do</span> <span class="op">|</span>el<span class="op">|</span></span>
+<span id="cb104-2"><a href="#cb104-2" aria-hidden="true" tabindex="-1"></a> double <span class="op">=</span> el <span class="op">*</span> <span class="dv">2</span></span>
+<span id="cb104-3"><a href="#cb104-3" aria-hidden="true" tabindex="-1"></a> double <span class="op">+</span> <span class="dv">1</span></span>
 <span id="cb104-4"><a href="#cb104-4" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
 <p>In this example, <code>map</code> has as its argument another
 function (the block) and is thus a <em>higher-order function</em>. How
